@@ -84,8 +84,7 @@ export default function TemplateCard({ template, purchased }: Props) {
           ) : (
             <Link
               href={`/template/${template.id}`}
-              className="flex-1 text-center text-xs text-white py-1.5 rounded-lg transition-colors font-medium"
-              style={{ backgroundColor: activeColor }}
+              className="flex-1 text-center text-xs bg-blue-600 text-white py-1.5 rounded-lg hover:bg-blue-700 transition-colors font-medium"
             >
               Select
             </Link>

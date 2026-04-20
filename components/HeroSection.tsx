@@ -11,7 +11,7 @@ export default function HeroSection() {
             {/* Left — copy */}
             <div className="flex-1 max-w-lg">
               <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-4 tracking-tight">
-                India&apos;s Top |<br />
+                India&apos;s Top<br />
                 <span className="text-blue-600">Resume Templates</span>
               </h1>
               <p className="text-gray-500 text-base mb-6 leading-relaxed">
@@ -76,7 +76,9 @@ export default function HeroSection() {
           <span className="text-xs text-gray-400 uppercase tracking-widest">Our customers have been hired by</span>
           <span className="text-gray-400 font-black text-base tracking-tight hover:text-gray-600 transition-colors">TATA</span>
           <span className="text-gray-400 font-normal text-base tracking-tight hover:text-gray-600 transition-colors" style={{ fontFamily: 'Arial, sans-serif' }}>Google</span>
-          <span className="text-gray-400 font-black text-lg italic tracking-tighter hover:text-gray-600 transition-colors">Nike</span>
+          <svg className="text-gray-400 hover:text-gray-600 transition-colors" width="48" height="18" viewBox="0 0 24 9" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M24 0.6L7.2 7.8C5.7 8.4 4.4 8.7 3.3 8.7c-1.3 0-2.2-.5-2.7-1.4C.1 6.5.3 5.1 1.1 3.6L2.4 1.2c.2-.4.1-.6-.2-.5L.6 1.1C.2 1.2 0 1.6 0 2.1c0 .3.1.6.2.9L1.9 6.3c.3.7.1 1.3-.5 1.6C.9 8.2.4 8 .1 7.4L0 7.1c-.1-.2 0-.4.1-.6L2.2.4C2.4.1 2.7 0 3 0c.2 0 .4.1.5.2L24 .6z"/>
+          </svg>
           <span className="text-gray-400 font-semibold text-sm tracking-wide hover:text-gray-600 transition-colors">Microsoft</span>
         </div>
       </div>

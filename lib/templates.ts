@@ -12,6 +12,17 @@ export interface Template {
 
 export const TEMPLATES: Template[] = [
   {
+    id: 'multicolumn',
+    name: 'Multicolumn',
+    description: 'Two-column layout that fits more content without feeling cluttered.',
+    price_inr: 24900,
+    preview_image: '/previews/multicolumn.png',
+    storage_path_pdf: 'templates/multicolumn.pdf',
+    storage_path_docx: 'templates/multicolumn.docx',
+    category: 'Creative',
+    colors: ['#2c3e50', '#8e44ad', '#2980b9', '#27ae60', '#e74c3c'],
+  },
+  {
     id: 'classic',
     name: 'Classic',
     description: 'A timeless, clean layout trusted by professionals across industries.',
@@ -32,17 +43,6 @@ export const TEMPLATES: Template[] = [
     storage_path_docx: 'templates/modern.docx',
     category: 'Modern',
     colors: ['#1a1a2e', '#16213e', '#0f3460', '#533483', '#e94560'],
-  },
-  {
-    id: 'multicolumn',
-    name: 'Multicolumn',
-    description: 'Two-column layout that fits more content without feeling cluttered.',
-    price_inr: 24900,
-    preview_image: '/previews/multicolumn.png',
-    storage_path_pdf: 'templates/multicolumn.pdf',
-    storage_path_docx: 'templates/multicolumn.docx',
-    category: 'Creative',
-    colors: ['#2c3e50', '#8e44ad', '#2980b9', '#27ae60', '#e74c3c'],
   },
   {
     id: 'quotation',
