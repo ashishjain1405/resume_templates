@@ -11,14 +11,33 @@ export default function ConfirmPage() {
   const supabase = createClient()
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data, error }) => {
-      if (error || !data.user) {
-        setStatus('error')
-      } else {
+    async function confirm() {
+      const params = new URLSearchParams(window.location.search)
+      const tokenHash = params.get('token_hash')
+      const type = params.get('type') as 'email' | 'recovery' | 'invite' | null
+
+      if (tokenHash && type) {
+        const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type })
+        if (error) {
+          setStatus('error')
+          return
+        }
         setStatus('success')
         setTimeout(() => router.push('/dashboard'), 2000)
+        return
       }
-    })
+
+      // Fallback: check if session already exists (e.g. magic link auto-confirmed)
+      const { data } = await supabase.auth.getUser()
+      if (data.user) {
+        setStatus('success')
+        setTimeout(() => router.push('/dashboard'), 2000)
+      } else {
+        setStatus('error')
+      }
+    }
+
+    confirm()
   }, [])
 
   return (
