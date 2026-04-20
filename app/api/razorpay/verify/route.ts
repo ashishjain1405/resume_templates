@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
   })
 
   if (error) {
-    console.error('Purchase insert error:', error)
-    return Response.json({ error: 'Failed to record purchase' }, { status: 500 })
+    console.error('Purchase insert error:', JSON.stringify(error))
+    return Response.json({ error: `Failed to record purchase: ${error.message} (${error.code})` }, { status: 500 })
   }
 
   return Response.json({ success: true })
