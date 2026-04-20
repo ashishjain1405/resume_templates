@@ -20,16 +20,16 @@ export default function HeroSection() {
 
               <div className="flex flex-col gap-3 mb-6">
                 <Link
-                  href="/templates"
+                  href="/builder/multicolumn"
                   className="w-full text-center bg-blue-600 text-white py-3.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm"
                 >
-                  Create new resume
+                  Build my resume — free
                 </Link>
                 <Link
-                  href="/auth/signup"
+                  href="/templates"
                   className="w-full text-center border border-gray-300 text-gray-700 py-3.5 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
                 >
-                  Optimize my resume
+                  Browse templates
                 </Link>
               </div>
 

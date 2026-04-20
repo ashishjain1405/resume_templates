@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
+import React from 'react'
 import Link from 'next/link'
 import HeroSection from '@/components/HeroSection'
 import TemplateCard from '@/components/TemplateCard'
+import BuilderDemo from '@/components/BuilderDemo'
 import { TEMPLATES } from '@/lib/templates'
 
 export const metadata: Metadata = {
@@ -10,15 +12,16 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.resumenow.in' },
 }
 
-const FEATURES = [
+const FEATURES: { icon: React.ReactNode; title: string; desc: string; href?: string }[] = [
   {
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
     ),
-    title: '35+ Template Designs',
-    desc: 'Professionally crafted layouts for every role and industry',
+    title: 'Resume Builder',
+    desc: 'Fill in your details and watch your resume update live. Download in seconds.',
+    href: '/builder/multicolumn',
   },
   {
     icon: (
@@ -89,25 +92,35 @@ export default function HomePage() {
       />
       <HeroSection />
 
-      {/* "Create a resume that gets results" */}
-      <section className="py-16 px-4 bg-white text-center">
-        <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight mb-6">
-            Create a resume<br />that gets results
-          </h2>
-          {/* Curved arrow SVG — points right-to-left downward toward button */}
-          <div className="flex justify-center mb-6">
-            <svg width="80" height="50" viewBox="0 0 80 50" fill="none" className="text-blue-400">
-              <path d="M70 10 Q40 -10 15 30" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeDasharray="6 3"/>
-              <path d="M20 25 L15 30 L22 32" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+      {/* Builder feature — animated demo section */}
+      <section className="py-20 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <span className="inline-block bg-blue-50 text-blue-600 text-xs font-semibold px-3 py-1 rounded-full mb-4 tracking-wide uppercase">New</span>
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight mb-4">
+              Build your resume in minutes
+            </h2>
+            <p className="text-gray-500 text-base max-w-xl mx-auto">
+              Fill in your details. Watch your resume come to life in real time. Download and apply.
+            </p>
           </div>
-          <Link
-            href="/templates"
-            className="inline-block bg-blue-600 text-white px-10 py-3.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm"
-          >
-            Choose a template
-          </Link>
+
+          <BuilderDemo />
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-center mt-10">
+            <Link
+              href="/builder/multicolumn"
+              className="bg-blue-600 text-white px-8 py-3.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm text-center"
+            >
+              Start building for free →
+            </Link>
+            <Link
+              href="/templates"
+              className="border border-gray-300 text-gray-700 px-8 py-3.5 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm text-center"
+            >
+              Browse templates
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -135,12 +148,25 @@ export default function HomePage() {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {FEATURES.map((f) => (
-              <div key={f.title} className="bg-gray-50 rounded-xl p-6 border border-gray-100 hover:shadow-sm transition-shadow flex flex-col gap-3">
-                <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 flex-shrink-0">{f.icon}</div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-sm mb-1">{f.title}</h3>
-                  <p className="text-xs text-gray-500 leading-relaxed">{f.desc}</p>
-                </div>
+              <div key={f.title} className={`rounded-xl p-6 border flex flex-col gap-3 transition-all ${f.href ? 'bg-blue-600 border-blue-700 hover:bg-blue-700 cursor-pointer' : 'bg-gray-50 border-gray-100 hover:shadow-sm'}`}>
+                {f.href ? (
+                  <Link href={f.href} className="flex flex-col gap-3 h-full">
+                    <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center text-white flex-shrink-0">{f.icon}</div>
+                    <div>
+                      <h3 className="font-semibold text-white text-sm mb-1">{f.title}</h3>
+                      <p className="text-xs text-blue-100 leading-relaxed">{f.desc}</p>
+                      <span className="inline-block mt-2 text-xs font-semibold text-white underline underline-offset-2">Try it free →</span>
+                    </div>
+                  </Link>
+                ) : (
+                  <>
+                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 flex-shrink-0">{f.icon}</div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 text-sm mb-1">{f.title}</h3>
+                      <p className="text-xs text-gray-500 leading-relaxed">{f.desc}</p>
+                    </div>
+                  </>
+                )}
               </div>
             ))}
           </div>
