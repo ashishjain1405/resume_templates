@@ -20,6 +20,11 @@ export async function POST(request: NextRequest) {
     .digest('hex')
 
   if (expectedSignature !== razorpay_signature) {
+    console.error('Signature mismatch', {
+      expected: expectedSignature,
+      received: razorpay_signature,
+      hasSecret: !!process.env.RAZORPAY_KEY_SECRET,
+    })
     return Response.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
