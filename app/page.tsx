@@ -1,7 +1,14 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import HeroSection from '@/components/HeroSection'
 import TemplateCard from '@/components/TemplateCard'
 import { TEMPLATES } from '@/lib/templates'
+
+export const metadata: Metadata = {
+  title: "India's Best Resume Templates — ATS-Friendly | ResumeNow",
+  description: 'Browse 35+ professionally designed, ATS-optimised resume templates for Indian job seekers. One-time purchase, lifetime access. Download in PDF & DOCX.',
+  alternates: { canonical: 'https://www.resumenow.in' },
+}
 
 const FEATURES = [
   {
@@ -60,9 +67,26 @@ const FEATURES = [
   },
 ]
 
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'ResumeNow',
+  url: 'https://www.resumenow.in',
+  description: "India's best ATS-friendly resume templates for job seekers.",
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: 'https://www.resumenow.in/templates',
+    'query-input': 'required name=search_term_string',
+  },
+}
+
 export default function HomePage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <HeroSection />
 
       {/* "Create a resume that gets results" */}

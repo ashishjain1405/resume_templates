@@ -1,5 +1,12 @@
+import type { Metadata } from 'next'
 import TemplateCard from '@/components/TemplateCard'
 import { TEMPLATES } from '@/lib/templates'
+
+export const metadata: Metadata = {
+  title: 'Resume Templates',
+  description: 'Browse all ATS-friendly resume templates — Classic, Modern, Multicolumn and more. One-time purchase, instant PDF & DOCX download.',
+  alternates: { canonical: 'https://www.resumenow.in/templates' },
+}
 
 export default function TemplatesPage() {
   return (

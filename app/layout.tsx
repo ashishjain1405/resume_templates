@@ -6,9 +6,41 @@ import Footer from '@/components/Footer'
 
 const inter = Inter({ subsets: ['latin'] })
 
+const BASE_URL = 'https://www.resumenow.in'
+
 export const metadata: Metadata = {
-  title: "ResumeNow — India's Top Resume Templates",
-  description: 'Download recruiter-approved resume templates. Get hired 2x faster.',
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: "ResumeNow — India's Best Resume Templates",
+    template: '%s | ResumeNow',
+  },
+  description: 'Download ATS-friendly, recruiter-approved resume templates designed for Indian job seekers. Get hired 2x faster with professional PDF & DOCX formats.',
+  keywords: ['resume templates India', 'ATS resume', 'professional resume', 'CV templates India', 'resume download', 'job resume India'],
+  authors: [{ name: 'ResumeNow' }],
+  creator: 'ResumeNow',
+  openGraph: {
+    type: 'website',
+    locale: 'en_IN',
+    url: BASE_URL,
+    siteName: 'ResumeNow',
+    title: "ResumeNow — India's Best Resume Templates",
+    description: 'ATS-friendly resume templates for Indian job seekers. Download in PDF & DOCX. Trusted by 1,000+ professionals.',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'ResumeNow — Resume Templates' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "ResumeNow — India's Best Resume Templates",
+    description: 'ATS-friendly resume templates for Indian job seekers.',
+    images: ['/og-image.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
+  },
+  alternates: {
+    canonical: BASE_URL,
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

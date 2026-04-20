@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { TEMPLATES, formatPrice } from '@/lib/templates'
 import { createClient } from '@/lib/supabase-server'
@@ -18,6 +19,26 @@ const PREVIEW_MAP: Record<string, React.ComponentType<{ accentColor?: string }>>
 
 export async function generateStaticParams() {
   return TEMPLATES.map((t) => ({ id: t.id }))
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  const template = TEMPLATES.find((t) => t.id === id)
+  if (!template) return {}
+  return {
+    title: `${template.name} Resume Template`,
+    description: `${template.description} ATS-friendly, one-time purchase. Download instantly in PDF & DOCX.`,
+    alternates: { canonical: `https://www.resumenow.in/template/${id}` },
+    openGraph: {
+      title: `${template.name} Resume Template | ResumeNow`,
+      description: template.description,
+      url: `https://www.resumenow.in/template/${id}`,
+    },
+  }
 }
 
 export default async function TemplateDetailPage({
