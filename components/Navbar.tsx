@@ -27,84 +27,78 @@ export default function Navbar() {
 
   return (
     <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
+      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2 flex-shrink-0">
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
             <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
-          <span className="font-bold text-gray-900 text-lg">ResumeNow</span>
+          <span className="font-bold text-gray-900 text-base">ResumeNow</span>
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden sm:flex items-center gap-3">
-          <Link href="/templates" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 transition-colors">
-            Templates
+        <div className="hidden md:flex items-center gap-2 flex-1 justify-end">
+          <Link href="/templates" className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+            Create new resume
           </Link>
+          <Link href="/auth/signup" className="text-sm border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+            Optimize my resume
+          </Link>
+
+          {/* Trustpilot badge */}
+          <div className="flex items-center gap-1.5 ml-2 pl-3 border-l border-gray-100">
+            <div className="flex flex-col items-center">
+              <div className="text-[9px] font-bold text-gray-700 leading-none">EXCELLENT</div>
+              <div className="flex gap-0.5 mt-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="w-3 h-3 bg-[#00b67a] flex items-center justify-center">
+                    <svg className="w-2 h-2 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[9px] text-gray-600 leading-none">4.5 out of 5</span>
+              <span className="text-[8px] text-gray-400">16,844 reviews</span>
+            </div>
+          </div>
+
           {user ? (
-            <>
-              <Link href="/dashboard" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 transition-colors">
-                My Templates
-              </Link>
-              <button onClick={handleSignOut} className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 transition-colors">
-                Sign out
-              </button>
-            </>
+            <div className="flex items-center gap-2 ml-2 pl-3 border-l border-gray-100">
+              <Link href="/dashboard" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">My Templates</Link>
+              <button onClick={handleSignOut} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">Sign out</button>
+            </div>
           ) : (
-            <>
-              <Link href="/auth/login" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 transition-colors">
-                Log in
-              </Link>
-              <Link href="/auth/signup" className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                Sign up free
-              </Link>
-            </>
+            <Link href="/auth/login" className="text-sm text-gray-500 hover:text-gray-900 transition-colors ml-1">Log in</Link>
           )}
         </div>
 
         {/* Mobile hamburger */}
-        <button
-          className="sm:hidden p-2 text-gray-500 hover:text-gray-900"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
+        <button className="md:hidden p-2 text-gray-500" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu">
           {menuOpen ? (
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           ) : (
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
           )}
         </button>
       </div>
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="sm:hidden border-t border-gray-100 bg-white px-4 py-3 space-y-1">
-          <Link href="/templates" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-700 py-2 hover:text-blue-600">
-            Templates
-          </Link>
+        <div className="md:hidden border-t border-gray-100 bg-white px-4 py-3 space-y-2">
+          <Link href="/templates" onClick={() => setMenuOpen(false)} className="block text-sm bg-blue-600 text-white px-4 py-2.5 rounded-lg text-center font-medium">Create new resume</Link>
+          <Link href="/auth/signup" onClick={() => setMenuOpen(false)} className="block text-sm border border-gray-300 text-gray-700 px-4 py-2.5 rounded-lg text-center font-medium">Optimize my resume</Link>
           {user ? (
             <>
-              <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-700 py-2 hover:text-blue-600">
-                My Templates
-              </Link>
-              <button onClick={() => { setMenuOpen(false); handleSignOut() }} className="block text-sm text-gray-700 py-2 hover:text-blue-600 w-full text-left">
-                Sign out
-              </button>
+              <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-700 py-2">My Templates</Link>
+              <button onClick={() => { setMenuOpen(false); handleSignOut() }} className="block text-sm text-gray-700 py-2 w-full text-left">Sign out</button>
             </>
           ) : (
-            <>
-              <Link href="/auth/login" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-700 py-2 hover:text-blue-600">
-                Log in
-              </Link>
-              <Link href="/auth/signup" onClick={() => setMenuOpen(false)} className="block text-sm text-blue-600 font-semibold py-2">
-                Sign up free
-              </Link>
-            </>
+            <Link href="/auth/login" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-700 py-2">Log in</Link>
           )}
         </div>
       )}
