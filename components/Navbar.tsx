@@ -2,11 +2,14 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import type { User } from '@supabase/supabase-js'
 
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
@@ -19,6 +22,7 @@ export default function Navbar() {
 
   async function handleSignOut() {
     await supabase.auth.signOut()
+    router.push('/')
   }
 
   return (
@@ -33,46 +37,77 @@ export default function Navbar() {
           <span className="font-bold text-gray-900 text-lg">ResumeNow</span>
         </Link>
 
-        <div className="flex items-center gap-3">
-          <Link
-            href="/templates"
-            className="hidden sm:block text-sm text-gray-600 hover:text-gray-900 px-3 py-2"
-          >
+        {/* Desktop nav */}
+        <div className="hidden sm:flex items-center gap-3">
+          <Link href="/templates" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 transition-colors">
             Templates
           </Link>
           {user ? (
             <>
-              <Link
-                href="/dashboard"
-                className="text-sm text-gray-600 hover:text-gray-900 px-3 py-2"
-              >
+              <Link href="/dashboard" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 transition-colors">
                 My Templates
               </Link>
-              <button
-                onClick={handleSignOut}
-                className="text-sm text-gray-600 hover:text-gray-900 px-3 py-2"
-              >
+              <button onClick={handleSignOut} className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 transition-colors">
                 Sign out
               </button>
             </>
           ) : (
             <>
-              <Link
-                href="/auth/login"
-                className="text-sm text-gray-600 hover:text-gray-900 px-3 py-2"
-              >
+              <Link href="/auth/login" className="text-sm text-gray-500 hover:text-gray-900 px-3 py-2 transition-colors">
                 Log in
               </Link>
-              <Link
-                href="/auth/signup"
-                className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
+              <Link href="/auth/signup" className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                 Sign up free
               </Link>
             </>
           )}
         </div>
+
+        {/* Mobile hamburger */}
+        <button
+          className="sm:hidden p-2 text-gray-500 hover:text-gray-900"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle menu"
+        >
+          {menuOpen ? (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          )}
+        </button>
       </div>
+
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div className="sm:hidden border-t border-gray-100 bg-white px-4 py-3 space-y-1">
+          <Link href="/templates" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-700 py-2 hover:text-blue-600">
+            Templates
+          </Link>
+          {user ? (
+            <>
+              <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-700 py-2 hover:text-blue-600">
+                My Templates
+              </Link>
+              <button onClick={() => { setMenuOpen(false); handleSignOut() }} className="block text-sm text-gray-700 py-2 hover:text-blue-600 w-full text-left">
+                Sign out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/auth/login" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-700 py-2 hover:text-blue-600">
+                Log in
+              </Link>
+              <Link href="/auth/signup" onClick={() => setMenuOpen(false)} className="block text-sm text-blue-600 font-semibold py-2">
+                Sign up free
+              </Link>
+            </>
+          )}
+        </div>
+      )}
     </nav>
   )
 }
