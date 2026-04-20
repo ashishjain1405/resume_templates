@@ -23,11 +23,11 @@ export default function HomePage() {
           <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight mb-6">
             Create a resume<br />that gets results
           </h2>
-          {/* Curved arrow SVG */}
+          {/* Curved arrow SVG — points right-to-left downward toward button */}
           <div className="flex justify-center mb-6">
             <svg width="80" height="50" viewBox="0 0 80 50" fill="none" className="text-blue-400">
-              <path d="M10 10 Q40 -10 65 30" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeDasharray="6 3"/>
-              <path d="M60 25 L65 30 L58 32" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M70 10 Q40 -10 15 30" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeDasharray="6 3"/>
+              <path d="M20 25 L15 30 L22 32" stroke="currentColor" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
           <Link
@@ -61,12 +61,14 @@ export default function HomePage() {
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-10 tracking-tight">
             6 features to boost your job search
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {FEATURES.map((f) => (
-              <div key={f.title} className="bg-gray-50 rounded-xl p-5 border border-gray-100 hover:shadow-sm transition-shadow">
-                <div className="text-2xl mb-3">{f.icon}</div>
-                <h3 className="font-semibold text-gray-900 text-sm mb-1">{f.title}</h3>
-                <p className="text-xs text-gray-500 leading-relaxed">{f.desc}</p>
+              <div key={f.title} className="bg-gray-50 rounded-xl p-6 border border-gray-100 hover:shadow-sm transition-shadow flex gap-4 items-start">
+                <div className="text-3xl flex-shrink-0">{f.icon}</div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 text-sm mb-1">{f.title}</h3>
+                  <p className="text-xs text-gray-500 leading-relaxed">{f.desc}</p>
+                </div>
               </div>
             ))}
           </div>

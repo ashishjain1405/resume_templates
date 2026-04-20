@@ -29,7 +29,7 @@ export default function TemplateCard({ template, purchased }: Props) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200 group">
       {/* Resume preview */}
-      <div className="relative overflow-hidden bg-gray-50" style={{ height: '220px' }}>
+      <div className="relative overflow-hidden bg-gray-50" style={{ height: '260px' }}>
         <div className="absolute inset-0 transform scale-100 origin-top">
           <Preview accentColor={activeColor} />
         </div>

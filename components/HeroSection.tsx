@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import ClassicPreview from './resume-previews/Classic'
+import MulticolumnPreview from './resume-previews/Multicolumn'
 
 export default function HeroSection() {
   return (
@@ -56,7 +56,7 @@ export default function HeroSection() {
             <div className="flex-1 flex justify-center lg:justify-end">
               <div className="relative w-56 lg:w-64">
                 <div className="bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden" style={{ height: '320px' }}>
-                  <ClassicPreview />
+                  <MulticolumnPreview />
                 </div>
                 <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow">
                   ATS-Friendly ✓
@@ -74,9 +74,10 @@ export default function HeroSection() {
       <div className="bg-gray-50 border-y border-gray-100 py-4 px-4">
         <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-6 md:gap-10">
           <span className="text-xs text-gray-400 uppercase tracking-widest">Our customers have been hired by</span>
-          {['Tata', 'Google', 'Nike', 'Microsoft'].map((company) => (
-            <span key={company} className="text-gray-400 font-bold text-sm tracking-wide hover:text-gray-600 transition-colors">{company}</span>
-          ))}
+          <span className="text-gray-400 font-black text-base tracking-tight hover:text-gray-600 transition-colors">TATA</span>
+          <span className="text-gray-400 font-normal text-base tracking-tight hover:text-gray-600 transition-colors" style={{ fontFamily: 'Arial, sans-serif' }}>Google</span>
+          <span className="text-gray-400 font-black text-lg italic tracking-tighter hover:text-gray-600 transition-colors">Nike</span>
+          <span className="text-gray-400 font-semibold text-sm tracking-wide hover:text-gray-600 transition-colors">Microsoft</span>
         </div>
       </div>
     </>

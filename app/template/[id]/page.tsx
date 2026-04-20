@@ -2,6 +2,19 @@ import { notFound } from 'next/navigation'
 import { TEMPLATES, formatPrice } from '@/lib/templates'
 import { createClient } from '@/lib/supabase-server'
 import BuyButton from '@/components/BuyButton'
+import ClassicPreview from '@/components/resume-previews/Classic'
+import ModernPreview from '@/components/resume-previews/Modern'
+import MulticolumnPreview from '@/components/resume-previews/Multicolumn'
+import QuotationPreview from '@/components/resume-previews/Quotation'
+import ExecutivePreview from '@/components/resume-previews/Executive'
+
+const PREVIEW_MAP: Record<string, React.ComponentType<{ accentColor?: string }>> = {
+  classic: ClassicPreview,
+  modern: ModernPreview,
+  multicolumn: MulticolumnPreview,
+  quotation: QuotationPreview,
+  executive: ExecutivePreview,
+}
 
 export async function generateStaticParams() {
   return TEMPLATES.map((t) => ({ id: t.id }))
@@ -30,29 +43,15 @@ export default async function TemplateDetailPage({
     purchased = !!data
   }
 
+  const Preview = PREVIEW_MAP[id] ?? ClassicPreview
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
       <div className="grid md:grid-cols-2 gap-10">
+        {/* Resume preview */}
         <div>
-          <div className="bg-gray-50 rounded-2xl p-8 aspect-[3/4] flex flex-col gap-3 border border-gray-100">
-            <div className="h-5 bg-gray-700 rounded w-1/2" />
-            <div className="h-3 bg-blue-400 rounded w-1/3" />
-            <div className="border-t border-gray-200 pt-3 space-y-2">
-              <div className="h-2 bg-gray-200 rounded w-full" />
-              <div className="h-2 bg-gray-200 rounded w-5/6" />
-              <div className="h-2 bg-gray-200 rounded w-4/5" />
-            </div>
-            <div className="border-t border-gray-200 pt-3 space-y-2">
-              <div className="h-2 bg-gray-300 rounded w-1/3" />
-              <div className="h-2 bg-gray-200 rounded w-full" />
-              <div className="h-2 bg-gray-200 rounded w-5/6" />
-              <div className="h-2 bg-gray-200 rounded w-3/4" />
-            </div>
-            <div className="border-t border-gray-200 pt-3 space-y-2">
-              <div className="h-2 bg-gray-300 rounded w-1/4" />
-              <div className="h-2 bg-gray-200 rounded w-full" />
-              <div className="h-2 bg-gray-200 rounded w-2/3" />
-            </div>
+          <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-lg" style={{ height: '520px' }}>
+            <Preview accentColor={template.colors[0]} />
           </div>
         </div>
 
