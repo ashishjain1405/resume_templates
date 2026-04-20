@@ -19,3 +19,21 @@ CREATE POLICY "Users can view their own purchases"
   USING (auth.uid() = user_id);
 
 -- Service role bypasses RLS for inserts in API routes
+
+-- Resume builder: stores user's resume data per template
+CREATE TABLE IF NOT EXISTS resumes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  template_id TEXT NOT NULL,
+  accent_color TEXT,
+  data JSONB NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(user_id, template_id)
+);
+
+ALTER TABLE resumes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users manage own resumes"
+  ON resumes
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);

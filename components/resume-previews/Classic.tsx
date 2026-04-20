@@ -1,49 +1,77 @@
-export default function ClassicPreview({ accentColor = '#1e3a5f' }: { accentColor?: string }) {
+import type { ResumeData } from '@/lib/resume-data'
+
+interface Props {
+  accentColor?: string
+  data?: ResumeData
+}
+
+export default function ClassicPreview({ accentColor = '#1e3a5f', data }: Props) {
+  const name = data?.personal.name || 'KATHLEEN JONES'
+  const title = data?.personal.title || 'Senior Marketing Manager'
+  const contact = data
+    ? [data.personal.email, data.personal.phone, data.personal.location].filter(Boolean).join(' · ')
+    : 'kathleen@email.com · +91 98765 43210 · Mumbai, India'
+
+  const experience = data?.experience.length
+    ? data.experience
+    : [
+        { id: '1', role: 'Marketing Director', company: 'Tata Consumer Products, Mumbai', startDate: '2020', endDate: '', bullets: ['Led digital campaigns reaching 5M+ users', 'Increased brand awareness by 40% YoY'] },
+        { id: '2', role: 'Brand Manager', company: 'HUL, Bengaluru', startDate: '2017', endDate: '2020', bullets: [] },
+      ]
+
+  const education = data?.education.length
+    ? data.education
+    : [{ id: '1', degree: 'MBA, Marketing', institution: 'IIM Ahmedabad', year: '2017' }]
+
+  const skills = data?.skills.length ? data.skills : []
+
   return (
     <div className="w-full h-full bg-white text-[6px] leading-tight overflow-hidden p-3 font-sans">
       {/* Header */}
       <div className="text-center border-b-2 pb-2 mb-2" style={{ borderColor: accentColor }}>
-        <div className="font-bold text-[9px] text-gray-900 tracking-wide">KATHLEEN JONES</div>
-        <div className="text-[6px] tracking-widest uppercase mt-0.5" style={{ color: accentColor }}>Senior Marketing Manager</div>
-        <div className="text-gray-400 mt-0.5 text-[5px]">kathleen@email.com · +91 98765 43210 · Mumbai, India</div>
-      </div>
-
-      {/* Summary */}
-      <div className="mb-2">
-        <div className="font-bold uppercase tracking-widest text-[5px] mb-0.5" style={{ color: accentColor }}>Professional Summary</div>
-        <div className="text-gray-500 text-[5px] leading-relaxed">Results-driven marketing professional with 8+ years of experience driving brand growth and digital strategy across FMCG and tech sectors.</div>
+        <div className="font-bold text-[9px] text-gray-900 tracking-wide">{name.toUpperCase()}</div>
+        <div className="text-[6px] tracking-widest uppercase mt-0.5" style={{ color: accentColor }}>{title}</div>
+        <div className="text-gray-400 mt-0.5 text-[5px]">{contact}</div>
       </div>
 
       {/* Experience */}
       <div className="mb-2">
         <div className="font-bold uppercase tracking-widest text-[5px] mb-1" style={{ color: accentColor }}>Experience</div>
-        <div className="mb-1">
-          <div className="flex justify-between">
-            <span className="font-semibold text-gray-800 text-[5.5px]">Marketing Director</span>
-            <span className="text-gray-400 text-[5px]">2020 – Present</span>
+        {experience.map((exp) => (
+          <div key={exp.id} className="mb-1">
+            <div className="flex justify-between">
+              <span className="font-semibold text-gray-800 text-[5.5px]">{exp.role}</span>
+              <span className="text-gray-400 text-[5px]">{exp.startDate}{exp.endDate ? ` – ${exp.endDate}` : exp.startDate ? ' – Present' : ''}</span>
+            </div>
+            <div className="text-gray-500 text-[5px]">{exp.company}</div>
+            {exp.bullets.slice(0, 2).map((b, i) => (
+              <div key={i} className="text-gray-400 text-[5px] mt-0.5">· {b}</div>
+            ))}
           </div>
-          <div className="text-gray-500 text-[5px]">Tata Consumer Products, Mumbai</div>
-          <div className="text-gray-400 text-[5px] mt-0.5">· Led digital campaigns reaching 5M+ users</div>
-          <div className="text-gray-400 text-[5px]">· Increased brand awareness by 40% YoY</div>
-        </div>
-        <div>
-          <div className="flex justify-between">
-            <span className="font-semibold text-gray-800 text-[5.5px]">Brand Manager</span>
-            <span className="text-gray-400 text-[5px]">2017 – 2020</span>
-          </div>
-          <div className="text-gray-500 text-[5px]">HUL, Bengaluru</div>
-        </div>
+        ))}
       </div>
 
       {/* Education */}
-      <div>
+      <div className="mb-2">
         <div className="font-bold uppercase tracking-widest text-[5px] mb-0.5" style={{ color: accentColor }}>Education</div>
-        <div className="flex justify-between">
-          <span className="font-semibold text-gray-800 text-[5.5px]">MBA, Marketing</span>
-          <span className="text-gray-400 text-[5px]">2017</span>
-        </div>
-        <div className="text-gray-500 text-[5px]">IIM Ahmedabad</div>
+        {education.map((edu) => (
+          <div key={edu.id}>
+            <div className="flex justify-between">
+              <span className="font-semibold text-gray-800 text-[5.5px]">{edu.degree}</span>
+              <span className="text-gray-400 text-[5px]">{edu.year}</span>
+            </div>
+            <div className="text-gray-500 text-[5px]">{edu.institution}</div>
+          </div>
+        ))}
       </div>
+
+      {/* Skills */}
+      {skills.length > 0 && (
+        <div>
+          <div className="font-bold uppercase tracking-widest text-[5px] mb-0.5" style={{ color: accentColor }}>Skills</div>
+          <div className="text-gray-500 text-[5px]">{skills.join(' · ')}</div>
+        </div>
+      )}
     </div>
   )
 }

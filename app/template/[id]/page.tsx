@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { TEMPLATES, formatPrice } from '@/lib/templates'
 import { createClient } from '@/lib/supabase-server'
@@ -119,6 +120,15 @@ export default async function TemplateDetailPage({
               One-time payment. No subscription. No expiry.
             </p>
           )}
+
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <Link
+              href={`/builder/${template.id}`}
+              className="w-full block text-center border border-blue-600 text-blue-600 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-50 transition-colors"
+            >
+              Build resume with this template →
+            </Link>
+          </div>
         </div>
       </div>
     </div>
