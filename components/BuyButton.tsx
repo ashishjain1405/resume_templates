@@ -84,10 +84,12 @@ export default function BuyButton({ template, purchased }: Props) {
                 templateId: template.id,
               }),
             })
+            const verifyData = await verifyRes.json()
+            console.log('Verify response:', verifyRes.status, verifyData)
             if (verifyRes.ok) {
               router.push('/payment/success')
             } else {
-              alert('Payment verification failed. Contact support.')
+              alert(`Payment verification failed: ${verifyData.error ?? verifyRes.status}`)
             }
           },
           prefill: { email: user.email ?? '' },
