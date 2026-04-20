@@ -358,10 +358,10 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             <h2 className="text-lg font-bold text-gray-900 mb-2">Save your progress</h2>
             <p className="text-sm text-gray-500 mb-5">Create a free account to save your resume and download it anytime.</p>
             <div className="flex flex-col gap-2">
-              <a href="/auth/signup" className="w-full text-center bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
+              <a href={`/auth/signup?redirect=/builder/${templateId}`} className="w-full text-center bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
                 Create free account
               </a>
-              <a href="/auth/login" className="w-full text-center border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors">
+              <a href={`/auth/login?redirect=/builder/${templateId}`} className="w-full text-center border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors">
                 Log in
               </a>
             </div>

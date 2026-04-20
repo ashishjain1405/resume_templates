@@ -26,6 +26,7 @@ function LoginForm() {
       setError(error.message)
       setLoading(false)
     } else {
+      router.refresh()
       router.push(redirect)
     }
   }
