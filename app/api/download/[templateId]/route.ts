@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-server'
 import { TEMPLATES } from '@/lib/templates'
+import { isPro } from '@/lib/pro'
 
 export async function GET(
   request: NextRequest,
@@ -16,15 +17,18 @@ export async function GET(
   }
 
   const adminClient = await createAdminClient()
-  const { data: purchase } = await adminClient
-    .from('purchases')
-    .select('id')
-    .eq('user_id', user.id)
-    .eq('template_id', templateId)
-    .maybeSingle()
 
-  if (!purchase) {
-    return Response.json({ error: 'Not purchased' }, { status: 403 })
+  const pro = await isPro(user.id, adminClient)
+  if (!pro) {
+    const { data: purchase } = await adminClient
+      .from('purchases')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('template_id', templateId)
+      .maybeSingle()
+    if (!purchase) {
+      return Response.json({ error: 'Not purchased' }, { status: 403 })
+    }
   }
 
   const template = TEMPLATES.find((t) => t.id === templateId)

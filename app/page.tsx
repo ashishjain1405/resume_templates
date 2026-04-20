@@ -35,11 +35,12 @@ const FEATURES: { icon: React.ReactNode; title: string; desc: string; href?: str
   {
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803 7.5 7.5 0 0015.803 15.803z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
-    title: 'Resume Review',
-    desc: 'Instant feedback on content, formatting and ATS score',
+    title: 'ATS Checker',
+    desc: 'Upload your resume and get an instant ATS score with actionable improvements.',
+    href: '/ats-check',
   },
   {
     icon: (

@@ -40,11 +40,14 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-2 flex-1 justify-end">
+          <Link href="/ats-check" className="text-sm text-gray-600 hover:text-gray-900 transition-colors font-medium">
+            ATS Checker
+          </Link>
+          <Link href="/pricing" className="text-sm text-gray-600 hover:text-gray-900 transition-colors font-medium">
+            Pricing
+          </Link>
           <Link href="/builder/multicolumn" className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
             Build my resume
-          </Link>
-          <Link href="/auth/signup" className="text-sm border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors font-medium">
-            Optimize my resume
           </Link>
 
           {user ? (
@@ -71,7 +74,8 @@ export default function Navbar() {
       {menuOpen && (
         <div className="md:hidden border-t border-gray-100 bg-white px-4 py-3 space-y-2">
           <Link href="/builder/multicolumn" onClick={() => setMenuOpen(false)} className="block text-sm bg-blue-600 text-white px-4 py-2.5 rounded-lg text-center font-medium">Build my resume</Link>
-          <Link href="/auth/signup" onClick={() => setMenuOpen(false)} className="block text-sm border border-gray-300 text-gray-700 px-4 py-2.5 rounded-lg text-center font-medium">Optimize my resume</Link>
+          <Link href="/ats-check" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-700 py-2">ATS Checker</Link>
+          <Link href="/pricing" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-700 py-2">Pricing</Link>
           {user ? (
             <>
               <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-700 py-2">My Templates</Link>

@@ -37,3 +37,19 @@ CREATE POLICY "Users manage own resumes"
   ON resumes
   USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
+
+-- Pro Access: one-time purchase unlocking all templates + ATS checker
+CREATE TABLE IF NOT EXISTS pro_access (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
+  razorpay_order_id TEXT,
+  razorpay_payment_id TEXT,
+  amount_inr INTEGER NOT NULL,
+  purchased_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE pro_access ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users view own pro access"
+  ON pro_access FOR SELECT
+  USING (auth.uid() = user_id);
