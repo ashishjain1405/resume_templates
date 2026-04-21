@@ -73,16 +73,18 @@ export default function ATSCheckPage() {
       form.append('jobDescription', jobDescription)
 
       const res = await fetch('/api/ats-check', { method: 'POST', body: form })
-      const data = await res.json()
+      const text = await res.text()
+      let data: { error?: string } & Partial<ATSResult> = {}
+      try { data = JSON.parse(text) } catch { /* non-JSON response */ }
       if (!res.ok) {
         if (res.status === 403) {
           setError('pro_required')
         } else {
-          setError(data.error ?? 'Analysis failed. Please try again.')
+          setError(data.error ?? `Server error (${res.status}). Please try again.`)
         }
         return
       }
-      setResult(data)
+      setResult(data as ATSResult)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.')
     } finally {
