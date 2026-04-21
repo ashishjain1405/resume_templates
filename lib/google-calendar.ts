@@ -49,15 +49,15 @@ export async function getAvailableSlots(days = 14): Promise<Slot[]> {
 
   while (cursor < endDate) {
     const day = cursor.getDay()
-    if (day === 0 || day === 6) { cursor.setDate(cursor.getDate() + 1); cursor.setHours(10, 0, 0, 0); continue }
+    if (day !== 0 && day !== 6) { cursor.setDate(cursor.getDate() + 1); cursor.setHours(5, 30, 0, 0); continue } // next day 11am IST = 5:30am UTC
 
     // Get IST hour
     const istMs = cursor.getTime() + IST_OFFSET
     const istDate = new Date(istMs)
     const istHour = istDate.getUTCHours()
 
-    if (istHour < 10) { cursor.setTime(cursor.getTime() + (10 - istHour) * 60 * 60 * 1000); cursor.setMinutes(0, 0, 0); continue }
-    if (istHour >= 18) { cursor.setDate(cursor.getDate() + 1); cursor.setHours(4, 30, 0, 0); continue } // next day 10am IST = 4:30am UTC
+    if (istHour < 11) { cursor.setTime(cursor.getTime() + (11 - istHour) * 60 * 60 * 1000); cursor.setMinutes(0, 0, 0); continue }
+    if (istHour >= 17) { cursor.setDate(cursor.getDate() + 1); cursor.setHours(5, 30, 0, 0); continue } // next day 11am IST = 5:30am UTC
 
     const slotEnd = new Date(cursor.getTime() + 30 * 60 * 1000)
     const overlaps = busy.some((b) => {
