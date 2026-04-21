@@ -83,8 +83,8 @@ export default function ATSCheckPage() {
         return
       }
       setResult(data)
-    } catch {
-      setError('Something went wrong. Please try again.')
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.')
     } finally {
       setLoading(false)
     }
