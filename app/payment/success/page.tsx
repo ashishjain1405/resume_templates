@@ -19,7 +19,7 @@ export default function PaymentSuccessPage({
         <p className="text-gray-500 text-sm mb-6">
           {isPro
             ? 'You now have Pro access. Enjoy unlimited ATS checks, PDF downloads, and your included expert session.'
-            : 'Your template has been added to your account. Download it anytime from your dashboard.'}
+            : 'Congrats! You have access to all Pro features.'}
         </p>
         <div className="flex flex-col gap-3">
           <Link
