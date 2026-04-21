@@ -86,6 +86,7 @@ export async function createBookingEvent(
   const event = await calendar.events.insert({
     calendarId: 'primary',
     conferenceDataVersion: 1,
+    sendUpdates: 'all',
     requestBody: {
       summary: `Resume Expert Session — ${user.name}`,
       description: `1:1 resume feedback session with ${user.name} (${user.email}) booked via ResumeNow.`,
