@@ -38,7 +38,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Quick actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         <Link href="/builder/multicolumn" className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:shadow-sm transition-shadow">
           <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 flex-shrink-0">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -74,6 +74,20 @@ export default async function DashboardPage() {
           <div>
             <div className="text-sm font-semibold text-gray-900">Templates</div>
             <div className="text-xs text-gray-400">Browse all designs</div>
+          </div>
+        </Link>
+
+        <Link href={pro ? '/sessions/book' : '/pricing'} className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:shadow-sm transition-shadow">
+          <div className="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center text-amber-600 flex-shrink-0">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
+            </svg>
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-gray-900">
+              Expert Session {!pro && <span className="text-xs text-blue-500 font-normal ml-1">— Pro</span>}
+            </div>
+            <div className="text-xs text-gray-400">{pro ? 'Book a 1:1 review' : 'Upgrade to access'}</div>
           </div>
         </Link>
       </div>

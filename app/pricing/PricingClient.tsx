@@ -13,6 +13,7 @@ const FEATURES_FREE = [
 const FEATURES_PRO = [
   'Everything in Free',
   'Unlimited ATS Checker',
+  '1:1 Expert Resume Review Session',
   'All 5 template downloads included',
   'Priority support',
 ]

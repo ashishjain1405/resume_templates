@@ -53,3 +53,23 @@ ALTER TABLE pro_access ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users view own pro access"
   ON pro_access FOR SELECT
   USING (auth.uid() = user_id);
+
+-- Expert sessions: 1:1 live resume review sessions (Pro only)
+CREATE TABLE IF NOT EXISTS sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_email TEXT NOT NULL,
+  user_name TEXT,
+  scheduled_at TIMESTAMPTZ NOT NULL,
+  duration_minutes INTEGER DEFAULT 30,
+  google_event_id TEXT,
+  meet_link TEXT,
+  status TEXT DEFAULT 'confirmed',
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users view own sessions"
+  ON sessions FOR SELECT
+  USING (auth.uid() = user_id);

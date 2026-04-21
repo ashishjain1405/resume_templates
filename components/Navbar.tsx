@@ -53,6 +53,7 @@ export default function Navbar() {
           {user ? (
             <div className="flex items-center gap-2 ml-2 pl-3 border-l border-gray-100">
               <Link href="/dashboard" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">My Templates</Link>
+              <Link href="/sessions" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">Sessions</Link>
               <button onClick={handleSignOut} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">Sign out</button>
             </div>
           ) : (
@@ -79,6 +80,7 @@ export default function Navbar() {
           {user ? (
             <>
               <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-700 py-2">My Templates</Link>
+              <Link href="/sessions" onClick={() => setMenuOpen(false)} className="block text-sm text-gray-700 py-2">Sessions</Link>
               <button onClick={() => { setMenuOpen(false); handleSignOut() }} className="block text-sm text-gray-700 py-2 w-full text-left">Sign out</button>
             </>
           ) : (
