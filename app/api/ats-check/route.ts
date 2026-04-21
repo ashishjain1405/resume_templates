@@ -5,7 +5,11 @@ import OpenAI from 'openai'
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfParse = require('pdf-parse') as (buf: Buffer) => Promise<{ text: string }>
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+let _openai: OpenAI | null = null
+function getOpenAI() {
+  if (!_openai) _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  return _openai
+}
 
 const SYSTEM_PROMPT = `You are an expert ATS (Applicant Tracking System) analyst. Analyse the provided resume text and return a structured JSON evaluation. Be honest and critical — most resumes have room for improvement.
 
@@ -65,7 +69,7 @@ export async function POST(request: NextRequest) {
     ? `RESUME:\n${resumeText}\n\nJOB DESCRIPTION:\n${jobDescription}`
     : `RESUME:\n${resumeText}`
 
-  const completion = await openai.chat.completions.create({
+  const completion = await getOpenAI().chat.completions.create({
     model: 'gpt-4o-mini',
     temperature: 0.2,
     messages: [
