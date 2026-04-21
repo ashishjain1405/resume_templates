@@ -77,7 +77,9 @@ export default function ATSCheckPage() {
       let data: { error?: string } & Partial<ATSResult> = {}
       try { data = JSON.parse(text) } catch { /* non-JSON response */ }
       if (!res.ok) {
-        if (res.status === 403) {
+        if (res.status === 401) {
+          setError('login_required')
+        } else if (res.status === 403) {
           setError('pro_required')
         } else {
           setError(data.error ?? `Server error (${res.status}). Please try again.`)
@@ -190,6 +192,15 @@ export default function ATSCheckPage() {
             ) : 'Analyse Resume'}
           </button>
 
+          {error === 'login_required' && (
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
+              <div className="text-sm font-semibold text-blue-800 mb-1">Sign in to continue</div>
+              <p className="text-xs text-blue-700 mb-3">Create a free account to use the ATS Checker.</p>
+              <Link href="/auth/login?redirect=/ats-check" className="inline-block bg-blue-600 text-white text-sm px-5 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                Sign in / Sign up — free
+              </Link>
+            </div>
+          )}
           {error === 'pro_required' && (
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
               <div className="text-sm font-semibold text-amber-800 mb-1">Pro Access Required</div>
@@ -199,7 +210,7 @@ export default function ATSCheckPage() {
               </Link>
             </div>
           )}
-          {error && error !== 'pro_required' && (
+          {error && error !== 'pro_required' && error !== 'login_required' && (
             <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">{error}</div>
           )}
         </div>
