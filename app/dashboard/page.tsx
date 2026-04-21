@@ -38,34 +38,37 @@ export default async function DashboardPage() {
         )}
       </div>
 
-      {/* Quick actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-        <Link href="/builder/multicolumn" className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:shadow-sm transition-shadow">
-          <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 flex-shrink-0">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
-            </svg>
-          </div>
-          <div>
-            <div className="text-sm font-semibold text-gray-900">Resume Builder</div>
-            <div className="text-xs text-gray-400">Edit your resume</div>
-          </div>
-        </Link>
-
-        <Link href={pro ? '/ats-check' : '/pricing'} className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:shadow-sm transition-shadow">
-          <div className="w-9 h-9 bg-green-50 rounded-lg flex items-center justify-center text-green-600 flex-shrink-0">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      {/* Primary actions */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+        <Link href="/ats-check" className="group flex items-center gap-4 p-5 bg-blue-600 rounded-2xl hover:bg-blue-700 transition-colors">
+          <div className="w-11 h-11 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
           <div>
-            <div className="text-sm font-semibold text-gray-900">
-              ATS Checker {!pro && <span className="text-xs text-blue-500 font-normal ml-1">— Pro</span>}
-            </div>
-            <div className="text-xs text-gray-400">{pro ? 'Check your resume score' : 'Upgrade to access'}</div>
+            <div className="text-base font-bold text-white">Check ATS Score</div>
+            <div className="text-xs text-blue-100 mt-0.5">See how your resume performs</div>
           </div>
+          <svg className="w-4 h-4 text-white/60 ml-auto group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
         </Link>
 
+        <Link href="/builder/multicolumn" className="group flex items-center gap-4 p-5 bg-white border border-gray-200 rounded-2xl hover:shadow-sm transition-shadow">
+          <div className="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+            <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+            </svg>
+          </div>
+          <div>
+            <div className="text-base font-bold text-gray-900">Build my Resume</div>
+            <div className="text-xs text-gray-400 mt-0.5">Create or edit your resume</div>
+          </div>
+          <svg className="w-4 h-4 text-gray-300 ml-auto group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+        </Link>
+      </div>
+
+      {/* Secondary actions */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
         <Link href="/templates" className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:shadow-sm transition-shadow">
           <div className="w-9 h-9 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600 flex-shrink-0">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
