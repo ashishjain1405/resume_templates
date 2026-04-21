@@ -3,14 +3,16 @@ import { createClient, createAdminClient } from '@/lib/supabase-server'
 import { isPro } from '@/lib/pro'
 import OpenAI from 'openai'
 async function parsePdf(buf: Buffer): Promise<string> {
-  const pdfjsLib = await import('pdfjs-dist/legacy/build/pdf.mjs')
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js')
   const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(buf) })
   const pdf = await loadingTask.promise
   const pages = await Promise.all(
-    Array.from({ length: pdf.numPages }, (_, i) =>
-      pdf.getPage(i + 1).then(p => p.getTextContent()).then(tc =>
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        tc.items.map((item: any) => item.str ?? '').join(' ')
+    Array.from({ length: pdf.numPages }, (_: unknown, i: number) =>
+      pdf.getPage(i + 1).then((p: { getTextContent: () => Promise<{ items: { str?: string }[] }> }) =>
+        p.getTextContent()
+      ).then((tc: { items: { str?: string }[] }) =>
+        tc.items.map(item => item.str ?? '').join(' ')
       )
     )
   )
