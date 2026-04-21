@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, Suspense } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 interface ATSResult {
   score: number
@@ -51,10 +52,7 @@ function SectionBar({ label, score }: { label: string; score: number }) {
 function Modal({ type, onClose }: { type: 'login_required' | 'pro_required'; onClose: () => void }) {
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4" onClick={onClose}>
-      <div
-        className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl relative"
-        onClick={e => e.stopPropagation()}
-      >
+      <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl relative" onClick={e => e.stopPropagation()}>
         <button onClick={onClose} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
         {type === 'login_required' ? (
           <>
@@ -66,7 +64,7 @@ function Modal({ type, onClose }: { type: 'login_required' | 'pro_required'; onC
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Sign in to continue</h3>
             <p className="text-sm text-gray-500 text-center mb-5">Create a free account to use the ATS Checker.</p>
             <Link
-              href="/auth/login?redirect=/ats-check"
+              href="/auth/login?redirect=/ats-check%3Frun%3D1"
               className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors"
             >
               Sign in / Sign up — free
@@ -81,10 +79,7 @@ function Modal({ type, onClose }: { type: 'login_required' | 'pro_required'; onC
             </div>
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Pro Access Required</h3>
             <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for unlimited ATS checks — ₹999, lifetime.</p>
-            <Link
-              href="/pricing"
-              className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors"
-            >
+            <Link href="/pricing" className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
               Get Pro Access — ₹999
             </Link>
           </>
@@ -96,7 +91,10 @@ function Modal({ type, onClose }: { type: 'login_required' | 'pro_required'; onC
 
 const STORAGE_KEY = 'ats_pending'
 
-export default function ATSCheckPage() {
+function ATSCheckInner() {
+  const searchParams = useSearchParams()
+  const shouldRun = searchParams.get('run') === '1'
+
   const [tab, setTab] = useState<'upload' | 'paste'>('upload')
   const [file, setFile] = useState<File | null>(null)
   const [resumeText, setResumeText] = useState('')
@@ -106,7 +104,6 @@ export default function ATSCheckPage() {
   const [error, setError] = useState('')
   const [result, setResult] = useState<ATSResult | null>(null)
   const [dragging, setDragging] = useState(false)
-  const [pdfNotice, setPdfNotice] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   const runAnalysis = useCallback(async (text: string, jd: string) => {
@@ -135,8 +132,9 @@ export default function ATSCheckPage() {
     }
   }, [])
 
-  // Restore pending state after login redirect
+  // Restore pending state when redirected back from login with ?run=1
   useEffect(() => {
+    if (!shouldRun) return
     const raw = sessionStorage.getItem(STORAGE_KEY)
     if (!raw) return
     sessionStorage.removeItem(STORAGE_KEY)
@@ -150,7 +148,7 @@ export default function ATSCheckPage() {
         runAnalysis(pending.resumeText, jd)
       }
     } catch { /* ignore */ }
-  }, [runAnalysis])
+  }, [shouldRun, runAnalysis])
 
   async function handleAnalyse() {
     setError('')
@@ -171,7 +169,6 @@ export default function ATSCheckPage() {
       try { data = JSON.parse(raw) } catch { /* non-JSON */ }
       if (!res.ok) {
         if (res.status === 401) {
-          // Only save if there's paste text to restore — PDF files can't be serialised
           if (tab === 'paste' && resumeText.trim()) {
             sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ resumeText, jobDescription }))
           }
@@ -209,26 +206,18 @@ export default function ATSCheckPage() {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8">
-        {/* Left — input */}
         <div className="space-y-5">
-          {/* Tab toggle */}
           <div className="flex bg-gray-100 rounded-lg p-1 w-fit">
             {(['upload', 'paste'] as const).map(t => (
               <button
                 key={t}
-                onClick={() => { setTab(t); setPdfNotice(false) }}
+                onClick={() => setTab(t)}
                 className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${tab === t ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
               >
                 {t === 'upload' ? 'Upload PDF' : 'Paste Text'}
               </button>
             ))}
           </div>
-
-          {pdfNotice && (
-            <div className="bg-amber-50 border border-amber-200 text-amber-700 rounded-xl px-4 py-3 text-xs">
-              Your PDF couldn&apos;t be saved across the login. Please paste your resume text below to continue.
-            </div>
-          )}
 
           {tab === 'upload' ? (
             <div
@@ -302,7 +291,6 @@ export default function ATSCheckPage() {
           )}
         </div>
 
-        {/* Right — results */}
         <div>
           {!result && !loading && (
             <div className="h-full min-h-[400px] border-2 border-dashed border-gray-100 rounded-2xl flex items-center justify-center">
@@ -386,5 +374,13 @@ export default function ATSCheckPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ATSCheckPage() {
+  return (
+    <Suspense>
+      <ATSCheckInner />
+    </Suspense>
   )
 }
