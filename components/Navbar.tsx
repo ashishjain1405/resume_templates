@@ -40,10 +40,10 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-2 flex-1 justify-end">
-          <Link href="/ats-check" className="text-sm text-gray-600 hover:text-gray-900 transition-colors font-medium">
+          <Link href="/ats-check" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
             Check my Resume
           </Link>
-          <Link href="/builder/multicolumn" className="text-sm text-gray-600 hover:text-gray-900 transition-colors font-medium">
+          <Link href="/builder/multicolumn" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
             Build my Resume
           </Link>
           <Link href="/pricing" className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
