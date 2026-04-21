@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback, Suspense } from 'react'
+import { useState, useRef, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 
 interface ATSResult {
@@ -102,32 +102,6 @@ function ATSCheckInner() {
   const [dragging, setDragging] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  const runAnalysis = useCallback(async (text: string, jd: string) => {
-    setError('')
-    setLoading(true)
-    setResult(null)
-    try {
-      const form = new FormData()
-      form.append('resumeText', text)
-      form.append('jobDescription', jd)
-      const res = await fetch('/api/ats-check', { method: 'POST', body: form })
-      const raw = await res.text()
-      let data: { error?: string } & Partial<ATSResult> = {}
-      try { data = JSON.parse(raw) } catch { /* non-JSON */ }
-      if (!res.ok) {
-        if (res.status === 401) setModal('login_required')
-        else if (res.status === 403) setModal('pro_required')
-        else setError(data.error ?? `Server error (${res.status}). Please try again.`)
-        return
-      }
-      setResult(data as ATSResult)
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
   // Restore pending state on mount — fires after login redirect returns to this page
   useEffect(() => {
     const raw = sessionStorage.getItem(STORAGE_KEY)
@@ -136,14 +110,31 @@ function ATSCheckInner() {
     try {
       const pending = JSON.parse(raw)
       const jd = pending.jobDescription ?? ''
-      setJobDescription(jd)
-      if (pending.resumeText) {
+      const text = pending.resumeText ?? ''
+      if (text) {
         setTab('paste')
-        setResumeText(pending.resumeText)
-        runAnalysis(pending.resumeText, jd)
+        setResumeText(text)
+        setJobDescription(jd)
+        // Inline the fetch so we don't depend on runAnalysis ref
+        setLoading(true)
+        const form = new FormData()
+        form.append('resumeText', text)
+        form.append('jobDescription', jd)
+        fetch('/api/ats-check', { method: 'POST', body: form })
+          .then(r => r.text())
+          .then(raw => {
+            try {
+              const data = JSON.parse(raw)
+              if (data.score !== undefined) setResult(data)
+              else if (data.error) setError(data.error)
+            } catch { setError('Analysis failed. Please try again.') }
+          })
+          .catch(() => setError('Something went wrong. Please try again.'))
+          .finally(() => setLoading(false))
       }
     } catch { /* ignore */ }
-  }, [runAnalysis])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function handleAnalyse() {
     setError('')
