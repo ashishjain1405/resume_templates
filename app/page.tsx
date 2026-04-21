@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
-import React from 'react'
 import Link from 'next/link'
 import HeroSection from '@/components/HeroSection'
 import TemplateCard from '@/components/TemplateCard'
 import BuilderDemo from '@/components/BuilderDemo'
+import HowItWorks from '@/components/HowItWorks'
+import ATSPreview from '@/components/ATSPreview'
 import { TEMPLATES } from '@/lib/templates'
 
 export const metadata: Metadata = {
@@ -11,75 +12,6 @@ export const metadata: Metadata = {
   description: 'Browse 35+ professionally designed, ATS-optimised resume templates for Indian job seekers. One-time purchase, lifetime access. Download in PDF & DOCX.',
   alternates: { canonical: 'https://www.resumenow.in' },
 }
-
-const FEATURES: { icon: React.ReactNode; title: string; desc: string; href?: string }[] = [
-  {
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-      </svg>
-    ),
-    title: 'Resume Builder',
-    desc: 'Fill in your details and watch your resume update live. Download in seconds.',
-    href: '/builder/multicolumn',
-  },
-  {
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-      </svg>
-    ),
-    title: 'Enhance with AI',
-    desc: 'AI-powered suggestions to strengthen your bullet points',
-  },
-  {
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-    title: 'ATS Checker',
-    desc: 'Upload your resume and get an instant ATS score with actionable improvements.',
-    href: '/ats-check',
-  },
-  {
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-      </svg>
-    ),
-    title: 'AI Cover Letter Builder',
-    desc: 'Generate tailored cover letters in seconds',
-  },
-  {
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
-      </svg>
-    ),
-    title: 'ATS Optimised',
-    desc: 'All templates pass leading applicant tracking systems',
-  },
-  {
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-      </svg>
-    ),
-    title: 'Instant Download',
-    desc: 'Download in PDF and DOCX formats immediately after purchase',
-  },
-  {
-    icon: (
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
-      </svg>
-    ),
-    title: '1:1 Expert Session',
-    desc: 'Book a 30-minute live resume review with an expert. Get actionable feedback before you apply.',
-    href: '/sessions/book',
-  },
-]
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -101,13 +33,93 @@ export default function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+
+      {/* 1. Hero */}
       <HeroSection />
 
-      {/* Builder feature — animated demo section */}
-      <section className="py-20 px-4 bg-white">
+      {/* 2. How it works */}
+      <HowItWorks />
+
+      {/* 3. ATS score preview */}
+      <ATSPreview />
+
+      {/* 4. Pro upgrade section */}
+      <section className="py-16 px-4 bg-gray-50 border-y border-gray-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">Go further with Pro</h2>
+            <p className="text-gray-500 text-sm">One-time payment. Lifetime access.</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 max-w-3xl mx-auto mb-8">
+            <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-3">
+              <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                </svg>
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-gray-900 mb-1">Resume Builder</div>
+                <p className="text-xs text-gray-500 leading-relaxed">Build and download your resume in a professional template. No design skills needed.</p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-3">
+              <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center text-green-600">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-gray-900 mb-1">Unlimited ATS Checks</div>
+                <p className="text-xs text-gray-500 leading-relaxed">Keep improving until your score is interview-ready. Check as many times as you need.</p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col gap-3">
+              <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center text-amber-600">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
+                </svg>
+              </div>
+              <div>
+                <div className="text-sm font-semibold text-gray-900 mb-1">1:1 Expert Session</div>
+                <p className="text-xs text-gray-500 leading-relaxed">30-minute live resume review with an expert. Get actionable feedback before you apply.</p>
+              </div>
+            </div>
+          </div>
+          <div className="text-center">
+            <Link
+              href="/pricing"
+              className="inline-block bg-blue-600 text-white px-8 py-3.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm"
+            >
+              Get Pro Access — ₹999
+            </Link>
+            <p className="text-xs text-gray-400 mt-2">One-time · no subscription · lifetime access</p>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Template grid */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-2xl font-bold text-gray-900 text-center mb-8 tracking-tight">Professional templates, built for India</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+            {TEMPLATES.slice(0, 4).map((template) => (
+              <TemplateCard key={template.id} template={template} />
+            ))}
+          </div>
+          <div className="text-center mt-8">
+            <Link href="/templates" className="inline-flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-700 text-sm">
+              View all templates →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Builder demo */}
+      <section className="py-20 px-4 bg-gray-50 border-t border-gray-100">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <span className="inline-block bg-blue-50 text-blue-600 text-xs font-semibold px-3 py-1 rounded-full mb-4 tracking-wide uppercase">New</span>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight mb-4">
               Build your resume in minutes
             </h2>
@@ -115,9 +127,7 @@ export default function HomePage() {
               Fill in your details. Watch your resume come to life in real time. Download and apply.
             </p>
           </div>
-
           <BuilderDemo />
-
           <div className="flex flex-col sm:flex-row gap-3 justify-center mt-10">
             <Link
               href="/builder/multicolumn"
@@ -135,55 +145,19 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Template grid */}
-      <section className="py-16 px-4 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
-            {TEMPLATES.slice(0, 4).map((template) => (
-              <TemplateCard key={template.id} template={template} />
-            ))}
-          </div>
-          <div className="text-center mt-8">
-            <Link href="/templates" className="inline-flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-700 text-sm">
-              View all templates →
-            </Link>
-          </div>
+      {/* 7. Footer CTA strip */}
+      <section className="py-14 px-4 bg-blue-600">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Ready to land your next job?</h2>
+          <p className="text-blue-100 text-sm mb-6">Check your resume score in seconds — it&apos;s free.</p>
+          <Link
+            href="/ats-check"
+            className="inline-block bg-white text-blue-600 px-8 py-3.5 rounded-lg font-semibold hover:bg-blue-50 transition-colors text-sm"
+          >
+            Check my resume score — free
+          </Link>
         </div>
       </section>
-
-      {/* 6 features */}
-      <section className="py-16 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl font-bold text-gray-900 text-center mb-10 tracking-tight">
-            6 features to boost your job search
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {FEATURES.map((f) => (
-              <div key={f.title} className={`rounded-xl p-6 border flex flex-col gap-3 transition-all ${f.href ? 'bg-blue-600 border-blue-700 hover:bg-blue-700 cursor-pointer' : 'bg-gray-50 border-gray-100 hover:shadow-sm'}`}>
-                {f.href ? (
-                  <Link href={f.href} className="flex flex-col gap-3 h-full">
-                    <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center text-white flex-shrink-0">{f.icon}</div>
-                    <div>
-                      <h3 className="font-semibold text-white text-sm mb-1">{f.title}</h3>
-                      <p className="text-xs text-blue-100 leading-relaxed">{f.desc}</p>
-                      <span className="inline-block mt-2 text-xs font-semibold text-white underline underline-offset-2">Try it free →</span>
-                    </div>
-                  </Link>
-                ) : (
-                  <>
-                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 flex-shrink-0">{f.icon}</div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900 text-sm mb-1">{f.title}</h3>
-                      <p className="text-xs text-gray-500 leading-relaxed">{f.desc}</p>
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
     </>
   )
 }
