@@ -11,6 +11,15 @@ interface ATSResult {
   sections: { keywords: number; formatting: number; contact: number; achievements: number }
   missing_keywords: string[]
   suggestions: string[]
+  _usage?: { used: number; limit: number } | null
+}
+
+interface UploadedResume {
+  id: string
+  filename: string
+  mime_type: string
+  size_bytes: number
+  created_at: string
 }
 
 function ScoreRing({ score }: { score: number }) {
@@ -65,10 +74,7 @@ function Modal({ type, onClose }: { type: 'login_required' | 'pro_required'; onC
             </div>
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Sign in to continue</h3>
             <p className="text-sm text-gray-500 text-center mb-5">Create a free account to use the ATS Checker.</p>
-            <Link
-              href="/auth/login?redirect=/ats-check"
-              className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors"
-            >
+            <Link href="/auth/login?redirect=/ats-check" className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
               Sign in / Sign up — free
             </Link>
           </>
@@ -79,8 +85,8 @@ function Modal({ type, onClose }: { type: 'login_required' | 'pro_required'; onC
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Pro Access Required</h3>
-            <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for unlimited ATS checks — ₹999, lifetime.</p>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Free limit reached</h3>
+            <p className="text-sm text-gray-500 text-center mb-5">You've used all 5 free checks. Upgrade once for unlimited ATS checks — ₹999, lifetime.</p>
             <Link href="/pricing" className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
               Get Pro Access — ₹999
             </Link>
@@ -92,11 +98,11 @@ function Modal({ type, onClose }: { type: 'login_required' | 'pro_required'; onC
 }
 
 const STORAGE_KEY = 'ats_pending'
-const RESULT_KEY = 'ats_result'
+const FREE_LIMIT = 5
 
 function ATSCheckInner() {
   const searchParams = useSearchParams()
-  const [tab, setTab] = useState<'upload' | 'paste'>('upload')
+  const [tab, setTab] = useState<'upload' | 'paste' | 'saved'>('upload')
   const [file, setFile] = useState<File | null>(null)
   const [resumeText, setResumeText] = useState('')
   const [jobDescription, setJobDescription] = useState('')
@@ -107,28 +113,30 @@ function ATSCheckInner() {
   const [result, setResult] = useState<ATSResult | null>(null)
   const [dragging, setDragging] = useState(false)
   const [isPro, setIsPro] = useState(false)
+  const [usage, setUsage] = useState<{ used: number; limit: number } | null>(null)
   const [editLoading, setEditLoading] = useState(false)
+  const [savedResumes, setSavedResumes] = useState<UploadedResume[]>([])
+  const [selectedResumeId, setSelectedResumeId] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  // Restore last result + inputs from localStorage on mount
+  // On mount: check pro status, fetch usage, load saved resumes
   useEffect(() => {
     const supabase = createClient()
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getUser().then(async ({ data }) => {
       if (!data.user) return
-      supabase.from('pro_access').select('id').eq('user_id', data.user.id).maybeSingle()
-        .then(({ data: row }) => setIsPro(!!row))
+      const { data: row } = await supabase.from('pro_access').select('id').eq('user_id', data.user.id).maybeSingle()
+      const pro = !!row
+      setIsPro(pro)
+      if (!pro) {
+        const { count } = await supabase.from('ats_checks').select('id', { count: 'exact', head: true }).eq('user_id', data.user.id)
+        setUsage({ used: count ?? 0, limit: FREE_LIMIT })
+      }
+      // Load saved resumes
+      fetch('/api/resume/list').then(r => r.json()).then(d => setSavedResumes(d.resumes ?? []))
     })
-    try {
-      const raw = localStorage.getItem(RESULT_KEY)
-      if (!raw) return
-      const saved = JSON.parse(raw)
-      if (saved.result) setResult(saved.result)
-      if (saved.resumeText) { setResumeText(saved.resumeText); setTab('paste') }
-      if (saved.jobDescription) setJobDescription(saved.jobDescription)
-    } catch { /* ignore */ }
   }, [])
 
-  // Load resume from dashboard "Check ATS" link
+  // Load resume from dashboard "Check ATS" link (?resumeId=)
   useEffect(() => {
     const resumeId = searchParams.get('resumeId')
     if (!resumeId) return
@@ -190,6 +198,15 @@ function ATSCheckInner() {
       const form = new FormData()
       if (tab === 'upload' && file) {
         form.append('file', file)
+      } else if (tab === 'saved' && selectedResumeId) {
+        // Fetch signed URL, download file, attach
+        const urlRes = await fetch(`/api/resume/${selectedResumeId}`)
+        const urlData = await urlRes.json()
+        if (!urlData.url) { setError('Could not load saved resume.'); return }
+        const resp = await fetch(urlData.url)
+        const blob = await resp.blob()
+        const resume = savedResumes.find(r => r.id === selectedResumeId)
+        form.append('file', blob, resume?.filename ?? 'resume.pdf')
       } else {
         form.append('resumeText', resumeText)
       }
@@ -197,7 +214,7 @@ function ATSCheckInner() {
 
       const res = await fetch('/api/ats-check', { method: 'POST', body: form })
       const raw = await res.text()
-      let data: { error?: string } & Partial<ATSResult> = {}
+      let data: { error?: string; _usage?: { used: number; limit: number } | null } & Partial<ATSResult> = {}
       try { data = JSON.parse(raw) } catch { /* non-JSON */ }
       if (!res.ok) {
         if (res.status === 401) {
@@ -216,9 +233,7 @@ function ATSCheckInner() {
       }
       const atsResult = data as ATSResult
       setResult(atsResult)
-      try {
-        localStorage.setItem(RESULT_KEY, JSON.stringify({ result: atsResult, resumeText, jobDescription, tab }))
-      } catch { /* ignore */ }
+      if (atsResult._usage) setUsage(atsResult._usage)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.')
     } finally {
@@ -226,7 +241,8 @@ function ATSCheckInner() {
     }
   }
 
-  const canSubmit = tab === 'upload' ? !!file : resumeText.trim().length > 50
+  const canSubmit = tab === 'upload' ? !!file : tab === 'saved' ? !!selectedResumeId : resumeText.trim().length > 50
+  const limitReached = !isPro && usage !== null && usage.used >= usage.limit
 
   async function handleEditInDocs() {
     if (!isPro) { setModal('pro_required'); return }
@@ -250,31 +266,50 @@ function ATSCheckInner() {
     }
   }
 
+  const tabs = [
+    { id: 'upload' as const, label: 'Upload PDF' },
+    { id: 'paste' as const, label: 'Paste Text' },
+    ...(savedResumes.length > 0 ? [{ id: 'saved' as const, label: 'My Resumes' }] : []),
+  ]
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
       {modal && <Modal type={modal} onClose={() => setModal(null)} />}
 
-      <div className="mb-10">
-        <div className="mb-3"><ProBadge /></div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">ATS Resume Checker</h1>
-        <p className="text-gray-500 max-w-xl">Upload your resume and optionally paste a job description. Get an instant ATS score with actionable improvements.</p>
+      <div className="mb-10 flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">ATS Resume Checker</h1>
+          <p className="text-gray-500 max-w-xl">Upload your resume and optionally paste a job description. Get an instant ATS score with actionable improvements.</p>
+        </div>
+        {limitReached && (
+          <div className="flex items-center gap-2">
+            <ProBadge />
+            <span className="text-xs text-gray-500">Free limit reached</span>
+          </div>
+        )}
+        {!isPro && usage && !limitReached && (
+          <div className="text-xs text-gray-400 bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full">
+            {usage.limit - usage.used} free check{usage.limit - usage.used !== 1 ? 's' : ''} remaining
+          </div>
+        )}
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8">
         <div className="space-y-5">
+          {/* Tab switcher */}
           <div className="flex bg-gray-100 rounded-lg p-1 w-fit">
-            {(['upload', 'paste'] as const).map(t => (
+            {tabs.map(t => (
               <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${tab === t ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${tab === t.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
               >
-                {t === 'upload' ? 'Upload PDF' : 'Paste Text'}
+                {t.label}
               </button>
             ))}
           </div>
 
-          {tab === 'upload' ? (
+          {tab === 'upload' && (
             <div
               onClick={() => fileRef.current?.click()}
               onDragOver={e => { e.preventDefault(); setDragging(true) }}
@@ -305,7 +340,9 @@ function ATSCheckInner() {
                 </>
               )}
             </div>
-          ) : (
+          )}
+
+          {tab === 'paste' && (
             <textarea
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 resize-none"
               rows={10}
@@ -313,6 +350,33 @@ function ATSCheckInner() {
               value={resumeText}
               onChange={e => setResumeText(e.target.value)}
             />
+          )}
+
+          {tab === 'saved' && (
+            <div className="space-y-2">
+              {savedResumes.map(r => (
+                <button
+                  key={r.id}
+                  onClick={() => setSelectedResumeId(r.id)}
+                  className={`w-full flex items-center gap-3 p-3.5 rounded-xl border text-left transition-colors ${selectedResumeId === r.id ? 'border-blue-400 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
+                >
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${r.mime_type === 'application/pdf' ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'}`}>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-gray-900 truncate">{r.filename}</div>
+                    <div className="text-xs text-gray-400">{new Date(r.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                  </div>
+                  {selectedResumeId === r.id && (
+                    <svg className="w-4 h-4 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </button>
+              ))}
+            </div>
           )}
 
           <div>
@@ -328,25 +392,31 @@ function ATSCheckInner() {
             />
           </div>
 
-          <button
-            onClick={handleAnalyse}
-            disabled={!canSubmit || loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center justify-center gap-2"
-          >
-            {loading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Analysing your resume…
-              </>
-            ) : 'Analyse Resume'}
-          </button>
+          {limitReached ? (
+            <div className="w-full bg-amber-50 border border-amber-200 rounded-xl px-4 py-4 text-center">
+              <p className="text-sm font-semibold text-amber-800 mb-1">You've used all 5 free checks</p>
+              <p className="text-xs text-amber-600 mb-3">Upgrade to Pro for unlimited ATS checks — ₹999, one-time.</p>
+              <Link href="/pricing" className="inline-block bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors">
+                Upgrade to Pro
+              </Link>
+            </div>
+          ) : (
+            <button
+              onClick={handleAnalyse}
+              disabled={!canSubmit || loading}
+              className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Analysing your resume…
+                </>
+              ) : 'Analyse Resume'}
+            </button>
+          )}
 
-          {info && (
-            <div className="bg-blue-50 border border-blue-200 text-blue-700 rounded-xl px-4 py-3 text-sm">{info}</div>
-          )}
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">{error}</div>
-          )}
+          {info && <div className="bg-blue-50 border border-blue-200 text-blue-700 rounded-xl px-4 py-3 text-sm">{info}</div>}
+          {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">{error}</div>}
         </div>
 
         <div>
@@ -402,6 +472,9 @@ function ATSCheckInner() {
                     {result.score >= 75 ? 'Strong resume' : result.score >= 50 ? 'Needs improvement' : 'Significant gaps found'}
                   </div>
                   <div className="text-sm text-gray-500 mt-0.5">ATS Compatibility Score</div>
+                  {result._usage && (
+                    <div className="text-xs text-gray-400 mt-1">{result._usage.limit - result._usage.used} free check{result._usage.limit - result._usage.used !== 1 ? 's' : ''} remaining</div>
+                  )}
                 </div>
               </div>
 
@@ -437,7 +510,6 @@ function ATSCheckInner() {
                   ))}
                 </ul>
               </div>
-
             </div>
           )}
         </div>

@@ -46,11 +46,19 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
-    // Use user client for isPro — service role key can still bypass RLS via adminClient
-    // but SELECT policy exists so user client works fine here too
     const adminClient = await createAdminClient()
     const pro = await isPro(user.id, adminClient)
-    if (!pro) return Response.json({ error: 'Pro access required' }, { status: 403 })
+
+    const FREE_LIMIT = 5
+    if (!pro) {
+      const { count } = await adminClient
+        .from('ats_checks')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+      if ((count ?? 0) >= FREE_LIMIT) {
+        return Response.json({ error: 'limit_reached', used: count, limit: FREE_LIMIT }, { status: 403 })
+      }
+    }
 
     let resumeText = ''
     let jobDescription = ''
@@ -99,7 +107,17 @@ export async function POST(request: NextRequest) {
     const raw = completion.choices[0].message.content ?? ''
     try {
       const result = JSON.parse(raw)
-      return Response.json(result)
+      // Track usage for free users
+      let usageAfter: number | null = null
+      if (!pro) {
+        await adminClient.from('ats_checks').insert({ user_id: user.id })
+        const { count } = await adminClient
+          .from('ats_checks')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+        usageAfter = count ?? null
+      }
+      return Response.json({ ...result, _usage: pro ? null : { used: usageAfter, limit: 5 } })
     } catch {
       console.error('OpenAI returned invalid JSON:', raw)
       return Response.json({ error: 'Analysis failed. Please try again.' }, { status: 500 })

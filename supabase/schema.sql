@@ -97,3 +97,20 @@ CREATE POLICY "Users view own uploaded resumes"
 -- Bucket name: user-resumes
 -- Private bucket (no public access)
 -- RLS policy on storage.objects: allow SELECT where owner = auth.uid()
+
+-- ATS check usage tracking (free tier cap: 5 checks)
+CREATE TABLE IF NOT EXISTS ats_checks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE ats_checks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users view own ats checks"
+  ON ats_checks FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Service role can insert ats checks"
+  ON ats_checks FOR INSERT
+  WITH CHECK (true);
