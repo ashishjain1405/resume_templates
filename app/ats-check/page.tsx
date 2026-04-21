@@ -104,7 +104,9 @@ function ATSCheckInner() {
 
   // Restore pending state on mount — fires after login redirect returns to this page
   useEffect(() => {
+    console.log('[ATS] mount effect fired, checking sessionStorage key:', STORAGE_KEY)
     const raw = sessionStorage.getItem(STORAGE_KEY)
+    console.log('[ATS] sessionStorage value:', raw)
     if (!raw) return
     sessionStorage.removeItem(STORAGE_KEY)
     try {
@@ -156,7 +158,11 @@ function ATSCheckInner() {
       if (!res.ok) {
         if (res.status === 401) {
           if (tab === 'paste' && resumeText.trim()) {
-            sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ resumeText, jobDescription }))
+            const payload = JSON.stringify({ resumeText, jobDescription })
+            console.log('[ATS] saving to sessionStorage:', payload.slice(0, 100))
+            sessionStorage.setItem(STORAGE_KEY, payload)
+          } else {
+            console.log('[ATS] NOT saving — tab:', tab, 'text length:', resumeText.trim().length)
           }
           setModal('login_required')
         } else if (res.status === 403) {
