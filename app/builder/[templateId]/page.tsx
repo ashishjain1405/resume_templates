@@ -158,7 +158,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ templateId, data, accentColor }),
       })
-      if (!res.ok) { alert('Could not generate resume. Please try again.'); return }
+      if (!res.ok) { const err = await res.text(); alert(`Could not generate resume: ${err}`); return }
       const blob = await res.blob()
       const name = `${data.personal.name?.replace(/\s+/g, '_') || 'resume'}_${templateId}.pdf`
       const file = new File([blob], name, { type: 'application/pdf' })
