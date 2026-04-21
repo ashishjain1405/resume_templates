@@ -153,15 +153,15 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     if (!user) { setShowAuthModal(true); return }
     setSavingVersion(true)
     try {
-      const res = await fetch('/api/builder/pdf', {
+      const res = await fetch('/api/builder/pdf?pdf=1', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ templateId, data, accentColor }),
       })
       if (!res.ok) { alert('Could not generate resume. Please try again.'); return }
       const blob = await res.blob()
-      const name = `${data.personal.name?.replace(/\s+/g, '_') || 'resume'}_${templateId}.html`
-      const file = new File([blob], name, { type: 'text/html' })
+      const name = `${data.personal.name?.replace(/\s+/g, '_') || 'resume'}_${templateId}.pdf`
+      const file = new File([blob], name, { type: 'application/pdf' })
       const form = new FormData()
       form.append('file', file)
       const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
