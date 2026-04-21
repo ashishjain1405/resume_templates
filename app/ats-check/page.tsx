@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 
 interface ATSResult {
@@ -48,16 +48,112 @@ function SectionBar({ label, score }: { label: string; score: number }) {
   )
 }
 
+function Modal({ type, onClose }: { type: 'login_required' | 'pro_required'; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4" onClick={onClose}>
+      <div
+        className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl relative"
+        onClick={e => e.stopPropagation()}
+      >
+        <button onClick={onClose} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+        {type === 'login_required' ? (
+          <>
+            <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Sign in to continue</h3>
+            <p className="text-sm text-gray-500 text-center mb-5">Create a free account to use the ATS Checker.</p>
+            <Link
+              href="/auth/login?redirect=/ats-check"
+              className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors"
+            >
+              Sign in / Sign up — free
+            </Link>
+          </>
+        ) : (
+          <>
+            <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Pro Access Required</h3>
+            <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for unlimited ATS checks — ₹999, lifetime.</p>
+            <Link
+              href="/pricing"
+              className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors"
+            >
+              Get Pro Access — ₹999
+            </Link>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+const STORAGE_KEY = 'ats_pending'
+
 export default function ATSCheckPage() {
   const [tab, setTab] = useState<'upload' | 'paste'>('upload')
   const [file, setFile] = useState<File | null>(null)
   const [resumeText, setResumeText] = useState('')
   const [jobDescription, setJobDescription] = useState('')
   const [loading, setLoading] = useState(false)
+  const [modal, setModal] = useState<'login_required' | 'pro_required' | null>(null)
   const [error, setError] = useState('')
   const [result, setResult] = useState<ATSResult | null>(null)
   const [dragging, setDragging] = useState(false)
+  const [pdfNotice, setPdfNotice] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  const runAnalysis = useCallback(async (text: string, jd: string) => {
+    setError('')
+    setLoading(true)
+    setResult(null)
+    try {
+      const form = new FormData()
+      form.append('resumeText', text)
+      form.append('jobDescription', jd)
+      const res = await fetch('/api/ats-check', { method: 'POST', body: form })
+      const raw = await res.text()
+      let data: { error?: string } & Partial<ATSResult> = {}
+      try { data = JSON.parse(raw) } catch { /* non-JSON */ }
+      if (!res.ok) {
+        if (res.status === 401) setModal('login_required')
+        else if (res.status === 403) setModal('pro_required')
+        else setError(data.error ?? `Server error (${res.status}). Please try again.`)
+        return
+      }
+      setResult(data as ATSResult)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  // Restore pending state after login redirect
+  useEffect(() => {
+    const raw = sessionStorage.getItem(STORAGE_KEY)
+    if (!raw) return
+    sessionStorage.removeItem(STORAGE_KEY)
+    try {
+      const pending = JSON.parse(raw)
+      const jd = pending.jobDescription ?? ''
+      setJobDescription(jd)
+      if (pending.resumeText) {
+        setTab('paste')
+        setResumeText(pending.resumeText)
+        runAnalysis(pending.resumeText, jd)
+      } else if (pending.tab === 'upload') {
+        setTab('paste')
+        setPdfNotice(true)
+      }
+    } catch { /* ignore */ }
+  }, [runAnalysis])
 
   async function handleAnalyse() {
     setError('')
@@ -73,14 +169,20 @@ export default function ATSCheckPage() {
       form.append('jobDescription', jobDescription)
 
       const res = await fetch('/api/ats-check', { method: 'POST', body: form })
-      const text = await res.text()
+      const raw = await res.text()
       let data: { error?: string } & Partial<ATSResult> = {}
-      try { data = JSON.parse(text) } catch { /* non-JSON response */ }
+      try { data = JSON.parse(raw) } catch { /* non-JSON */ }
       if (!res.ok) {
         if (res.status === 401) {
-          setError('login_required')
+          // Save current inputs before redirecting to login
+          sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+            tab,
+            resumeText: tab === 'paste' ? resumeText : '',
+            jobDescription,
+          }))
+          setModal('login_required')
         } else if (res.status === 403) {
-          setError('pro_required')
+          setModal('pro_required')
         } else {
           setError(data.error ?? `Server error (${res.status}). Please try again.`)
         }
@@ -98,6 +200,8 @@ export default function ATSCheckPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
+      {modal && <Modal type={modal} onClose={() => setModal(null)} />}
+
       <div className="mb-10">
         <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 text-xs font-semibold px-3 py-1 rounded-full mb-3">
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -117,13 +221,19 @@ export default function ATSCheckPage() {
             {(['upload', 'paste'] as const).map(t => (
               <button
                 key={t}
-                onClick={() => setTab(t)}
+                onClick={() => { setTab(t); setPdfNotice(false) }}
                 className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${tab === t ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
               >
                 {t === 'upload' ? 'Upload PDF' : 'Paste Text'}
               </button>
             ))}
           </div>
+
+          {pdfNotice && (
+            <div className="bg-amber-50 border border-amber-200 text-amber-700 rounded-xl px-4 py-3 text-xs">
+              Your PDF couldn&apos;t be saved across the login. Please paste your resume text below to continue.
+            </div>
+          )}
 
           {tab === 'upload' ? (
             <div
@@ -192,25 +302,7 @@ export default function ATSCheckPage() {
             ) : 'Analyse Resume'}
           </button>
 
-          {error === 'login_required' && (
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
-              <div className="text-sm font-semibold text-blue-800 mb-1">Sign in to continue</div>
-              <p className="text-xs text-blue-700 mb-3">Create a free account to use the ATS Checker.</p>
-              <Link href="/auth/login?redirect=/ats-check" className="inline-block bg-blue-600 text-white text-sm px-5 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                Sign in / Sign up — free
-              </Link>
-            </div>
-          )}
-          {error === 'pro_required' && (
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-              <div className="text-sm font-semibold text-amber-800 mb-1">Pro Access Required</div>
-              <p className="text-xs text-amber-700 mb-3">The ATS Checker is a Pro feature. Upgrade once for unlimited checks.</p>
-              <Link href="/pricing" className="inline-block bg-blue-600 text-white text-sm px-5 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                Get Pro Access — ₹999
-              </Link>
-            </div>
-          )}
-          {error && error !== 'pro_required' && error !== 'login_required' && (
+          {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">{error}</div>
           )}
         </div>
@@ -246,7 +338,6 @@ export default function ATSCheckPage() {
 
           {result && (
             <div className="border border-gray-100 rounded-2xl p-6 shadow-sm space-y-6">
-              {/* Score */}
               <div className="flex items-center gap-6">
                 <ScoreRing score={result.score} />
                 <div>
@@ -257,7 +348,6 @@ export default function ATSCheckPage() {
                 </div>
               </div>
 
-              {/* Section scores */}
               <div>
                 <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Section Breakdown</div>
                 <div className="space-y-3">
@@ -268,7 +358,6 @@ export default function ATSCheckPage() {
                 </div>
               </div>
 
-              {/* Missing keywords */}
               {result.missing_keywords.length > 0 && (
                 <div>
                   <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Missing Keywords</div>
@@ -280,7 +369,6 @@ export default function ATSCheckPage() {
                 </div>
               )}
 
-              {/* Suggestions */}
               <div>
                 <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">How to Improve</div>
                 <ul className="space-y-2">
