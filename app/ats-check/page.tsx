@@ -148,9 +148,6 @@ export default function ATSCheckPage() {
         setTab('paste')
         setResumeText(pending.resumeText)
         runAnalysis(pending.resumeText, jd)
-      } else if (pending.tab === 'upload') {
-        setTab('paste')
-        setPdfNotice(true)
       }
     } catch { /* ignore */ }
   }, [runAnalysis])
@@ -174,12 +171,10 @@ export default function ATSCheckPage() {
       try { data = JSON.parse(raw) } catch { /* non-JSON */ }
       if (!res.ok) {
         if (res.status === 401) {
-          // Save current inputs before redirecting to login
-          sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
-            tab,
-            resumeText: tab === 'paste' ? resumeText : '',
-            jobDescription,
-          }))
+          // Only save if there's paste text to restore — PDF files can't be serialised
+          if (tab === 'paste' && resumeText.trim()) {
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ resumeText, jobDescription }))
+          }
           setModal('login_required')
         } else if (res.status === 403) {
           setModal('pro_required')
