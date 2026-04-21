@@ -98,44 +98,43 @@ function ATSCheckInner() {
   const [loading, setLoading] = useState(false)
   const [modal, setModal] = useState<'login_required' | 'pro_required' | null>(null)
   const [error, setError] = useState('')
+  const [info, setInfo] = useState('')
   const [result, setResult] = useState<ATSResult | null>(null)
   const [dragging, setDragging] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   // Restore pending state on mount — fires after login redirect returns to this page
   useEffect(() => {
-    console.log('[ATS] mount effect fired, checking sessionStorage key:', STORAGE_KEY)
     const raw = sessionStorage.getItem(STORAGE_KEY)
-    console.log('[ATS] sessionStorage value:', raw)
     if (!raw) return
     sessionStorage.removeItem(STORAGE_KEY)
     try {
       const pending = JSON.parse(raw)
       const jd = pending.jobDescription ?? ''
-      const text = pending.resumeText ?? ''
-      if (text) {
+      setJobDescription(jd)
+      if (pending.tab === 'paste' && pending.resumeText) {
         setTab('paste')
-        setResumeText(text)
-        setJobDescription(jd)
-        // Inline the fetch so we don't depend on runAnalysis ref
+        setResumeText(pending.resumeText)
         setLoading(true)
         const form = new FormData()
-        form.append('resumeText', text)
+        form.append('resumeText', pending.resumeText)
         form.append('jobDescription', jd)
         fetch('/api/ats-check', { method: 'POST', body: form })
           .then(r => r.text())
-          .then(raw => {
+          .then(txt => {
             try {
-              const data = JSON.parse(raw)
+              const data = JSON.parse(txt)
               if (data.score !== undefined) setResult(data)
               else if (data.error) setError(data.error)
             } catch { setError('Analysis failed. Please try again.') }
           })
           .catch(() => setError('Something went wrong. Please try again.'))
           .finally(() => setLoading(false))
+      } else if (pending.tab === 'upload') {
+        setTab('upload')
+        setInfo('You\'re signed in — re-upload your PDF and click Analyse.')
       }
     } catch { /* ignore */ }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function handleAnalyse() {
@@ -158,11 +157,9 @@ function ATSCheckInner() {
       if (!res.ok) {
         if (res.status === 401) {
           if (tab === 'paste' && resumeText.trim()) {
-            const payload = JSON.stringify({ resumeText, jobDescription })
-            console.log('[ATS] saving to sessionStorage:', payload.slice(0, 100))
-            sessionStorage.setItem(STORAGE_KEY, payload)
-          } else {
-            console.log('[ATS] NOT saving — tab:', tab, 'text length:', resumeText.trim().length)
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ tab: 'paste', resumeText, jobDescription }))
+          } else if (tab === 'upload') {
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ tab: 'upload', jobDescription }))
           }
           setModal('login_required')
         } else if (res.status === 403) {
@@ -278,6 +275,9 @@ function ATSCheckInner() {
             ) : 'Analyse Resume'}
           </button>
 
+          {info && (
+            <div className="bg-blue-50 border border-blue-200 text-blue-700 rounded-xl px-4 py-3 text-sm">{info}</div>
+          )}
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">{error}</div>
           )}
