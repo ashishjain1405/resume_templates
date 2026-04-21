@@ -45,6 +45,8 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [saving, setSaving] = useState(false)
   const [savedMsg, setSavedMsg] = useState(false)
+  const [savingVersion, setSavingVersion] = useState(false)
+  const [savedVersion, setSavedVersion] = useState(false)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const Preview = PREVIEW_MAP[templateId] ?? ClassicPreview
@@ -145,6 +147,30 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const skillsStr = data.skills.join(', ')
   function setSkills(raw: string) {
     updateData({ ...data, skills: raw.split(',').map(s => s.trim()).filter(Boolean) })
+  }
+
+  async function handleSaveVersion() {
+    if (!user) { setShowAuthModal(true); return }
+    setSavingVersion(true)
+    try {
+      const res = await fetch('/api/builder/pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ templateId, data, accentColor }),
+      })
+      if (!res.ok) { alert('Could not generate resume. Please try again.'); return }
+      const blob = await res.blob()
+      const name = `${data.personal.name?.replace(/\s+/g, '_') || 'resume'}_${templateId}.html`
+      const file = new File([blob], name, { type: 'text/html' })
+      const form = new FormData()
+      form.append('file', file)
+      const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
+      if (!uploadRes.ok) { alert('Could not save to My Resumes. Please try again.'); return }
+      setSavedVersion(true)
+      setTimeout(() => setSavedVersion(false), 3000)
+    } finally {
+      setSavingVersion(false)
+    }
   }
 
   async function handleDownload() {
@@ -314,6 +340,24 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
               <button onClick={() => setShowAuthModal(true)} className="text-blue-500 hover:underline">Sign up</button> to save & revisit
             </span>
           )}
+          <button
+            onClick={handleSaveVersion}
+            disabled={savingVersion}
+            className="border border-gray-200 text-gray-700 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50 flex items-center gap-1.5"
+          >
+            {savingVersion ? (
+              <div className="w-3.5 h-3.5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+            ) : savedVersion ? (
+              <svg className="w-3.5 h-3.5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            ) : (
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 3v13.5m-4.5-4.5L12 16.5l4.5-4.5" />
+              </svg>
+            )}
+            {savingVersion ? 'Saving…' : savedVersion ? 'Saved!' : 'Save This Version'}
+          </button>
           <button
             onClick={handleDownload}
             className="bg-blue-600 text-white text-sm px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"

@@ -65,11 +65,15 @@ export async function POST(request: NextRequest) {
 
       if (file && file.size > 0) {
         const buffer = Buffer.from(await file.arrayBuffer())
-        try {
-          resumeText = await parsePdf(buffer)
-        } catch (e) {
-          console.error('pdf-parse error:', e)
-          return Response.json({ error: 'Could not parse PDF. Try pasting the text instead.' }, { status: 422 })
+        if (file.type === 'text/html') {
+          resumeText = buffer.toString('utf-8').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+        } else {
+          try {
+            resumeText = await parsePdf(buffer)
+          } catch (e) {
+            console.error('pdf-parse error:', e)
+            return Response.json({ error: 'Could not parse PDF. Try pasting the text instead.' }, { status: 422 })
+          }
         }
       }
     } else {
