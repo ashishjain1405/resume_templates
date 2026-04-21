@@ -16,6 +16,15 @@ export async function POST(request: NextRequest) {
     const { start, end, userName } = await request.json()
     if (!start || !end) return Response.json({ error: 'Invalid slot' }, { status: 400 })
 
+    // Enforce 1-session limit per pro user
+    const { count: existingCount } = await adminClient
+      .from('sessions')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+    if ((existingCount ?? 0) >= 1) {
+      return Response.json({ error: 'session_limit_reached' }, { status: 403 })
+    }
+
     // Verify slot is still free
     const available = await getAvailableSlots(14)
     const stillFree = available.some((s) => s.start === start && s.end === end)

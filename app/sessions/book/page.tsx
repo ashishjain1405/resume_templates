@@ -64,7 +64,14 @@ export default function BookSessionPage() {
         body: JSON.stringify({ start: selectedSlot.start, end: selectedSlot.end, userName }),
       })
       const data = await res.json()
-      if (!res.ok) { setError(data.error ?? 'Booking failed.'); return }
+      if (!res.ok) {
+        if (data.error === 'session_limit_reached') {
+          setError('You have already used your included expert session. Each Pro plan includes 1 session.')
+        } else {
+          setError(data.error ?? 'Booking failed.')
+        }
+        return
+      }
       setMeetLink(data.meetLink)
       setScheduledAt(data.scheduledAt)
       setStep('done')
