@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
 
     if (uploadError) {
       console.error('Storage upload error:', uploadError)
-      return Response.json({ error: 'Upload failed' }, { status: 500 })
+      return Response.json({ error: uploadError.message }, { status: 500 })
     }
 
     const { data: row, error: dbError } = await adminClient
