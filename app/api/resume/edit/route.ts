@@ -23,7 +23,8 @@ export async function POST(request: NextRequest) {
     const url = await uploadResumeToDrive(buffer, file.name, file.type)
     return Response.json({ url })
   } catch (e) {
-    console.error('resume/edit error:', e)
-    return Response.json({ error: 'Failed to upload resume' }, { status: 500 })
+    const msg = e instanceof Error ? e.message : String(e)
+    console.error('resume/edit error:', msg)
+    return Response.json({ error: msg }, { status: 500 })
   }
 }

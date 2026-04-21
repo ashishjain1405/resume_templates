@@ -19,7 +19,7 @@ export async function uploadResumeToDrive(
   const auth = getOAuth2Client()
   const drive = google.drive({ version: 'v3', auth })
 
-  const stream = Readable.from(fileBuffer)
+  const stream = Readable.from([fileBuffer])
 
   const res = await drive.files.create({
     requestBody: {
