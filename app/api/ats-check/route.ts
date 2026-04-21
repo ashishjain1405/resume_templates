@@ -3,8 +3,10 @@ import { createClient, createAdminClient } from '@/lib/supabase-server'
 import { isPro } from '@/lib/pro'
 import OpenAI from 'openai'
 async function parsePdf(buf: Buffer): Promise<string> {
+  // Use the internal module directly to avoid pdf-parse's test-file check that
+  // crashes in serverless environments (Vercel) where those paths don't exist.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const pdfParse = require('pdf-parse') as (buf: Buffer) => Promise<{ text: string }>
+  const pdfParse = require('pdf-parse/lib/pdf-parse.js') as (buf: Buffer) => Promise<{ text: string }>
   const result = await pdfParse(buf)
   return result.text
 }
