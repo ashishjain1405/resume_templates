@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect, Suspense } from 'react'
 import Link from 'next/link'
+import ProBadge from '@/components/ProBadge'
+import { createClient } from '@/lib/supabase'
 
 interface ATSResult {
   score: number
@@ -89,6 +91,7 @@ function Modal({ type, onClose }: { type: 'login_required' | 'pro_required'; onC
 }
 
 const STORAGE_KEY = 'ats_pending'
+const RESULT_KEY = 'ats_result'
 
 function ATSCheckInner() {
   const [tab, setTab] = useState<'upload' | 'paste'>('upload')
@@ -101,7 +104,27 @@ function ATSCheckInner() {
   const [info, setInfo] = useState('')
   const [result, setResult] = useState<ATSResult | null>(null)
   const [dragging, setDragging] = useState(false)
+  const [isPro, setIsPro] = useState(false)
+  const [editLoading, setEditLoading] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  // Restore last result + inputs from localStorage on mount
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) return
+      supabase.from('pro_access').select('id').eq('user_id', data.user.id).maybeSingle()
+        .then(({ data: row }) => setIsPro(!!row))
+    })
+    try {
+      const raw = localStorage.getItem(RESULT_KEY)
+      if (!raw) return
+      const saved = JSON.parse(raw)
+      if (saved.result) setResult(saved.result)
+      if (saved.resumeText) { setResumeText(saved.resumeText); setTab('paste') }
+      if (saved.jobDescription) setJobDescription(saved.jobDescription)
+    } catch { /* ignore */ }
+  }, [])
 
   // Restore pending state on mount — fires after login redirect returns to this page
   useEffect(() => {
@@ -169,7 +192,11 @@ function ATSCheckInner() {
         }
         return
       }
-      setResult(data as ATSResult)
+      const atsResult = data as ATSResult
+      setResult(atsResult)
+      try {
+        localStorage.setItem(RESULT_KEY, JSON.stringify({ result: atsResult, resumeText, jobDescription, tab }))
+      } catch { /* ignore */ }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.')
     } finally {
@@ -179,17 +206,34 @@ function ATSCheckInner() {
 
   const canSubmit = tab === 'upload' ? !!file : resumeText.trim().length > 50
 
+  async function handleEditInDocs() {
+    if (!isPro) { setModal('pro_required'); return }
+    setEditLoading(true)
+    try {
+      const form = new FormData()
+      if (tab === 'upload' && file) {
+        form.append('file', file)
+      } else {
+        const blob = new Blob([resumeText], { type: 'text/plain' })
+        form.append('file', blob, 'resume.txt')
+      }
+      const res = await fetch('/api/resume/edit', { method: 'POST', body: form })
+      const data = await res.json()
+      if (data.url) window.open(data.url, '_blank')
+      else setError(data.error ?? 'Failed to open in Google Docs')
+    } catch {
+      setError('Something went wrong. Please try again.')
+    } finally {
+      setEditLoading(false)
+    }
+  }
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
       {modal && <Modal type={modal} onClose={() => setModal(null)} />}
 
       <div className="mb-10">
-        <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 text-xs font-semibold px-3 py-1 rounded-full mb-3">
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          Pro Feature
-        </div>
+        <div className="mb-3"><ProBadge /></div>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">ATS Resume Checker</h1>
         <p className="text-gray-500 max-w-xl">Upload your resume and optionally paste a job description. Get an instant ATS score with actionable improvements.</p>
       </div>
@@ -313,6 +357,22 @@ function ATSCheckInner() {
 
           {result && (
             <div className="border border-gray-100 rounded-2xl p-6 shadow-sm space-y-6">
+              <button
+                onClick={handleEditInDocs}
+                disabled={editLoading}
+                className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors disabled:opacity-50"
+              >
+                {editLoading ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                )}
+                Update my resume
+                {!isPro && <ProBadge />}
+              </button>
+
               <div className="flex items-center gap-6">
                 <ScoreRing score={result.score} />
                 <div>
@@ -356,11 +416,6 @@ function ATSCheckInner() {
                 </ul>
               </div>
 
-              <div className="pt-2 border-t border-gray-50">
-                <Link href="/builder/multicolumn" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                  Apply these improvements in the Resume Builder →
-                </Link>
-              </div>
             </div>
           )}
         </div>

@@ -17,7 +17,7 @@ export default function GoogleAuthPage() {
     client_id: clientId,
     redirect_uri: redirectUri,
     response_type: 'code',
-    scope: 'https://www.googleapis.com/auth/calendar',
+    scope: 'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/drive.file',
     access_type: 'offline',
     prompt: 'consent',
   })
