@@ -26,8 +26,8 @@ function LoginForm() {
       setError(error.message)
       setLoading(false)
     } else {
-      router.refresh()
-      router.push(redirect)
+      // Use full navigation so destination page remounts (needed for sessionStorage restore)
+      window.location.href = redirect
     }
   }
 

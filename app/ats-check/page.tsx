@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
 
 interface ATSResult {
   score: number
@@ -64,7 +63,7 @@ function Modal({ type, onClose }: { type: 'login_required' | 'pro_required'; onC
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Sign in to continue</h3>
             <p className="text-sm text-gray-500 text-center mb-5">Create a free account to use the ATS Checker.</p>
             <Link
-              href="/auth/login?redirect=/ats-check%3Frun%3D1"
+              href="/auth/login?redirect=/ats-check"
               className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors"
             >
               Sign in / Sign up — free
@@ -92,9 +91,6 @@ function Modal({ type, onClose }: { type: 'login_required' | 'pro_required'; onC
 const STORAGE_KEY = 'ats_pending'
 
 function ATSCheckInner() {
-  const searchParams = useSearchParams()
-  const shouldRun = searchParams.get('run') === '1'
-
   const [tab, setTab] = useState<'upload' | 'paste'>('upload')
   const [file, setFile] = useState<File | null>(null)
   const [resumeText, setResumeText] = useState('')
@@ -132,9 +128,8 @@ function ATSCheckInner() {
     }
   }, [])
 
-  // Restore pending state when redirected back from login with ?run=1
+  // Restore pending state on mount — fires after login redirect returns to this page
   useEffect(() => {
-    if (!shouldRun) return
     const raw = sessionStorage.getItem(STORAGE_KEY)
     if (!raw) return
     sessionStorage.removeItem(STORAGE_KEY)
@@ -148,7 +143,7 @@ function ATSCheckInner() {
         runAnalysis(pending.resumeText, jd)
       }
     } catch { /* ignore */ }
-  }, [shouldRun, runAnalysis])
+  }, [runAnalysis])
 
   async function handleAnalyse() {
     setError('')
