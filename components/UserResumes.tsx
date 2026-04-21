@@ -25,6 +25,7 @@ export default function UserResumes() {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [downloadingId, setDownloadingId] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => { fetchResumes() }, [])
@@ -55,6 +56,23 @@ export default function UserResumes() {
       setResumes(prev => [data.resume, ...prev])
     } catch { setError('Upload failed. Please try again.') } finally {
       setUploading(false)
+    }
+  }
+
+  async function handleDownload(r: UploadedResume) {
+    setDownloadingId(r.id)
+    try {
+      const res = await fetch(`/api/resume/${r.id}`)
+      const data = await res.json()
+      if (!data.url) return
+      const fileRes = await fetch(data.url)
+      const blob = await fileRes.blob()
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(blob)
+      a.download = r.filename
+      a.click()
+    } catch { /* ignore */ } finally {
+      setDownloadingId(null)
     }
   }
 
@@ -127,6 +145,20 @@ export default function UserResumes() {
                 >
                   Check ATS
                 </Link>
+                <button
+                  onClick={() => handleDownload(r)}
+                  disabled={downloadingId === r.id}
+                  className="text-gray-400 hover:text-gray-700 transition-colors disabled:opacity-50"
+                  aria-label="Download"
+                >
+                  {downloadingId === r.id ? (
+                    <div className="w-4 h-4 border-2 border-gray-200 border-t-gray-400 rounded-full animate-spin" />
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 3v13.5m-4.5-4.5L12 16.5l4.5-4.5" />
+                    </svg>
+                  )}
+                </button>
                 <button
                   onClick={() => handleDelete(r.id)}
                   disabled={deletingId === r.id}

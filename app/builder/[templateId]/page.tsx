@@ -175,7 +175,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
 
   async function handleDownload() {
     if (!user) { setShowAuthModal(true); return }
-    const res = await fetch('/api/builder/pdf', {
+    const res = await fetch('/api/builder/pdf?pdf=1', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ templateId, data, accentColor }),
@@ -185,7 +185,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `resume-${templateId}.html`
+    a.download = `resume-${templateId}.pdf`
     a.click()
     URL.revokeObjectURL(url)
   }
