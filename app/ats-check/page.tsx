@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, Suspense } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import ProBadge from '@/components/ProBadge'
 import { createClient } from '@/lib/supabase'
 
@@ -94,6 +95,7 @@ const STORAGE_KEY = 'ats_pending'
 const RESULT_KEY = 'ats_result'
 
 function ATSCheckInner() {
+  const searchParams = useSearchParams()
   const [tab, setTab] = useState<'upload' | 'paste'>('upload')
   const [file, setFile] = useState<File | null>(null)
   const [resumeText, setResumeText] = useState('')
@@ -125,6 +127,26 @@ function ATSCheckInner() {
       if (saved.jobDescription) setJobDescription(saved.jobDescription)
     } catch { /* ignore */ }
   }, [])
+
+  // Load resume from dashboard "Check ATS" link
+  useEffect(() => {
+    const resumeId = searchParams.get('resumeId')
+    if (!resumeId) return
+    fetch(`/api/resume/${resumeId}`)
+      .then(r => r.json())
+      .then(async data => {
+        if (!data.url) return
+        const resp = await fetch(data.url)
+        const blob = await resp.blob()
+        const contentType = blob.type || 'application/pdf'
+        const ext = contentType.includes('pdf') ? 'pdf' : 'docx'
+        const f = new File([blob], `resume.${ext}`, { type: contentType })
+        setFile(f)
+        setTab('upload')
+        setInfo('Resume loaded — click Analyse to check your score.')
+      })
+      .catch(() => {})
+  }, [searchParams])
 
   // Restore pending state on mount — fires after login redirect returns to this page
   useEffect(() => {

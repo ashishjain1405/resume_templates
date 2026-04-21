@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase-server'
 import { TEMPLATES } from '@/lib/templates'
 import { isPro } from '@/lib/pro'
 import TemplateCard from '@/components/TemplateCard'
+import UserResumes from '@/components/UserResumes'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -119,11 +120,16 @@ export default async function DashboardPage() {
             <h2 className="text-lg font-semibold text-gray-900">More templates</h2>
             <Link href="/pricing" className="text-sm text-blue-600 font-medium hover:text-blue-700">Get Pro for all →</Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-10">
             {lockedTemplates.map((t) => <TemplateCard key={t.id} template={t} />)}
           </div>
         </>
       )}
+
+      {/* Uploaded resumes */}
+      <div className="mt-10">
+        <UserResumes />
+      </div>
     </div>
   )
 }

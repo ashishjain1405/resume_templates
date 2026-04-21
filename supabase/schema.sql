@@ -73,3 +73,27 @@ ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users view own sessions"
   ON sessions FOR SELECT
   USING (auth.uid() = user_id);
+
+-- Uploaded resumes: user-uploaded PDF/DOCX files stored in Supabase Storage
+CREATE TABLE IF NOT EXISTS uploaded_resumes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  filename TEXT NOT NULL,
+  storage_path TEXT NOT NULL,
+  mime_type TEXT NOT NULL,
+  size_bytes INTEGER NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE uploaded_resumes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users view own uploaded resumes"
+  ON uploaded_resumes FOR SELECT
+  USING (auth.uid() = user_id);
+
+-- Service role handles INSERT and DELETE via API routes
+
+-- Storage bucket: create manually in Supabase dashboard
+-- Bucket name: user-resumes
+-- Private bucket (no public access)
+-- RLS policy on storage.objects: allow SELECT where owner = auth.uid()
