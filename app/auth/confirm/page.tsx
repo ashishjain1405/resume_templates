@@ -15,7 +15,9 @@ export default function ConfirmPage() {
       const params = new URLSearchParams(window.location.search)
       const tokenHash = params.get('token_hash')
       const type = params.get('type') as 'email' | 'recovery' | 'invite' | null
-      const redirect = params.get('redirect') ?? '/dashboard'
+      // URL param is preferred; fall back to localStorage set at signup time
+      const redirect = params.get('redirect') ?? localStorage.getItem('auth_redirect') ?? '/dashboard'
+      localStorage.removeItem('auth_redirect')
 
       if (tokenHash && type) {
         const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type })

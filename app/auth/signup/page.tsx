@@ -30,6 +30,9 @@ function SignupForm() {
       return
     }
 
+    // Store redirect in localStorage so confirm page can retrieve it even if URL params are lost
+    localStorage.setItem('auth_redirect', redirect)
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
