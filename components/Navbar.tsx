@@ -42,6 +42,8 @@ export default function Navbar() {
   }, [])
 
   async function handleSignOut() {
+    // Clear any locally cached builder drafts so the next user on this device starts fresh
+    Object.keys(localStorage).filter(k => k.startsWith('resume_builder_')).forEach(k => localStorage.removeItem(k))
     await supabase.auth.signOut()
     setMenuOpen(false)
     setMobileOpen(false)
