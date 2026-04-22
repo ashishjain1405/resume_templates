@@ -60,7 +60,7 @@ function SectionBar({ label, score }: { label: string; score: number }) {
   )
 }
 
-function Modal({ type, onClose }: { type: 'login_required' | 'pro_required'; onClose: () => void }) {
+function Modal({ type, onClose }: { type: 'login_required' | 'pro_required' | 'pro_docs'; onClose: () => void }) {
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4" onClick={onClose}>
       <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl relative" onClick={e => e.stopPropagation()}>
@@ -76,6 +76,19 @@ function Modal({ type, onClose }: { type: 'login_required' | 'pro_required'; onC
             <p className="text-sm text-gray-500 text-center mb-5">Create a free account to use the ATS Checker.</p>
             <Link href="/auth/login?redirect=/ats-check" className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
               Sign in / Sign up — free
+            </Link>
+          </>
+        ) : type === 'pro_docs' ? (
+          <>
+            <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Pro feature</h3>
+            <p className="text-sm text-gray-500 text-center mb-5">Editing your resume in Google Docs is available on Pro. Upgrade once for lifetime access — ₹999.</p>
+            <Link href="/pricing" className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
+              Get Pro Access — ₹999
             </Link>
           </>
         ) : (
@@ -107,7 +120,7 @@ function ATSCheckInner() {
   const [resumeText, setResumeText] = useState('')
   const [jobDescription, setJobDescription] = useState('')
   const [loading, setLoading] = useState(false)
-  const [modal, setModal] = useState<'login_required' | 'pro_required' | null>(null)
+  const [modal, setModal] = useState<'login_required' | 'pro_required' | 'pro_docs' | null>(null)
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
   const [result, setResult] = useState<ATSResult | null>(null)
@@ -299,7 +312,7 @@ function ATSCheckInner() {
   }
 
   async function handleEditInDocs() {
-    if (!isPro) { setModal('pro_required'); return }
+    if (!isPro) { setModal('pro_docs'); return }
     setEditLoading(true)
     try {
       const form = new FormData()
@@ -516,7 +529,7 @@ function ATSCheckInner() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   )}
-                  Update my resume
+                  Edit in Google Docs
                   {!isPro && <ProBadge />}
                 </button>
                 <button
