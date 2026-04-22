@@ -108,6 +108,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit')
   const [isPro, setIsPro] = useState(false)
   const [showProDownloadModal, setShowProDownloadModal] = useState(false)
+  const [showProDocsModal, setShowProDocsModal] = useState(false)
   const [showChangeTemplateModal, setShowChangeTemplateModal] = useState(false)
   const [authForATS, setAuthForATS] = useState(false)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -271,6 +272,27 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       setTimeout(() => setSavedVersion(false), 3000)
     } finally {
       setSavingVersion(false)
+    }
+  }
+
+  async function handleEditInDocs() {
+    if (!user) { setShowAuthModal(true); return }
+    if (!isPro) { setShowProDocsModal(true); return }
+    try {
+      const pdfRes = await fetch('/api/builder/pdf?pdf=1', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ templateId, data, accentColor }),
+      })
+      if (!pdfRes.ok) return
+      const blob = await pdfRes.blob()
+      const form = new FormData()
+      form.append('file', new File([blob], 'resume.pdf', { type: 'application/pdf' }))
+      const res = await fetch('/api/resume/edit', { method: 'POST', body: form })
+      const json = await res.json()
+      if (json.url) window.open(json.url, '_blank')
+    } catch {
+      alert('Failed to open in Google Docs. Please try again.')
     }
   }
 
@@ -516,13 +538,24 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
               />
             ))}
           </div>
-          <button
-            onClick={() => setShowChangeTemplateModal(true)}
-            className="ml-auto flex items-center gap-1.5 text-xs border border-blue-200 text-blue-600 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg font-medium transition-colors"
-          >
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-            Change Template
-          </button>
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={handleEditInDocs}
+              className="flex items-center gap-1.5 text-xs border border-gray-200 text-gray-600 bg-white hover:bg-gray-50 px-2.5 py-1 rounded-lg font-medium transition-colors"
+            >
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+              {isPro ? 'Edit in Google Docs' : (
+                <span className="flex items-center gap-1">Edit in Google Docs <svg className="w-2.5 h-2.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg></span>
+              )}
+            </button>
+            <button
+              onClick={() => setShowChangeTemplateModal(true)}
+              className="flex items-center gap-1.5 text-xs border border-blue-200 text-blue-600 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg font-medium transition-colors"
+            >
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+              Change Template
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 overflow-auto flex items-start justify-center p-4 lg:p-8">
@@ -591,6 +624,22 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       )}
 
       {/* Pro download modal */}
+      {showProDocsModal && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowProDocsModal(false)}>
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl relative" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowProDocsModal(false)} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+            <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Edit in Google Docs is a Pro feature</h3>
+            <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for lifetime access — edit in Google Docs, unlimited ATS checks, PDF downloads, and an expert session. ₹999, one-time.</p>
+            <ProUpgradeCTAs layout="stack" source="docs" />
+          </div>
+        </div>
+      )}
+
       {showProDownloadModal && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowProDownloadModal(false)}>
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl relative" onClick={e => e.stopPropagation()}>

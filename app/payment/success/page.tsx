@@ -29,13 +29,14 @@ const DEFAULT_SOURCE = {
   description: 'You now have Pro access — unlimited ATS checks, PDF downloads, and an expert session.',
 }
 
-export default function PaymentSuccessPage({
+export default async function PaymentSuccessPage({
   searchParams,
 }: {
-  searchParams: { type?: string; source?: string }
+  searchParams: Promise<{ type?: string; source?: string }>
 }) {
-  const isPro = searchParams.type === 'pro'
-  const primary = (searchParams.source ? SOURCE_CONFIG[searchParams.source] : undefined) ?? DEFAULT_SOURCE
+  const params = await searchParams
+  const isPro = params.type === 'pro'
+  const primary = (params.source ? SOURCE_CONFIG[params.source] : undefined) ?? DEFAULT_SOURCE
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 bg-gray-50">
