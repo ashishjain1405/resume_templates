@@ -132,6 +132,7 @@ function ATSCheckInner() {
   const [savedToDashboard, setSavedToDashboard] = useState(false)
   const [saveCount, setSaveCount] = useState(0)
   const [showSaveModal, setShowSaveModal] = useState(false)
+  const [pendingNavUrl, setPendingNavUrl] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
   // On mount: check pro status, fetch usage, load saved resumes
@@ -186,7 +187,6 @@ function ATSCheckInner() {
             setResult(parsed as ATSResult)
             if (parsed._usage) setUsage(parsed._usage)
             setSaveCount(0)
-            setTimeout(() => setShowSaveModal(true), 1500)
           }
         } catch (e) {
           setError(e instanceof Error ? e.message : 'Something went wrong.')
@@ -257,6 +257,22 @@ function ATSCheckInner() {
     return () => window.removeEventListener('beforeunload', handler)
   }, [result, saveCount])
 
+  // Intercept in-app link clicks when result is unsaved
+  useEffect(() => {
+    if (!result || saveCount > 0) return
+    const handler = (e: MouseEvent) => {
+      const anchor = (e.target as Element).closest('a')
+      if (!anchor) return
+      const href = anchor.getAttribute('href')
+      if (!href || href.startsWith('#') || anchor.getAttribute('target') === '_blank') return
+      e.preventDefault()
+      setPendingNavUrl(href)
+      setShowSaveModal(true)
+    }
+    document.addEventListener('click', handler, true)
+    return () => document.removeEventListener('click', handler, true)
+  }, [result, saveCount])
+
   async function handleAnalyse() {
     setError('')
     setLoading(true)
@@ -315,7 +331,6 @@ function ATSCheckInner() {
       setResult(atsResult)
       setSaveCount(0)
       if (atsResult._usage) setUsage(atsResult._usage)
-      setTimeout(() => setShowSaveModal(true), 1500)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.')
     } finally {
@@ -397,9 +412,8 @@ function ATSCheckInner() {
       {modal && <Modal type={modal} onClose={() => setModal(null)} userEmail={userEmail} />}
 
       {showSaveModal && saveCount === 0 && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4" onClick={() => setShowSaveModal(false)}>
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl relative" onClick={e => e.stopPropagation()}>
-            <button onClick={() => setShowSaveModal(false)} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl relative">
             <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
@@ -409,13 +423,20 @@ function ATSCheckInner() {
             <p className="text-sm text-gray-500 text-center mb-5">Your score and suggestions will be gone once you leave this page.</p>
             <div className="flex flex-col gap-2">
               <button
-                onClick={async () => { await handleSaveToDashboard(); setShowSaveModal(false) }}
+                onClick={async () => {
+                  await handleSaveToDashboard()
+                  setShowSaveModal(false)
+                  if (pendingNavUrl) window.location.href = pendingNavUrl
+                }}
                 disabled={savingToDashboard}
                 className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors disabled:opacity-60"
               >
                 {savingToDashboard ? 'Saving…' : 'Save to Dashboard'}
               </button>
-              <button onClick={() => setShowSaveModal(false)} className="w-full border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors">
+              <button
+                onClick={() => { setShowSaveModal(false); if (pendingNavUrl) window.location.href = pendingNavUrl }}
+                className="w-full border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors"
+              >
                 Leave anyway
               </button>
             </div>

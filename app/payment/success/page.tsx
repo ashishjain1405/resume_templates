@@ -8,7 +8,7 @@ const SOURCE_CONFIG: Record<string, { label: string; href: string; description: 
   },
   download: {
     label: 'Download your resume →',
-    href: '/builder/multicolumn',
+    href: '/builder',
     description: 'Head back to the Builder to download your PDF.',
   },
   ats: {
@@ -19,8 +19,8 @@ const SOURCE_CONFIG: Record<string, { label: string; href: string; description: 
 }
 
 const DEFAULT_SOURCE = {
-  label: 'Check your ATS score →',
-  href: '/ats-check',
+  label: 'Go to Dashboard →',
+  href: '/dashboard',
   description: 'You now have Pro access — unlimited ATS checks, PDF downloads, and an expert session.',
 }
 
