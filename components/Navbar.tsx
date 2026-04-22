@@ -77,10 +77,10 @@ export default function Navbar() {
           {user ? (
             <>
               <Link href="/ats-check" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
-                Check my Resume
+                Check ATS Score
               </Link>
               <Link href="/builder" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
-                Build my Resume
+                Create my Resume
               </Link>
               {!isPro && <GoProLink />}
 
@@ -131,10 +131,10 @@ export default function Navbar() {
           ) : (
             <>
               <Link href="/ats-check" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
-                Check my Resume
+                Check ATS Score
               </Link>
               <Link href="/builder" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
-                Build my Resume
+                Create my Resume
               </Link>
               <GoProLink />
               <Link href="/auth/login" className="text-sm text-gray-500 hover:text-gray-900 transition-colors ml-1">Log in</Link>
