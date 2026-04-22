@@ -21,7 +21,6 @@ function CheckATSButton({ user, onAuthRequired, data, accentColor, templateId }:
   templateId: string
 }) {
   const [saving, setSaving] = useState(false)
-  const [resumeId, setResumeId] = useState<string | null>(null)
 
   async function handleCheckATS() {
     if (!user) {
@@ -44,26 +43,12 @@ function CheckATSButton({ user, onAuthRequired, data, accentColor, templateId }:
       form.append('file', file)
       const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
       const uploadData = await uploadRes.json()
-      if (uploadData.resume?.id) setResumeId(uploadData.resume.id)
+      if (uploadData.resume?.id) {
+        window.open(`/ats-check?resumeId=${uploadData.resume.id}`, '_blank')
+      }
     } finally {
       setSaving(false)
     }
-  }
-
-  if (resumeId) {
-    return (
-      <a
-        href={`/ats-check?resumeId=${resumeId}`}
-        target="_blank"
-        rel="noreferrer"
-        className="border border-gray-200 text-gray-700 text-sm px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center gap-1.5 flex-shrink-0"
-      >
-        <svg className="w-3.5 h-3.5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-        </svg>
-        Check ATS
-      </a>
-    )
   }
 
   return (
