@@ -131,7 +131,7 @@ function ATSCheckInner() {
   const [savingToDashboard, setSavingToDashboard] = useState(false)
   const [savedToDashboard, setSavedToDashboard] = useState(false)
   const [saveCount, setSaveCount] = useState(0)
-  const [bannerDismissed, setBannerDismissed] = useState(false)
+  const [showSaveModal, setShowSaveModal] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   // On mount: check pro status, fetch usage, load saved resumes
@@ -185,6 +185,8 @@ function ATSCheckInner() {
           } else {
             setResult(parsed as ATSResult)
             if (parsed._usage) setUsage(parsed._usage)
+            setSaveCount(0)
+            setTimeout(() => setShowSaveModal(true), 1500)
           }
         } catch (e) {
           setError(e instanceof Error ? e.message : 'Something went wrong.')
@@ -312,8 +314,8 @@ function ATSCheckInner() {
       const atsResult = data as ATSResult
       setResult(atsResult)
       setSaveCount(0)
-      setBannerDismissed(false)
       if (atsResult._usage) setUsage(atsResult._usage)
+      setTimeout(() => setShowSaveModal(true), 1500)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.')
     } finally {
@@ -393,6 +395,33 @@ function ATSCheckInner() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
       {modal && <Modal type={modal} onClose={() => setModal(null)} userEmail={userEmail} />}
+
+      {showSaveModal && saveCount === 0 && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4" onClick={() => setShowSaveModal(false)}>
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl relative" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowSaveModal(false)} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+            <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Save your ATS results?</h3>
+            <p className="text-sm text-gray-500 text-center mb-5">Your score and suggestions will be gone once you leave this page.</p>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={async () => { await handleSaveToDashboard(); setShowSaveModal(false) }}
+                disabled={savingToDashboard}
+                className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors disabled:opacity-60"
+              >
+                {savingToDashboard ? 'Saving…' : 'Save to Dashboard'}
+              </button>
+              <button onClick={() => setShowSaveModal(false)} className="w-full border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors">
+                Leave anyway
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="mb-10 flex items-start justify-between flex-wrap gap-3">
         <div>
@@ -661,24 +690,6 @@ function ATSCheckInner() {
                 </div>
               )}
 
-              {saveCount === 0 && !bannerDismissed && (
-                <div className="flex items-start justify-between gap-3 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-semibold text-blue-800 mb-0.5">Save your results before leaving</div>
-                    <div className="text-xs text-blue-600">Your ATS score won&apos;t be here when you come back.</div>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <button
-                      onClick={handleSaveToDashboard}
-                      disabled={savingToDashboard}
-                      className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-60"
-                    >
-                      {savingToDashboard ? 'Saving…' : 'Save to Dashboard'}
-                    </button>
-                    <button onClick={() => setBannerDismissed(true)} className="text-blue-400 hover:text-blue-600 text-lg leading-none">×</button>
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </div>

@@ -486,12 +486,6 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             )}
             {savingVersion ? 'Saving…' : savedVersion ? 'Saved to Dashboard' : 'Save to Dashboard'}
           </button>
-          <button
-            onClick={() => setShowChangeTemplateModal(true)}
-            className="border border-gray-200 text-gray-500 text-sm px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors font-medium flex-shrink-0"
-          >
-            Change template
-          </button>
           <CheckATSButton user={user} onAuthRequired={() => setShowAuthModal(true)} data={data} accentColor={accentColor} templateId={templateId} />
           {isPro ? (
             <button
@@ -532,7 +526,14 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
               />
             ))}
           </div>
-          <span className="ml-auto text-xs text-gray-400">{template?.name} template</span>
+          <button
+            onClick={() => setShowChangeTemplateModal(true)}
+            className="ml-auto text-xs text-gray-400 hover:text-blue-600 transition-colors flex items-center gap-1"
+          >
+            {template?.name}
+            <span className="text-gray-300 mx-0.5">·</span>
+            <span className="text-blue-500">Change</span>
+          </button>
         </div>
 
         <div className="flex-1 overflow-auto flex items-start justify-center p-4 lg:p-8">
