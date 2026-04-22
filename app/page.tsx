@@ -58,7 +58,7 @@ export default function HomePage() {
                 </svg>
               </div>
               <div>
-                <div className="text-2xl font-black text-gray-900 mb-1">5 templates</div>
+                <div className="text-2xl font-black text-blue-600 mb-1">5 templates</div>
                 <div className="text-base font-semibold text-gray-700 mb-1.5">Resume Builder</div>
                 <p className="text-sm text-gray-400 leading-relaxed">Build and download your resume in a professional template. No design skills needed.</p>
               </div>
@@ -71,7 +71,7 @@ export default function HomePage() {
                 </svg>
               </div>
               <div>
-                <div className="text-2xl font-black text-gray-900 mb-1">Unlimited</div>
+                <div className="text-2xl font-black text-blue-600 mb-1">Unlimited</div>
                 <div className="text-base font-semibold text-gray-700 mb-1.5">ATS Checks</div>
                 <p className="text-sm text-gray-400 leading-relaxed">Keep improving until your score is interview-ready. Check as many times as you need.</p>
               </div>
@@ -84,7 +84,7 @@ export default function HomePage() {
                 </svg>
               </div>
               <div>
-                <div className="text-2xl font-black text-gray-900 mb-1">30-min 1:1</div>
+                <div className="text-2xl font-black text-blue-600 mb-1">30-min 1:1</div>
                 <div className="text-base font-semibold text-gray-700 mb-1.5">Expert Session</div>
                 <p className="text-sm text-gray-400 leading-relaxed">Live resume review with an expert. Get actionable feedback before you apply.</p>
               </div>
@@ -153,7 +153,7 @@ export default function HomePage() {
               href="/builder"
               className="bg-blue-600 text-white px-8 py-3.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm text-center"
             >
-              Create my resume →
+              Create my resume
             </Link>
             <Link
               href="/templates"

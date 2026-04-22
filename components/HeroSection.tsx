@@ -73,14 +73,14 @@ function ATSAnimation() {
       `}</style>
 
       {/* Fixed-height container so size never changes */}
-      <div className="relative" style={{ height: '340px' }}>
+      <div className="relative" style={{ height: '420px' }}>
 
         {/* Back card — score (slides back when flipped) */}
         <div
           className={cardBase}
           style={{
             zIndex: flipped ? 0 : 2,
-            animation: flipped ? 'cardFlipBack 0.5s cubic-bezier(0.4,0,0.2,1) forwards' : undefined,
+            animation: flipped ? 'cardFlipBack 1s cubic-bezier(0.4,0,0.2,1) forwards' : undefined,
           }}
         >
           <div className="flex items-center justify-between mb-5">
@@ -150,7 +150,7 @@ function ATSAnimation() {
             zIndex: flipped ? 2 : 0,
             opacity: 0,
             transform: 'translateY(12px) scale(0.97) translateZ(-20px)',
-            animation: flipped ? 'cardFlipFront 0.5s cubic-bezier(0.4,0,0.2,1) forwards' : undefined,
+            animation: flipped ? 'cardFlipFront 1s cubic-bezier(0.4,0,0.2,1) forwards' : undefined,
           }}
         >
           <div className="flex items-center justify-between mb-5">
