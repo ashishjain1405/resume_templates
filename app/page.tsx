@@ -130,7 +130,7 @@ export default function HomePage() {
           <BuilderDemo />
           <div className="flex flex-col sm:flex-row gap-3 justify-center mt-10">
             <Link
-              href="/builder/multicolumn"
+              href="/builder"
               className="bg-blue-600 text-white px-8 py-3.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm text-center"
             >
               Start building for free →

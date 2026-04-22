@@ -79,7 +79,7 @@ export default function Navbar() {
               <Link href="/ats-check" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
                 Check my Resume
               </Link>
-              <Link href="/builder/multicolumn" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
+              <Link href="/builder" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
                 Build my Resume
               </Link>
               {!isPro && <GoProLink />}
@@ -133,7 +133,7 @@ export default function Navbar() {
               <Link href="/ats-check" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
                 Check my Resume
               </Link>
-              <Link href="/builder/multicolumn" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
+              <Link href="/builder" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
                 Build my Resume
               </Link>
               <GoProLink />
@@ -147,7 +147,7 @@ export default function Navbar() {
           <Link href="/ats-check" className="text-xs text-gray-700 border border-gray-200 px-2.5 py-1.5 rounded-lg font-medium whitespace-nowrap">
             Check
           </Link>
-          <Link href="/builder/multicolumn" className="text-xs text-gray-700 border border-gray-200 px-2.5 py-1.5 rounded-lg font-medium whitespace-nowrap">
+          <Link href="/builder" className="text-xs text-gray-700 border border-gray-200 px-2.5 py-1.5 rounded-lg font-medium whitespace-nowrap">
             Build
           </Link>
           <button className="p-2 text-gray-500" onClick={() => setMobileOpen(o => !o)} aria-label="Toggle menu">

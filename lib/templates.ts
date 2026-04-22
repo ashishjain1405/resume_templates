@@ -7,6 +7,7 @@ export interface Template {
   storage_path_pdf: string
   storage_path_docx: string
   category: string
+  tag: string
   colors: string[]
 }
 
@@ -20,6 +21,7 @@ export const TEMPLATES: Template[] = [
     storage_path_pdf: 'templates/multicolumn.pdf',
     storage_path_docx: 'templates/multicolumn.docx',
     category: 'Creative',
+    tag: 'Best for tech & creative roles',
     colors: ['#2c3e50', '#8e44ad', '#2980b9', '#27ae60', '#e74c3c'],
   },
   {
@@ -31,6 +33,7 @@ export const TEMPLATES: Template[] = [
     storage_path_pdf: 'templates/classic.pdf',
     storage_path_docx: 'templates/classic.docx',
     category: 'Classic',
+    tag: 'Clean, ATS-safe, all industries',
     colors: ['#1e3a5f', '#2d6a9f', '#4a9ede', '#7bbfe8', '#b0d9f5'],
   },
   {
@@ -42,6 +45,7 @@ export const TEMPLATES: Template[] = [
     storage_path_pdf: 'templates/modern.pdf',
     storage_path_docx: 'templates/modern.docx',
     category: 'Modern',
+    tag: 'Stand out with a bold sidebar',
     colors: ['#1a1a2e', '#16213e', '#0f3460', '#533483', '#e94560'],
   },
   {
@@ -53,6 +57,7 @@ export const TEMPLATES: Template[] = [
     storage_path_pdf: 'templates/quotation.pdf',
     storage_path_docx: 'templates/quotation.docx',
     category: 'Minimal',
+    tag: 'Minimal & elegant for creatives',
     colors: ['#f5f0e8', '#d4a853', '#8b7355', '#4a3728', '#2c1810'],
   },
   {
@@ -64,6 +69,7 @@ export const TEMPLATES: Template[] = [
     storage_path_pdf: 'templates/executive.pdf',
     storage_path_docx: 'templates/executive.docx',
     category: 'Professional',
+    tag: 'Senior professionals & C-suite',
     colors: ['#0a0a0a', '#1c1c1c', '#2d2d2d', '#8a7d6b', '#c9b99a'],
   },
 ]

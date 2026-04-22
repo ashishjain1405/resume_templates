@@ -65,7 +65,7 @@ export default async function DashboardPage() {
           <svg className="w-4 h-4 text-white/60 ml-auto group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
         </Link>
 
-        <Link href="/builder/multicolumn" className="group flex items-center gap-4 p-5 bg-white border border-gray-200 rounded-2xl hover:shadow-sm transition-shadow">
+        <Link href="/builder" className="group flex items-center gap-4 p-5 bg-white border border-gray-200 rounded-2xl hover:shadow-sm transition-shadow">
           <div className="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
             <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
