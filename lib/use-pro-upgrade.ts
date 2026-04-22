@@ -3,13 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-declare global {
-  interface Window {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    Razorpay: any
-  }
-}
-
 function loadRazorpayScript(): Promise<void> {
   if (typeof window !== 'undefined' && window.Razorpay) return Promise.resolve()
   return new Promise((resolve, reject) => {
