@@ -132,8 +132,11 @@ export default function BuilderDemo() {
           <div
             className={`mt-2 transition-all duration-500 ${done ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
           >
-            <div className="w-full bg-blue-600 text-white text-sm py-2.5 rounded-lg font-semibold text-center cursor-default select-none">
-              Download Resume ↓
+            <div className="w-full bg-amber-50 border border-amber-200 text-amber-700 text-sm py-2.5 rounded-lg font-semibold text-center cursor-default select-none flex items-center justify-center gap-1.5">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+              </svg>
+              Download PDF — Pro
             </div>
           </div>
         </div>

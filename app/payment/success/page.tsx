@@ -22,27 +22,42 @@ export default function PaymentSuccessPage({
             : 'Congrats! You have access to all Pro features.'}
         </p>
         <div className="flex flex-col gap-3">
-          <Link
-            href="/dashboard"
-            className="bg-blue-600 text-white py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm"
-          >
-            Go to Dashboard
-          </Link>
-          {isPro && (
-            <Link
-              href="/sessions/book"
-              className="border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
-            >
-              Book your expert session →
-            </Link>
-          )}
-          {!isPro && (
-            <Link
-              href="/templates"
-              className="border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
-            >
-              Browse more templates
-            </Link>
+          {isPro ? (
+            <>
+              <Link
+                href="/ats-check"
+                className="bg-blue-600 text-white py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm"
+              >
+                Check your ATS score now →
+              </Link>
+              <Link
+                href="/sessions/book"
+                className="border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
+              >
+                Book your expert session
+              </Link>
+              <Link
+                href="/dashboard"
+                className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                Go to Dashboard
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/dashboard"
+                className="bg-blue-600 text-white py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm"
+              >
+                Go to Dashboard
+              </Link>
+              <Link
+                href="/templates"
+                className="border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
+              >
+                Browse more templates
+              </Link>
+            </>
           )}
         </div>
       </div>

@@ -114,15 +114,29 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [savingVersion, setSavingVersion] = useState(false)
   const [savedVersion, setSavedVersion] = useState(false)
   const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit')
+  const [isPro, setIsPro] = useState(false)
+  const [showProDownloadModal, setShowProDownloadModal] = useState(false)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const Preview = PREVIEW_MAP[templateId] ?? ClassicPreview
 
-  // Load user
+  // Load user + pro status
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user))
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+    supabase.auth.getUser().then(async ({ data }) => {
+      setUser(data.user)
+      if (data.user) {
+        const { data: row } = await supabase.from('pro_access').select('id').eq('user_id', data.user.id).maybeSingle()
+        setIsPro(!!row)
+      }
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_, session) => {
       setUser(session?.user ?? null)
+      if (session?.user) {
+        const { data: row } = await supabase.from('pro_access').select('id').eq('user_id', session.user.id).maybeSingle()
+        setIsPro(!!row)
+      } else {
+        setIsPro(false)
+      }
     })
     return () => subscription.unsubscribe()
   }, [])
@@ -443,12 +457,24 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             {savingVersion ? 'Saving…' : savedVersion ? 'Saved!' : 'Save'}
           </button>
           <CheckATSButton user={user} onAuthRequired={() => setShowAuthModal(true)} data={data} accentColor={accentColor} templateId={templateId} />
-          <button
-            onClick={handleDownload}
-            className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium flex-shrink-0"
-          >
-            Download PDF
-          </button>
+          {isPro ? (
+            <button
+              onClick={handleDownload}
+              className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium flex-shrink-0"
+            >
+              Download PDF
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowProDownloadModal(true)}
+              className="bg-amber-50 border border-amber-200 text-amber-700 text-sm px-4 py-2 rounded-lg hover:bg-amber-100 transition-colors font-semibold flex-shrink-0 flex items-center gap-1.5"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+              </svg>
+              Download PDF
+            </button>
+          )}
         </div>
       </div>
 
@@ -496,6 +522,25 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
               </a>
             </div>
             <button onClick={() => setShowAuthModal(false)} className="mt-3 w-full text-center text-xs text-gray-400 hover:text-gray-600">Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* Pro download modal */}
+      {showProDownloadModal && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowProDownloadModal(false)}>
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl relative" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowProDownloadModal(false)} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+            <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 3v13.5m-4.5-4.5L12 16.5l4.5-4.5" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">PDF download is a Pro feature</h3>
+            <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for lifetime access — unlimited downloads, unlimited ATS checks, and an expert session. ₹999, one-time.</p>
+            <Link href="/pricing" className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
+              Get Pro Access — ₹999
+            </Link>
           </div>
         </div>
       )}

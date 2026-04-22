@@ -38,6 +38,19 @@ export default async function DashboardPage() {
         )}
       </div>
 
+      {/* Free user upgrade banner */}
+      {!pro && (
+        <div className="flex items-center justify-between gap-4 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6 flex-wrap">
+          <div className="text-sm text-amber-800">
+            <span className="font-semibold">✦ You&apos;re on the free plan.</span>{' '}
+            <span className="text-amber-700">Unlimited checks, PDF downloads &amp; expert session with Pro.</span>
+          </div>
+          <Link href="/pricing" className="text-sm font-semibold text-amber-700 border border-amber-300 bg-white px-3.5 py-1.5 rounded-lg hover:bg-amber-50 transition-colors whitespace-nowrap flex-shrink-0">
+            Upgrade — ₹999 →
+          </Link>
+        </div>
+      )}
+
       {/* Primary actions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
         <Link href="/ats-check" className="group flex items-center gap-4 p-5 bg-blue-600 rounded-2xl hover:bg-blue-700 transition-colors">

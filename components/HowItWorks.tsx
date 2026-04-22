@@ -1,4 +1,4 @@
-const STEPS = [
+const STEPS: { n: string; title: string; desc: string; pro?: boolean }[] = [
   {
     n: '1',
     title: 'Build or upload',
@@ -17,6 +17,7 @@ const STEPS = [
   {
     n: '4',
     title: 'Book an expert review',
+    pro: true,
     desc: 'Want a second opinion? Book a 30-minute 1:1 session with a resume expert and get personalised feedback before you apply.',
   },
 ]
@@ -35,7 +36,10 @@ export default function HowItWorks() {
               {i < STEPS.length - 1 && (
                 <div className="hidden sm:block absolute top-5 left-[calc(50%+20px)] right-0 h-px border-t-2 border-dashed border-blue-200" />
               )}
-              <h3 className="text-sm font-semibold text-gray-900 mb-1.5">{step.title}</h3>
+              <h3 className="text-sm font-semibold text-gray-900 mb-1.5 flex items-center gap-1.5 justify-center">
+                {step.title}
+                {step.pro && <span className="text-[9px] font-bold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full tracking-wide">PRO</span>}
+              </h3>
               <p className="text-xs text-gray-500 leading-relaxed">{step.desc}</p>
             </div>
           ))}

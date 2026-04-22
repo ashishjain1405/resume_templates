@@ -354,11 +354,15 @@ function ATSCheckInner() {
             <span className="text-xs text-gray-500">Free limit reached</span>
           </div>
         )}
-        {!isPro && usage && !limitReached && (
-          <div className="text-xs text-gray-400 bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full">
-            {usage.limit - usage.used} free check{usage.limit - usage.used !== 1 ? 's' : ''} remaining
-          </div>
-        )}
+        {!isPro && usage && !limitReached && (() => {
+          const remaining = usage.limit - usage.used
+          const isWarning = remaining <= 2
+          return (
+            <div className={`text-xs px-3 py-1.5 rounded-full border ${isWarning ? 'bg-amber-50 border-amber-200 text-amber-700 font-medium' : 'bg-gray-50 border-gray-200 text-gray-400'}`}>
+              {remaining === 1 ? 'Last free check' : `${remaining} free checks remaining`}
+            </div>
+          )
+        })()}
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8">
@@ -598,6 +602,23 @@ function ATSCheckInner() {
                   ))}
                 </ul>
               </div>
+
+              {!isPro && (
+                <Link
+                  href="/pricing"
+                  className="block bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5 hover:bg-amber-100 transition-colors"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <div className="text-xs font-bold text-amber-800 mb-1">✦ Unlock Pro — ₹999 one-time</div>
+                      <div className="text-xs text-amber-700">Unlimited checks · PDF download · Edit in Google Docs · Expert session</div>
+                    </div>
+                    <svg className="w-4 h-4 text-amber-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </Link>
+              )}
             </div>
           )}
         </div>
