@@ -9,6 +9,11 @@ const BARS = [
   { label: 'Formatting & Structure', value: 80, color: 'bg-green-500', delay: '0.8s' },
   { label: 'Achievements', value: 55, color: 'bg-red-400', delay: '1.1s' },
 ]
+const SUGGESTIONS = [
+  'Add measurable achievements (e.g. "grew revenue by 30%")',
+  'Include missing keywords: Python, SQL, Leadership',
+  'Move contact details to the top of your resume',
+]
 
 function ATSAnimation() {
   const [started, setStarted] = useState(false)
@@ -105,6 +110,23 @@ function ATSAnimation() {
           </div>
         ))}
       </div>
+
+      {/* Actionable suggestions — fade in after score animation completes */}
+      {done && (
+        <>
+          <style>{`@keyframes fadeInUp { from { opacity:0; transform:translateY(6px) } to { opacity:1; transform:none } }`}</style>
+          <div className="mt-4 border-t border-gray-100 pt-4 space-y-2">
+            <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Top Suggestions</div>
+            {SUGGESTIONS.map((s, i) => (
+              <div key={i} className="flex items-start gap-2 text-xs text-gray-600"
+                style={{ opacity: 0, animation: 'fadeInUp 0.35s ease forwards', animationDelay: `${i * 0.18}s` }}>
+                <span className="text-amber-500 mt-0.5 flex-shrink-0 font-bold">→</span>
+                <span>{s}</span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   )
 }
