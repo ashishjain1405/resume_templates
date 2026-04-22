@@ -203,13 +203,8 @@ function ATSCheckInner() {
       const pending = JSON.parse(raw)
       const jd = pending.jobDescription ?? ''
       setJobDescription(jd)
-      if (pending.tab === 'paste' && pending.resumeText) {
-        setTab('paste')
-        setResumeText(pending.resumeText)
+      const autoAnalyse = (form: FormData) => {
         setLoading(true)
-        const form = new FormData()
-        form.append('resumeText', pending.resumeText)
-        form.append('jobDescription', jd)
         fetch('/api/ats-check', { method: 'POST', body: form })
           .then(r => r.text())
           .then(txt => {
@@ -221,6 +216,29 @@ function ATSCheckInner() {
           })
           .catch(() => setError('Something went wrong. Please try again.'))
           .finally(() => setLoading(false))
+      }
+
+      if (pending.tab === 'paste' && pending.resumeText) {
+        setTab('paste')
+        setResumeText(pending.resumeText)
+        const form = new FormData()
+        form.append('resumeText', pending.resumeText)
+        form.append('jobDescription', jd)
+        autoAnalyse(form)
+      } else if (pending.tab === 'upload' && pending.fileData) {
+        setTab('upload')
+        // Reconstruct File from base64 data URL
+        fetch(pending.fileData)
+          .then(r => r.blob())
+          .then(blob => {
+            const restoredFile = new File([blob], pending.fileName ?? 'resume.pdf', { type: pending.fileType ?? 'application/pdf' })
+            setFile(restoredFile)
+            const form = new FormData()
+            form.append('file', restoredFile)
+            form.append('jobDescription', jd)
+            autoAnalyse(form)
+          })
+          .catch(() => setInfo('Resume could not be restored — please re-upload.'))
       } else if (pending.tab === 'upload') {
         setTab('upload')
         setInfo('You\'re signed in — re-upload your PDF and click Analyse.')
@@ -258,8 +276,21 @@ function ATSCheckInner() {
         if (res.status === 401) {
           if (tab === 'paste' && resumeText.trim()) {
             sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ tab: 'paste', resumeText, jobDescription }))
-          } else if (tab === 'upload') {
-            sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ tab: 'upload', jobDescription }))
+          } else if (tab === 'upload' && file) {
+            // Encode file as base64 so it survives the auth redirect
+            const reader = new FileReader()
+            reader.onload = () => {
+              sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+                tab: 'upload',
+                jobDescription,
+                fileData: reader.result as string,
+                fileName: file.name,
+                fileType: file.type,
+              }))
+              setModal('login_required')
+            }
+            reader.readAsDataURL(file)
+            return
           }
           setModal('login_required')
         } else if (res.status === 403) {
