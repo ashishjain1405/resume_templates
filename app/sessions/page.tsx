@@ -39,9 +39,11 @@ export default async function SessionsPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-1">My Sessions</h1>
           <p className="text-gray-500 text-sm">Your expert resume review sessions.</p>
         </div>
-        <Link href="/sessions/book" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
-          Book a session
-        </Link>
+        {(sessions ?? []).length > 0 && (
+          <Link href="/sessions/book" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
+            Book a session
+          </Link>
+        )}
       </div>
 
       {upcoming.length > 0 && (

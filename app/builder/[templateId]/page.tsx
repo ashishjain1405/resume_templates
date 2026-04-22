@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, use } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { TEMPLATES } from '@/lib/templates'
 import { EMPTY_RESUME, type ResumeData, type ExperienceEntry, type EducationEntry } from '@/lib/resume-data'
 import { createClient } from '@/lib/supabase'
@@ -11,6 +12,71 @@ import MulticolumnPreview from '@/components/resume-previews/Multicolumn'
 import QuotationPreview from '@/components/resume-previews/Quotation'
 import ExecutivePreview from '@/components/resume-previews/Executive'
 import type { User } from '@supabase/supabase-js'
+
+function CheckATSButton({ user, onAuthRequired, data, accentColor, templateId }: {
+  user: User | null
+  onAuthRequired: () => void
+  data: ResumeData
+  accentColor: string
+  templateId: string
+}) {
+  const [saving, setSaving] = useState(false)
+  const [resumeId, setResumeId] = useState<string | null>(null)
+
+  async function handleCheckATS() {
+    if (!user) { onAuthRequired(); return }
+    setSaving(true)
+    try {
+      const pdfRes = await fetch('/api/builder/pdf?pdf=1', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ templateId, data, accentColor }),
+      })
+      if (!pdfRes.ok) return
+      const blob = await pdfRes.blob()
+      const name = `${data.personal.name?.replace(/\s+/g, '_') || 'resume'}_${templateId}.pdf`
+      const file = new File([blob], name, { type: 'application/pdf' })
+      const form = new FormData()
+      form.append('file', file)
+      const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
+      const uploadData = await uploadRes.json()
+      if (uploadData.resume?.id) setResumeId(uploadData.resume.id)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (resumeId) {
+    return (
+      <Link
+        href={`/ats-check?resumeId=${resumeId}`}
+        className="border border-gray-200 text-gray-700 text-sm px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center gap-1.5 flex-shrink-0"
+      >
+        <svg className="w-3.5 h-3.5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+        Check ATS
+      </Link>
+    )
+  }
+
+  return (
+    <button
+      onClick={handleCheckATS}
+      disabled={saving}
+      className="border border-gray-200 text-gray-700 text-sm px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50 flex items-center gap-1.5 flex-shrink-0"
+    >
+      {saving ? (
+        <div className="w-3.5 h-3.5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+      ) : (
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )}
+      {saving ? 'Preparing…' : 'Check ATS'}
+    </button>
+  )
+}
 
 const PREVIEW_MAP: Record<string, React.ComponentType<{ accentColor?: string; data?: ResumeData }>> = {
   classic: ClassicPreview,
@@ -47,6 +113,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [savedMsg, setSavedMsg] = useState(false)
   const [savingVersion, setSavingVersion] = useState(false)
   const [savedVersion, setSavedVersion] = useState(false)
+  const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit')
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const Preview = PREVIEW_MAP[templateId] ?? ClassicPreview
@@ -200,9 +267,26 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   ]
 
   return (
-    <div className="flex h-[calc(100vh-64px)] overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden">
+      {/* Mobile view toggle */}
+      <div className="lg:hidden flex border-b border-gray-100 bg-white">
+        <button
+          onClick={() => setMobileView('edit')}
+          className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${mobileView === 'edit' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
+        >
+          Edit
+        </button>
+        <button
+          onClick={() => setMobileView('preview')}
+          className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${mobileView === 'preview' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
+        >
+          Preview
+        </button>
+      </div>
+
+      <div className="flex flex-1 overflow-hidden">
       {/* Left panel */}
-      <div className="w-full lg:w-[42%] flex flex-col border-r border-gray-100 bg-white">
+      <div className={`${mobileView === 'edit' ? 'flex' : 'hidden'} lg:flex w-full lg:w-[42%] flex-col border-r border-gray-100 bg-white`}>
         {/* Tab bar */}
         <div className="flex border-b border-gray-100 bg-gray-50">
           {tabs.map(t => (
@@ -330,20 +414,20 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-gray-100 p-3 flex items-center gap-2">
+        <div className="border-t border-gray-100 p-3 flex items-center gap-2 flex-wrap">
           {user ? (
-            <span className="text-xs text-gray-400 flex-1">
+            <span className="text-xs text-gray-400 flex-1 min-w-0">
               {saving ? 'Saving…' : savedMsg ? '✓ Saved' : 'Auto-saved'}
             </span>
           ) : (
-            <span className="text-xs text-gray-400 flex-1">
+            <span className="text-xs text-gray-400 flex-1 min-w-0">
               <button onClick={() => setShowAuthModal(true)} className="text-blue-500 hover:underline">Sign up</button> to save & revisit
             </span>
           )}
           <button
             onClick={handleSaveVersion}
             disabled={savingVersion}
-            className="border border-gray-200 text-gray-700 text-sm px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50 flex items-center gap-1.5"
+            className="border border-gray-200 text-gray-700 text-sm px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50 flex items-center gap-1.5 flex-shrink-0"
           >
             {savingVersion ? (
               <div className="w-3.5 h-3.5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
@@ -356,19 +440,20 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 3v13.5m-4.5-4.5L12 16.5l4.5-4.5" />
               </svg>
             )}
-            {savingVersion ? 'Saving…' : savedVersion ? 'Saved!' : 'Save This Version'}
+            {savingVersion ? 'Saving…' : savedVersion ? 'Saved!' : 'Save'}
           </button>
+          <CheckATSButton user={user} onAuthRequired={() => setShowAuthModal(true)} data={data} accentColor={accentColor} templateId={templateId} />
           <button
             onClick={handleDownload}
-            className="bg-blue-600 text-white text-sm px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium flex-shrink-0"
           >
             Download PDF
           </button>
         </div>
       </div>
 
-      {/* Right panel — live preview */}
-      <div className="hidden lg:flex flex-1 flex-col bg-gray-100">
+      {/* Right panel — live preview (desktop always, mobile when preview tab active) */}
+      <div className={`${mobileView === 'preview' ? 'flex' : 'hidden'} lg:flex flex-1 flex-col bg-gray-100`}>
         {/* Color picker */}
         <div className="bg-white border-b border-gray-100 px-4 py-2.5 flex items-center gap-3">
           <span className="text-xs text-gray-500 font-medium">Accent color</span>
@@ -388,12 +473,13 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
           <span className="ml-auto text-xs text-gray-400">{template?.name} template</span>
         </div>
 
-        <div className="flex-1 overflow-auto flex items-start justify-center p-8">
-          <div className="bg-white shadow-xl rounded-xl overflow-hidden" style={{ width: '420px', height: '594px' }}>
+        <div className="flex-1 overflow-auto flex items-start justify-center p-4 lg:p-8">
+          <div className="bg-white shadow-xl rounded-xl overflow-hidden w-full max-w-[420px]" style={{ aspectRatio: '420/594' }}>
             <Preview accentColor={accentColor} data={data} />
           </div>
         </div>
       </div>
+      </div>{/* end flex row */}
 
       {/* Auth modal */}
       {showAuthModal && (

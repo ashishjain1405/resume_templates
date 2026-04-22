@@ -117,6 +117,8 @@ function ATSCheckInner() {
   const [editLoading, setEditLoading] = useState(false)
   const [savedResumes, setSavedResumes] = useState<UploadedResume[]>([])
   const [selectedResumeId, setSelectedResumeId] = useState<string | null>(null)
+  const [savingToDashboard, setSavingToDashboard] = useState(false)
+  const [savedToDashboard, setSavedToDashboard] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   // On mount: check pro status, fetch usage, load saved resumes
@@ -136,7 +138,7 @@ function ATSCheckInner() {
     })
   }, [])
 
-  // Load resume from dashboard "Check ATS" link (?resumeId=)
+  // Load resume from dashboard "Check ATS" link (?resumeId=) and auto-analyse
   useEffect(() => {
     const resumeId = searchParams.get('resumeId')
     if (!resumeId) return
@@ -147,11 +149,34 @@ function ATSCheckInner() {
         const resp = await fetch(data.url)
         const blob = await resp.blob()
         const contentType = blob.type || 'application/pdf'
-        const ext = contentType.includes('pdf') ? 'pdf' : 'docx'
-        const f = new File([blob], `resume.${ext}`, { type: contentType })
+        const filename = data.filename ?? (contentType.includes('pdf') ? 'resume.pdf' : 'resume.docx')
+        const f = new File([blob], filename, { type: contentType })
         setFile(f)
         setTab('upload')
-        setInfo('Resume loaded — click Analyse to check your score.')
+        // Auto-trigger analysis
+        setError('')
+        setLoading(true)
+        setResult(null)
+        const form = new FormData()
+        form.append('file', f)
+        try {
+          const res = await fetch('/api/ats-check', { method: 'POST', body: form })
+          const raw = await res.text()
+          let parsed: { error?: string; _usage?: { used: number; limit: number } | null } & Partial<ATSResult> = {}
+          try { parsed = JSON.parse(raw) } catch { /* ignore */ }
+          if (!res.ok) {
+            if (res.status === 403) setModal('pro_required')
+            else if (res.status === 401) setModal('login_required')
+            else setError(parsed.error ?? `Error ${res.status}`)
+          } else {
+            setResult(parsed as ATSResult)
+            if (parsed._usage) setUsage(parsed._usage)
+          }
+        } catch (e) {
+          setError(e instanceof Error ? e.message : 'Something went wrong.')
+        } finally {
+          setLoading(false)
+        }
       })
       .catch(() => {})
   }, [searchParams])
@@ -243,6 +268,35 @@ function ATSCheckInner() {
 
   const canSubmit = tab === 'upload' ? !!file : tab === 'saved' ? !!selectedResumeId : resumeText.trim().length > 50
   const limitReached = !isPro && usage !== null && usage.used >= usage.limit
+
+  async function handleSaveToDashboard() {
+    setSavingToDashboard(true)
+    try {
+      let fileToUpload: File | null = null
+      if (tab === 'upload' && file) {
+        fileToUpload = file
+      } else if (tab === 'saved' && selectedResumeId) {
+        const urlRes = await fetch(`/api/resume/${selectedResumeId}`)
+        const urlData = await urlRes.json()
+        if (!urlData.url) return
+        const resp = await fetch(urlData.url)
+        const blob = await resp.blob()
+        const resume = savedResumes.find(r => r.id === selectedResumeId)
+        fileToUpload = new File([blob], urlData.filename ?? resume?.filename ?? 'resume.pdf', { type: blob.type || 'application/pdf' })
+      } else if (tab === 'paste' && resumeText.trim()) {
+        const blob = new Blob([resumeText], { type: 'text/plain' })
+        fileToUpload = new File([blob], 'resume.txt', { type: 'text/plain' })
+      }
+      if (!fileToUpload) return
+      const form = new FormData()
+      form.append('file', fileToUpload)
+      await fetch('/api/resume/upload', { method: 'POST', body: form })
+      setSavedToDashboard(true)
+      setTimeout(() => setSavedToDashboard(false), 3000)
+    } finally {
+      setSavingToDashboard(false)
+    }
+  }
 
   async function handleEditInDocs() {
     if (!isPro) { setModal('pro_required'); return }
@@ -404,11 +458,11 @@ function ATSCheckInner() {
             <button
               onClick={handleAnalyse}
               disabled={!canSubmit || loading}
-              className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm flex items-center justify-center gap-2"
+              className={`w-full py-3 rounded-xl font-semibold transition-colors text-sm flex items-center justify-center gap-2 ${canSubmit && !loading ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
             >
               {loading ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-500 rounded-full animate-spin" />
                   Analysing your resume…
                 </>
               ) : 'Analyse Resume'}
@@ -449,21 +503,42 @@ function ATSCheckInner() {
 
           {result && (
             <div className="border border-gray-100 rounded-2xl p-6 shadow-sm space-y-6">
-              <button
-                onClick={handleEditInDocs}
-                disabled={editLoading}
-                className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors disabled:opacity-50"
-              >
-                {editLoading ? (
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                )}
-                Update my resume
-                {!isPro && <ProBadge />}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleEditInDocs}
+                  disabled={editLoading}
+                  className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors disabled:opacity-50"
+                >
+                  {editLoading ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  )}
+                  Update my resume
+                  {!isPro && <ProBadge />}
+                </button>
+                <button
+                  onClick={handleSaveToDashboard}
+                  disabled={savingToDashboard}
+                  className="flex items-center gap-1.5 border border-gray-200 text-gray-700 px-3.5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  title="Save to My Resumes"
+                >
+                  {savingToDashboard ? (
+                    <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-500 rounded-full animate-spin" />
+                  ) : savedToDashboard ? (
+                    <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 3v13.5m-4.5-4.5L12 16.5l4.5-4.5" />
+                    </svg>
+                  )}
+                  {savedToDashboard ? 'Saved!' : 'Save'}
+                </button>
+              </div>
 
               <div className="flex items-center gap-6">
                 <ScoreRing score={result.score} />

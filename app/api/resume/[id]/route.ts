@@ -10,7 +10,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
   const { data: row, error } = await supabase
     .from('uploaded_resumes')
-    .select('storage_path')
+    .select('storage_path, filename')
     .eq('id', id)
     .eq('user_id', user.id)
     .single()
@@ -23,7 +23,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     .createSignedUrl(row.storage_path, 120)
 
   if (signError || !signed) return Response.json({ error: 'Could not generate URL' }, { status: 500 })
-  return Response.json({ url: signed.signedUrl })
+  return Response.json({ url: signed.signedUrl, filename: row.filename })
 }
 
 // DELETE /api/resume/[id]
