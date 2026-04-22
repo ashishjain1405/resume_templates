@@ -4,8 +4,9 @@ import { isPro } from '@/lib/pro'
 import OpenAI from 'openai'
 async function parsePdf(buf: Buffer): Promise<string> {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js')
-  const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(buf) })
+  const pdfjsLib = require('pdfjs-dist')
+  pdfjsLib.GlobalWorkerOptions.workerSrc = ''
+  const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(buf), useWorkerFetch: false, isEvalSupported: false, useSystemFonts: true })
   const pdf = await loadingTask.promise
   const pages = await Promise.all(
     Array.from({ length: pdf.numPages }, (_: unknown, i: number) =>
