@@ -270,18 +270,32 @@ function ATSCheckInner() {
         autoAnalyse(form)
       } else if (pending.tab === 'upload' && pending.fileData) {
         setTab('upload')
-        // Reconstruct File from base64 data URL
+        setLoading(true)
+        // Reconstruct file, upload to storage, then analyse via resumeId (avoids pdfjs on raw bytes)
         fetch(pending.fileData)
           .then(r => r.blob())
-          .then(blob => {
+          .then(async blob => {
             const restoredFile = new File([blob], pending.fileName ?? 'resume.pdf', { type: pending.fileType ?? 'application/pdf' })
             setFile(restoredFile)
-            const form = new FormData()
-            form.append('file', restoredFile)
-            form.append('jobDescription', jd)
-            autoAnalyse(form)
+            const uploadForm = new FormData()
+            uploadForm.append('file', restoredFile)
+            const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: uploadForm })
+            const uploadData = await uploadRes.json()
+            if (uploadData.resume?.id) {
+              // Fetch signed URL and analyse via blob — same path as dashboard "Check ATS"
+              const urlRes = await fetch(`/api/resume/${uploadData.resume.id}`)
+              const urlData = await urlRes.json()
+              if (!urlData.url) throw new Error('no url')
+              const pdfBlob = await fetch(urlData.url).then(r => r.blob())
+              const form = new FormData()
+              form.append('file', new File([pdfBlob], restoredFile.name, { type: restoredFile.type }))
+              form.append('jobDescription', jd)
+              autoAnalyse(form)
+            } else {
+              throw new Error('upload failed')
+            }
           })
-          .catch(() => setInfo('Resume could not be restored — please re-upload.'))
+          .catch(() => { setInfo('Resume could not be restored — please re-upload.'); setLoading(false) })
       } else if (pending.tab === 'upload') {
         setTab('upload')
         setInfo('You\'re signed in — re-upload your PDF and click Analyse.')
