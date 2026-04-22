@@ -98,7 +98,7 @@ export default function ATSPreview() {
               href="/ats-check"
               className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors shadow-lg"
             >
-              See your real score — free →
+              Check Resume Score
             </Link>
           </div>
         </div>
