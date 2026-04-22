@@ -22,8 +22,8 @@ export function useProUpgrade() {
     setLoading(true)
     try {
       const res = await fetch('/api/razorpay/pro-order', { method: 'POST' })
-      if (res.status === 401) { router.push('/auth/login?redirect=/pricing'); return }
-      if (!res.ok) { const d = await res.json(); alert(d.error ?? 'Failed to create order'); return }
+      if (res.status === 401) { router.push('/auth/login?redirect=/pricing'); setLoading(false); return }
+      if (!res.ok) { const d = await res.json(); alert(d.error ?? 'Failed to create order'); setLoading(false); return }
       const { orderId, amount, currency } = await res.json()
 
       await loadRazorpayScript()
@@ -47,15 +47,20 @@ export function useProUpgrade() {
           } else {
             const d = await verifyRes.json()
             alert(`Payment verification failed: ${d.error ?? 'Unknown error'}`)
+            setLoading(false)
           }
         },
         prefill: { email: userEmail ?? '' },
         theme: { color: '#2563eb' },
+        modal: {
+          ondismiss: () => {
+            setLoading(false)
+          },
+        },
       })
       rzp.open()
     } catch (err) {
       console.error(err)
-    } finally {
       setLoading(false)
     }
   }

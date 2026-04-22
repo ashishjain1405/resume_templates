@@ -608,13 +608,18 @@ function ATSCheckInner() {
           )}
 
           {tab === 'paste' && (
-            <textarea
-              className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 resize-none"
-              rows={10}
-              placeholder="Paste your resume text here..."
-              value={resumeText}
-              onChange={e => setResumeText(e.target.value)}
-            />
+            <>
+              <textarea
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 resize-none"
+                rows={10}
+                placeholder="Paste your resume text here..."
+                value={resumeText}
+                onChange={e => setResumeText(e.target.value)}
+              />
+              {resumeText.trim().length > 0 && resumeText.trim().length < 50 && (
+                <p className="text-xs text-amber-600 mt-1">Please enter at least 50 characters.</p>
+              )}
+            </>
           )}
 
           {tab === 'saved' && (

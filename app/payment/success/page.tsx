@@ -50,7 +50,7 @@ export default async function PaymentSuccessPage({
         <p className="text-gray-500 text-sm mb-6">
           {isPro
             ? primary.description
-            : 'Congrats! You have access to all Pro features.'}
+            : 'Your purchase is confirmed. Head to your dashboard to access your template.'}
         </p>
         <div className="flex flex-col gap-3">
           {isPro ? (

@@ -132,6 +132,10 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         setIsPro(!!row)
       } else {
         setIsPro(false)
+        // Clear stale builder data on sign-out so next user sees empty fields
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem(`resume_builder_${templateId}`)
+        }
       }
     })
     return () => subscription.unsubscribe()

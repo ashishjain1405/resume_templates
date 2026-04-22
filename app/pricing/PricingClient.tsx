@@ -68,7 +68,7 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
 
   function handleUpgrade() {
     if (!isLoggedIn) { router.push('/auth/login?redirect=/pricing'); return }
-    startUpgrade(userEmail)
+    startUpgrade(userEmail, 'pricing')
   }
 
   const UpgradeButton = ({ className = '' }: { className?: string }) => isPro ? (

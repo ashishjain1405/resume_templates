@@ -26,6 +26,7 @@ interface RazorpayOptions {
   handler: (response: RazorpayResponse) => void
   prefill: { email: string }
   theme: { color: string }
+  modal?: { ondismiss?: () => void }
 }
 
 interface RazorpayInstance {
@@ -85,18 +86,22 @@ export default function BuyButton({ template, purchased }: Props) {
               }),
             })
             const verifyData = await verifyRes.json()
-            console.log('Verify response:', verifyRes.status, verifyData)
             if (verifyRes.ok) {
               router.push('/payment/success')
             } else {
               alert(`Payment verification failed: ${verifyData.error ?? verifyRes.status}`)
+              setLoading(false)
             }
           },
           prefill: { email: user.email ?? '' },
           theme: { color: '#2563eb' },
+          modal: {
+            ondismiss: () => {
+              setLoading(false)
+            },
+          },
         })
         rzp.open()
-        setLoading(false)
       }
     } catch (err) {
       console.error(err)

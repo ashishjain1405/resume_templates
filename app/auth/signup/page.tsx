@@ -44,7 +44,7 @@ function SignupForm() {
     if (error) {
       setError(error.message)
     } else {
-      setMessage('Check your email for a confirmation link.')
+      setMessage('Check your inbox — we\'ve sent you a link to continue.')
     }
     setLoading(false)
   }
