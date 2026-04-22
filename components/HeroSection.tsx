@@ -196,11 +196,11 @@ export default function HeroSection() {
             {/* Left — copy */}
             <div className="flex-1 max-w-lg">
               <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-4 tracking-tight">
-                Get hired faster with an<br />
+                <span className="whitespace-nowrap">Get hired faster with an</span><br />
                 <span className="text-blue-600">ATS-ready resume</span>
               </h1>
               <p className="text-gray-500 text-base mb-6 leading-relaxed">
-                Check your resume score free. See exactly what&apos;s missing. Fix the gaps and land more interviews.
+                Check your resume score for free. See exactly what&apos;s missing. Fix the gaps and land more interviews.
               </p>
 
               <div className="flex flex-col gap-3 mb-6">
