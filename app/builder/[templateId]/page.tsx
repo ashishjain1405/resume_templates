@@ -15,7 +15,7 @@ import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
 
 function CheckATSButton({ user, onAuthRequired, data, accentColor, templateId }: {
   user: User | null
-  onAuthRequired: () => void
+  onAuthRequired: (forATS: boolean) => void
   data: ResumeData
   accentColor: string
   templateId: string
@@ -24,7 +24,11 @@ function CheckATSButton({ user, onAuthRequired, data, accentColor, templateId }:
   const [resumeId, setResumeId] = useState<string | null>(null)
 
   async function handleCheckATS() {
-    if (!user) { onAuthRequired(); return }
+    if (!user) {
+      sessionStorage.setItem('ats_pending', JSON.stringify({ fromBuilder: true, templateId, data, accentColor }))
+      onAuthRequired(true)
+      return
+    }
     setSaving(true)
     try {
       const pdfRes = await fetch('/api/builder/pdf?pdf=1', {
@@ -120,6 +124,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [isPro, setIsPro] = useState(false)
   const [showProDownloadModal, setShowProDownloadModal] = useState(false)
   const [showChangeTemplateModal, setShowChangeTemplateModal] = useState(false)
+  const [authForATS, setAuthForATS] = useState(false)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const Preview = PREVIEW_MAP[templateId] ?? ClassicPreview
@@ -486,7 +491,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             )}
             {savingVersion ? 'Saving…' : savedVersion ? 'Saved to Dashboard' : 'Save to Dashboard'}
           </button>
-          <CheckATSButton user={user} onAuthRequired={() => setShowAuthModal(true)} data={data} accentColor={accentColor} templateId={templateId} />
+          <CheckATSButton user={user} onAuthRequired={(forATS) => { setAuthForATS(forATS); setShowAuthModal(true) }} data={data} accentColor={accentColor} templateId={templateId} />
           {isPro ? (
             <button
               onClick={handleDownload}
@@ -551,15 +556,15 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             <p className="text-sm text-gray-500 mb-5">Create a free account to save your resume and download it anytime.</p>
             <div className="flex flex-col gap-2">
               <a
-                href={`/auth/signup?redirect=/builder/${templateId}`}
-                onClick={() => sessionStorage.setItem(`builder_session_${templateId}`, JSON.stringify({ data, accentColor }))}
+                href={`/auth/signup?redirect=${encodeURIComponent(authForATS ? '/ats-check' : `/builder/${templateId}`)}`}
+                onClick={() => { if (!authForATS) sessionStorage.setItem(`builder_session_${templateId}`, JSON.stringify({ data, accentColor })) }}
                 className="w-full text-center bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors"
               >
                 Create free account
               </a>
               <a
-                href={`/auth/login?redirect=/builder/${templateId}`}
-                onClick={() => sessionStorage.setItem(`builder_session_${templateId}`, JSON.stringify({ data, accentColor }))}
+                href={`/auth/login?redirect=${encodeURIComponent(authForATS ? '/ats-check' : `/builder/${templateId}`)}`}
+                onClick={() => { if (!authForATS) sessionStorage.setItem(`builder_session_${templateId}`, JSON.stringify({ data, accentColor })) }}
                 className="w-full text-center border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors"
               >
                 Log in

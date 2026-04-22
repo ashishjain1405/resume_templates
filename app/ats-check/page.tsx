@@ -221,7 +221,24 @@ function ATSCheckInner() {
           .finally(() => setLoading(false))
       }
 
-      if (pending.tab === 'paste' && pending.resumeText) {
+      if (pending.fromBuilder && pending.templateId && pending.data) {
+        setTab('upload')
+        setLoading(true)
+        fetch('/api/builder/pdf?pdf=1', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ templateId: pending.templateId, data: pending.data, accentColor: pending.accentColor }),
+        })
+          .then(r => { if (!r.ok) throw new Error('PDF generation failed'); return r.blob() })
+          .then(blob => {
+            const file = new File([blob], 'resume.pdf', { type: 'application/pdf' })
+            setFile(file)
+            const form = new FormData()
+            form.append('file', file)
+            autoAnalyse(form)
+          })
+          .catch(() => { setError('Could not generate PDF. Please try again.'); setLoading(false) })
+      } else if (pending.tab === 'paste' && pending.resumeText) {
         setTab('paste')
         setResumeText(pending.resumeText)
         const form = new FormData()
