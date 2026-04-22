@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase-server'
 import { isPro } from '@/lib/pro'
 import { getAvailableSlots, createBookingEvent } from '@/lib/google-calendar'
+import { Resend } from 'resend'
 
 export async function POST(request: NextRequest) {
   try {
@@ -47,6 +48,24 @@ export async function POST(request: NextRequest) {
     if (dbError) {
       console.error('Session insert error:', dbError)
       return Response.json({ error: 'Booking created but failed to save. Contact support.' }, { status: 500 })
+    }
+
+    // Notify expert by email
+    try {
+      const resend = new Resend(process.env.RESEND_API_KEY)
+      const scheduledDate = new Date(start).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'full', timeStyle: 'short' })
+      await resend.emails.send({
+        from: 'onboarding@resend.dev',
+        to: process.env.EXPERT_EMAIL!,
+        subject: `New session booked — ${userName || user.email}`,
+        html: `<p>A new resume session has been booked.</p>
+               <p><strong>Name:</strong> ${userName || 'Not provided'}<br>
+               <strong>Email:</strong> ${user.email}<br>
+               <strong>Time:</strong> ${scheduledDate} IST<br>
+               <strong>Meet link:</strong> <a href="${meetLink}">${meetLink}</a></p>`,
+      })
+    } catch (emailErr) {
+      console.error('Expert email failed:', emailErr)
     }
 
     return Response.json({ meetLink, eventId, scheduledAt: start })
