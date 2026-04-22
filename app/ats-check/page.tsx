@@ -221,23 +221,30 @@ function ATSCheckInner() {
           .finally(() => setLoading(false))
       }
 
-      if (pending.fromBuilder && pending.templateId && pending.data) {
-        setTab('upload')
-        setLoading(true)
-        fetch('/api/builder/pdf?pdf=1', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ templateId: pending.templateId, data: pending.data, accentColor: pending.accentColor }),
-        })
-          .then(r => { if (!r.ok) throw new Error('PDF generation failed'); return r.blob() })
-          .then(blob => {
-            const file = new File([blob], 'resume.pdf', { type: 'application/pdf' })
-            setFile(file)
-            const form = new FormData()
-            form.append('file', file)
-            autoAnalyse(form)
-          })
-          .catch(() => { setError('Could not generate PDF. Please try again.'); setLoading(false) })
+      if (pending.fromBuilder && pending.data) {
+        const d = pending.data
+        const lines: string[] = []
+        const p = d.personal ?? {}
+        if (p.name) lines.push(p.name)
+        if (p.title) lines.push(p.title)
+        if (p.email) lines.push(p.email)
+        if (p.phone) lines.push(p.phone)
+        if (p.location) lines.push(p.location)
+        if (p.linkedin) lines.push(p.linkedin)
+        for (const exp of d.experience ?? []) {
+          lines.push(`${exp.role} at ${exp.company} (${exp.startDate}–${exp.endDate})`)
+          for (const b of exp.bullets ?? []) if (b.trim()) lines.push(b)
+        }
+        for (const edu of d.education ?? []) {
+          lines.push(`${edu.degree}, ${edu.institution}, ${edu.year}`)
+        }
+        if ((d.skills ?? []).length) lines.push('Skills: ' + d.skills.join(', '))
+        const text = lines.join('\n')
+        setTab('paste')
+        setResumeText(text)
+        const form = new FormData()
+        form.append('resumeText', text)
+        autoAnalyse(form)
       } else if (pending.tab === 'paste' && pending.resumeText) {
         setTab('paste')
         setResumeText(pending.resumeText)
