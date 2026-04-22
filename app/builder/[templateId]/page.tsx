@@ -159,11 +159,6 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             }, { onConflict: 'user_id,template_id' })
           }
         } catch {}
-        // Auto-open Pro upgrade modal if user just signed up to download
-        if (sessionStorage.getItem('download_pending')) {
-          sessionStorage.removeItem('download_pending')
-          setShowProDownloadModal(true)
-        }
         return
       }
 
@@ -177,12 +172,21 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         if (row) {
           setData(row.data as ResumeData)
           if (row.accent_color) setAccentColor(row.accent_color)
-          return
+        }
+      } else {
+        const stored = typeof window !== 'undefined' ? localStorage.getItem(storageKey(templateId)) : null
+        if (stored) {
+          try { setData(JSON.parse(stored)) } catch {}
         }
       }
-      const stored = typeof window !== 'undefined' ? localStorage.getItem(storageKey(templateId)) : null
-      if (stored) {
-        try { setData(JSON.parse(stored)) } catch {}
+
+      // Auto-open Pro upgrade modal if user signed up/in to download (flag survives email confirmation)
+      if (user) {
+        const downloadPending = localStorage.getItem(`download_pending_${templateId}`)
+        if (downloadPending) {
+          localStorage.removeItem(`download_pending_${templateId}`)
+          setShowProDownloadModal(true)
+        }
       }
     }
     load()
@@ -306,7 +310,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     if (!user) {
       setAuthForDownload(true)
       sessionStorage.setItem(`builder_session_${templateId}`, JSON.stringify({ data, accentColor }))
-      sessionStorage.setItem('download_pending', '1')
+      localStorage.setItem(`download_pending_${templateId}`, '1')
       setShowAuthModal(true)
       return
     }
