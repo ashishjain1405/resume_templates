@@ -174,7 +174,7 @@ export default function HomePage() {
             href="/ats-check"
             className="inline-block bg-white text-blue-600 px-8 py-3.5 rounded-lg font-semibold hover:bg-blue-50 transition-colors text-sm"
           >
-            Check my resume score — free
+            Check Resume Score
           </Link>
         </div>
       </section>

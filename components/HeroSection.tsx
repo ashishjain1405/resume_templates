@@ -208,7 +208,7 @@ export default function HeroSection() {
                   href="/ats-check"
                   className="w-full text-center bg-blue-600 text-white py-3.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm"
                 >
-                  Check my resume score — free
+                  Check Resume Score
                 </Link>
                 <Link
                   href="/templates"
