@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import type { User } from '@supabase/supabase-js'
 
@@ -13,6 +13,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
+  const pathname = usePathname()
   const supabase = createClient()
 
   useEffect(() => {
@@ -32,6 +33,10 @@ export default function Navbar() {
     const { data } = await supabase.from('pro_access').select('id').eq('user_id', userId).maybeSingle()
     setIsPro(!!data)
   }
+
+  useEffect(() => {
+    if (user && pathname.startsWith('/payment/success')) checkPro(user.id)
+  }, [pathname, user])
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -57,7 +62,7 @@ export default function Navbar() {
       href="/pricing"
       className={`text-sm bg-amber-50 text-amber-700 border border-amber-200 px-4 py-2 rounded-lg hover:bg-amber-100 transition-colors font-semibold ${className}`}
     >
-      Go Pro ✦
+      Upgrade to Pro ✦
     </Link>
   )
 

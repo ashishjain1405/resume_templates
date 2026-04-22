@@ -538,21 +538,21 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
             <h2 className="text-lg font-bold text-gray-900 mb-2">Save your progress</h2>
-            <p className="text-sm text-gray-500 mb-5">Create a free account to save your resume and download it anytime.</p>
+            <p className="text-sm text-gray-500 mb-5">Sign in to save your resume and pick up where you left off.</p>
             <div className="flex flex-col gap-2">
               <a
                 href={`/auth/signup?redirect=${encodeURIComponent(authForATS ? '/ats-check' : `/builder/${templateId}`)}`}
                 onClick={() => { if (!authForATS) sessionStorage.setItem(`builder_session_${templateId}`, JSON.stringify({ data, accentColor })) }}
                 className="w-full text-center bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors"
               >
-                Create free account
+                Create account
               </a>
               <a
                 href={`/auth/login?redirect=${encodeURIComponent(authForATS ? '/ats-check' : `/builder/${templateId}`)}`}
                 onClick={() => { if (!authForATS) sessionStorage.setItem(`builder_session_${templateId}`, JSON.stringify({ data, accentColor })) }}
                 className="w-full text-center border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors"
               >
-                Log in
+                Sign in
               </a>
             </div>
             <button onClick={() => setShowAuthModal(false)} className="mt-3 w-full text-center text-xs text-gray-400 hover:text-gray-600">Cancel</button>

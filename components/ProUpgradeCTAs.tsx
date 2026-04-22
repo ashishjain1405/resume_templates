@@ -18,7 +18,7 @@ export default function ProUpgradeCTAs({ layout = 'row', userEmail, source }: Pr
         disabled={loading}
         className={`bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-60 ${layout === 'stack' ? 'w-full py-3' : 'px-4 py-2'}`}
       >
-        {loading ? 'Processing…' : 'Go Pro — ₹999'}
+        {loading ? 'Processing…' : 'Upgrade to Pro — ₹999'}
       </button>
       <Link
         href="/pricing"

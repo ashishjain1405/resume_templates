@@ -73,10 +73,10 @@ function Modal({ type, onClose, userEmail }: { type: 'login_required' | 'pro_req
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Sign in to continue</h3>
-            <p className="text-sm text-gray-500 text-center mb-5">Create a free account to use the ATS Checker.</p>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Save your results</h3>
+            <p className="text-sm text-gray-500 text-center mb-5">Sign in to keep your ATS score and access it anytime from your dashboard.</p>
             <Link href="/auth/login?redirect=/ats-check" className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
-              Sign in / Sign up — free
+              Sign in or create account
             </Link>
           </>
         ) : type === 'pro_docs' ? (
@@ -88,7 +88,7 @@ function Modal({ type, onClose, userEmail }: { type: 'login_required' | 'pro_req
             </div>
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Pro feature</h3>
             <p className="text-sm text-gray-500 text-center mb-5">Editing your resume in Google Docs is available on Pro. Upgrade once for lifetime access — ₹999.</p>
-            <ProUpgradeCTAs layout="stack" userEmail={userEmail} source="ats" />
+            <ProUpgradeCTAs layout="stack" userEmail={userEmail} source="docs" />
           </>
         ) : (
           <>
@@ -152,6 +152,11 @@ function ATSCheckInner() {
       fetch('/api/resume/list').then(r => r.json()).then(d => setSavedResumes(d.resumes ?? []))
     })
   }, [])
+
+  // Auto-trigger Google Docs edit when returning from payment with ?openDocs=1
+  useEffect(() => {
+    if (searchParams.get('openDocs') && isPro) handleEditInDocs()
+  }, [isPro])
 
   // Load resume from dashboard "Check ATS" link (?resumeId=) and auto-analyse
   useEffect(() => {

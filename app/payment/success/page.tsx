@@ -16,6 +16,11 @@ const SOURCE_CONFIG: Record<string, { label: string; href: string; description: 
     href: '/ats-check',
     description: 'Run unlimited ATS checks now.',
   },
+  docs: {
+    label: 'Edit in Google Docs →',
+    href: '/ats-check?openDocs=1',
+    description: 'Your resume is ready to open in Google Docs.',
+  },
 }
 
 const DEFAULT_SOURCE = {
