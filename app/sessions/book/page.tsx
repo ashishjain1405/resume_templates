@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
 
 interface Slot {
   start: string
@@ -105,9 +106,7 @@ export default function BookSessionPage() {
         </div>
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Pro Access Required</h1>
         <p className="text-gray-500 mb-6 text-sm">Expert sessions are available to Pro members. Upgrade once for lifetime access.</p>
-        <Link href="/pricing" className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm">
-          Get Pro Access — ₹999
-        </Link>
+        <ProUpgradeCTAs layout="stack" source="sessions" />
       </div>
     )
   }

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useProUpgrade } from '@/lib/use-pro-upgrade'
 
 interface Props {
   isPro: boolean
@@ -61,56 +62,13 @@ function Cross() {
 }
 
 export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
-  const [loading, setLoading] = useState(false)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const router = useRouter()
+  const { startUpgrade, loading } = useProUpgrade()
 
-  async function handleUpgrade() {
-    if (!isLoggedIn) {
-      router.push('/auth/login?redirect=/pricing')
-      return
-    }
-    setLoading(true)
-    try {
-      const res = await fetch('/api/razorpay/pro-order', { method: 'POST' })
-      if (!res.ok) { const d = await res.json(); alert(d.error ?? 'Failed to create order'); return }
-      const { orderId, amount, currency } = await res.json()
-
-      const script = document.createElement('script')
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js'
-      document.head.appendChild(script)
-      script.onload = () => {
-        const rzp = new window.Razorpay({
-          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
-          amount,
-          currency,
-          name: 'ResumeNow',
-          description: 'Pro Access — Lifetime',
-          order_id: orderId,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          handler: async (response: any) => {
-            const verifyRes = await fetch('/api/razorpay/pro-verify', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(response),
-            })
-            if (verifyRes.ok) {
-              router.push('/payment/success?type=pro')
-            } else {
-              const d = await verifyRes.json()
-              alert(`Payment verification failed: ${d.error ?? 'Unknown error'}`)
-            }
-          },
-          prefill: { email: userEmail },
-          theme: { color: '#2563eb' },
-        })
-        rzp.open()
-        setLoading(false)
-      }
-    } catch (err) {
-      console.error(err)
-      setLoading(false)
-    }
+  function handleUpgrade() {
+    if (!isLoggedIn) { router.push('/auth/login?redirect=/pricing'); return }
+    startUpgrade(userEmail)
   }
 
   const UpgradeButton = ({ className = '' }: { className?: string }) => isPro ? (
@@ -147,9 +105,15 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <UpgradeButton className="w-full sm:w-auto px-10" />
-            <Link href="/ats-check" className="text-sm text-gray-500 hover:text-gray-700 font-medium">
-              Try ATS Checker →
-            </Link>
+            {isPro ? (
+              <Link href="/dashboard" className="text-sm text-gray-500 hover:text-gray-700 font-medium">
+                Go to Dashboard →
+              </Link>
+            ) : (
+              <Link href="/ats-check" className="text-sm text-gray-500 hover:text-gray-700 font-medium">
+                Try ATS Checker →
+              </Link>
+            )}
           </div>
           <p className="text-xs text-gray-400 mt-3">Secure payment via Razorpay · GST invoice on request</p>
         </div>

@@ -1,11 +1,36 @@
 import Link from 'next/link'
 
+const SOURCE_CONFIG: Record<string, { label: string; href: string; description: string }> = {
+  sessions: {
+    label: 'Book your expert session →',
+    href: '/sessions/book',
+    description: 'Your 1:1 resume review is ready to schedule.',
+  },
+  download: {
+    label: 'Download your resume →',
+    href: '/builder/multicolumn',
+    description: 'Head back to the Builder to download your PDF.',
+  },
+  ats: {
+    label: 'Check your ATS score →',
+    href: '/ats-check',
+    description: 'Run unlimited ATS checks now.',
+  },
+}
+
+const DEFAULT_SOURCE = {
+  label: 'Check your ATS score →',
+  href: '/ats-check',
+  description: 'You now have Pro access — unlimited ATS checks, PDF downloads, and an expert session.',
+}
+
 export default function PaymentSuccessPage({
   searchParams,
 }: {
-  searchParams: { type?: string }
+  searchParams: { type?: string; source?: string }
 }) {
   const isPro = searchParams.type === 'pro'
+  const primary = (searchParams.source ? SOURCE_CONFIG[searchParams.source] : undefined) ?? DEFAULT_SOURCE
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 bg-gray-50">
@@ -18,27 +43,21 @@ export default function PaymentSuccessPage({
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Payment successful!</h1>
         <p className="text-gray-500 text-sm mb-6">
           {isPro
-            ? 'You now have Pro access. Enjoy unlimited ATS checks, PDF downloads, and your included expert session.'
+            ? primary.description
             : 'Congrats! You have access to all Pro features.'}
         </p>
         <div className="flex flex-col gap-3">
           {isPro ? (
             <>
               <Link
-                href="/ats-check"
+                href={primary.href}
                 className="bg-blue-600 text-white py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm"
               >
-                Check your ATS score now →
-              </Link>
-              <Link
-                href="/sessions/book"
-                className="border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
-              >
-                Book your expert session
+                {primary.label}
               </Link>
               <Link
                 href="/dashboard"
-                className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+                className="border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
               >
                 Go to Dashboard
               </Link>

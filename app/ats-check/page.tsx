@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import ProBadge from '@/components/ProBadge'
+import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
 import { createClient } from '@/lib/supabase'
 
 interface ATSResult {
@@ -60,7 +61,7 @@ function SectionBar({ label, score }: { label: string; score: number }) {
   )
 }
 
-function Modal({ type, onClose }: { type: 'login_required' | 'pro_required' | 'pro_docs'; onClose: () => void }) {
+function Modal({ type, onClose, userEmail }: { type: 'login_required' | 'pro_required' | 'pro_docs'; onClose: () => void; userEmail?: string }) {
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4" onClick={onClose}>
       <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl relative" onClick={e => e.stopPropagation()}>
@@ -87,9 +88,7 @@ function Modal({ type, onClose }: { type: 'login_required' | 'pro_required' | 'p
             </div>
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Pro feature</h3>
             <p className="text-sm text-gray-500 text-center mb-5">Editing your resume in Google Docs is available on Pro. Upgrade once for lifetime access — ₹999.</p>
-            <Link href="/pricing" className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
-              Get Pro Access — ₹999
-            </Link>
+            <ProUpgradeCTAs layout="stack" userEmail={userEmail} source="ats" />
           </>
         ) : (
           <>
@@ -100,9 +99,7 @@ function Modal({ type, onClose }: { type: 'login_required' | 'pro_required' | 'p
             </div>
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Free limit reached</h3>
             <p className="text-sm text-gray-500 text-center mb-5">You've used all 5 free checks. Upgrade once for unlimited ATS checks — ₹999, lifetime.</p>
-            <Link href="/pricing" className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
-              Get Pro Access — ₹999
-            </Link>
+            <ProUpgradeCTAs layout="stack" userEmail={userEmail} source="ats" />
           </>
         )}
       </div>
@@ -127,11 +124,13 @@ function ATSCheckInner() {
   const [dragging, setDragging] = useState(false)
   const [isPro, setIsPro] = useState(false)
   const [usage, setUsage] = useState<{ used: number; limit: number } | null>(null)
+  const [userEmail, setUserEmail] = useState<string | undefined>(undefined)
   const [editLoading, setEditLoading] = useState(false)
   const [savedResumes, setSavedResumes] = useState<UploadedResume[]>([])
   const [selectedResumeId, setSelectedResumeId] = useState<string | null>(null)
   const [savingToDashboard, setSavingToDashboard] = useState(false)
   const [savedToDashboard, setSavedToDashboard] = useState(false)
+  const [saveCount, setSaveCount] = useState(0)
   const fileRef = useRef<HTMLInputElement>(null)
 
   // On mount: check pro status, fetch usage, load saved resumes
@@ -139,6 +138,7 @@ function ATSCheckInner() {
     const supabase = createClient()
     supabase.auth.getUser().then(async ({ data }) => {
       if (!data.user) return
+      setUserEmail(data.user.email)
       const { data: row } = await supabase.from('pro_access').select('id').eq('user_id', data.user.id).maybeSingle()
       const pro = !!row
       setIsPro(pro)
@@ -317,8 +317,13 @@ function ATSCheckInner() {
     setSavingToDashboard(true)
     try {
       let fileToUpload: File | null = null
+      const version = saveCount + 1
+      const versionSuffix = version > 1 ? `_v${version}` : ''
+
       if (tab === 'upload' && file) {
-        fileToUpload = file
+        const base = file.name.replace(/\.[^.]+$/, '')
+        const ext = file.name.split('.').pop() ?? 'pdf'
+        fileToUpload = new File([file], `${base}${versionSuffix}.${ext}`, { type: file.type })
       } else if (tab === 'saved' && selectedResumeId) {
         const urlRes = await fetch(`/api/resume/${selectedResumeId}`)
         const urlData = await urlRes.json()
@@ -326,15 +331,19 @@ function ATSCheckInner() {
         const resp = await fetch(urlData.url)
         const blob = await resp.blob()
         const resume = savedResumes.find(r => r.id === selectedResumeId)
-        fileToUpload = new File([blob], urlData.filename ?? resume?.filename ?? 'resume.pdf', { type: blob.type || 'application/pdf' })
+        const origName = urlData.filename ?? resume?.filename ?? 'resume.pdf'
+        const base = origName.replace(/\.[^.]+$/, '')
+        const ext = origName.split('.').pop() ?? 'pdf'
+        fileToUpload = new File([blob], `${base}${versionSuffix}.${ext}`, { type: blob.type || 'application/pdf' })
       } else if (tab === 'paste' && resumeText.trim()) {
         const blob = new Blob([resumeText], { type: 'text/plain' })
-        fileToUpload = new File([blob], 'resume.txt', { type: 'text/plain' })
+        fileToUpload = new File([blob], `resume${versionSuffix}.txt`, { type: 'text/plain' })
       }
       if (!fileToUpload) return
       const form = new FormData()
       form.append('file', fileToUpload)
       await fetch('/api/resume/upload', { method: 'POST', body: form })
+      setSaveCount(c => c + 1)
       setSavedToDashboard(true)
       setTimeout(() => setSavedToDashboard(false), 3000)
     } finally {
@@ -372,7 +381,7 @@ function ATSCheckInner() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
-      {modal && <Modal type={modal} onClose={() => setModal(null)} />}
+      {modal && <Modal type={modal} onClose={() => setModal(null)} userEmail={userEmail} />}
 
       <div className="mb-10 flex items-start justify-between flex-wrap gap-3">
         <div>
@@ -498,9 +507,9 @@ function ATSCheckInner() {
             <div className="w-full bg-amber-50 border border-amber-200 rounded-xl px-4 py-4 text-center">
               <p className="text-sm font-semibold text-amber-800 mb-1">You've used all 5 free checks</p>
               <p className="text-xs text-amber-600 mb-3">Upgrade to Pro for unlimited ATS checks — ₹999, one-time.</p>
-              <Link href="/pricing" className="inline-block bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors">
-                Upgrade to Pro
-              </Link>
+              <div className="flex justify-center">
+                <ProUpgradeCTAs layout="row" userEmail={userEmail} source="ats" />
+              </div>
             </div>
           ) : (
             <button
@@ -571,7 +580,6 @@ function ATSCheckInner() {
                   onClick={handleSaveToDashboard}
                   disabled={savingToDashboard}
                   className="flex items-center gap-1.5 border border-gray-200 text-gray-700 px-3.5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
-                  title="Save to My Resumes"
                 >
                   {savingToDashboard ? (
                     <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-500 rounded-full animate-spin" />
@@ -581,10 +589,10 @@ function ATSCheckInner() {
                     </svg>
                   ) : (
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 3v13.5m-4.5-4.5L12 16.5l4.5-4.5" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
                     </svg>
                   )}
-                  {savedToDashboard ? 'Saved!' : 'Save'}
+                  {savedToDashboard ? 'Saved to Dashboard' : 'Save to Dashboard'}
                 </button>
               </div>
 
@@ -635,20 +643,11 @@ function ATSCheckInner() {
               </div>
 
               {!isPro && (
-                <Link
-                  href="/pricing"
-                  className="block bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5 hover:bg-amber-100 transition-colors"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <div>
-                      <div className="text-xs font-bold text-amber-800 mb-1">✦ Unlock Pro — ₹999 one-time</div>
-                      <div className="text-xs text-amber-700">Unlimited checks · PDF download · Edit in Google Docs · Expert session</div>
-                    </div>
-                    <svg className="w-4 h-4 text-amber-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </Link>
+                <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5">
+                  <div className="text-xs font-bold text-amber-800 mb-1">✦ Unlock Pro — ₹999 one-time</div>
+                  <div className="text-xs text-amber-700 mb-3">Unlimited checks · PDF download · Edit in Google Docs · Expert session</div>
+                  <ProUpgradeCTAs layout="row" userEmail={userEmail} source="ats" />
+                </div>
               )}
             </div>
           )}

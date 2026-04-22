@@ -1,0 +1,31 @@
+'use client'
+
+import Link from 'next/link'
+import { useProUpgrade } from '@/lib/use-pro-upgrade'
+
+interface Props {
+  layout?: 'row' | 'stack'
+  userEmail?: string
+  source?: string
+}
+
+export default function ProUpgradeCTAs({ layout = 'row', userEmail, source }: Props) {
+  const { startUpgrade, loading } = useProUpgrade()
+  return (
+    <div className={layout === 'stack' ? 'flex flex-col gap-2' : 'flex items-center gap-2 flex-wrap'}>
+      <button
+        onClick={() => startUpgrade(userEmail, source)}
+        disabled={loading}
+        className={`bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-60 ${layout === 'stack' ? 'w-full py-3' : 'px-4 py-2'}`}
+      >
+        {loading ? 'Processing…' : 'Go Pro — ₹999'}
+      </button>
+      <Link
+        href="/pricing"
+        className={`text-sm text-gray-500 hover:text-gray-700 font-medium transition-colors ${layout === 'stack' ? 'text-center py-1' : ''}`}
+      >
+        Explore Pro features →
+      </Link>
+    </div>
+  )
+}

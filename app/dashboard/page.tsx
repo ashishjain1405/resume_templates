@@ -5,6 +5,7 @@ import { TEMPLATES } from '@/lib/templates'
 import { isPro } from '@/lib/pro'
 import TemplateCard from '@/components/TemplateCard'
 import UserResumes from '@/components/UserResumes'
+import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -45,9 +46,7 @@ export default async function DashboardPage() {
             <span className="font-semibold">✦ You&apos;re on the free plan.</span>{' '}
             <span className="text-amber-700">Unlimited checks, PDF downloads &amp; expert session with Pro.</span>
           </div>
-          <Link href="/pricing" className="text-sm font-semibold text-amber-700 border border-amber-300 bg-white px-3.5 py-1.5 rounded-lg hover:bg-amber-50 transition-colors whitespace-nowrap flex-shrink-0">
-            Upgrade to Pro
-          </Link>
+          <ProUpgradeCTAs layout="row" userEmail={user.email} />
         </div>
       )}
 

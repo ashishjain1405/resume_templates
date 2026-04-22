@@ -12,6 +12,7 @@ import MulticolumnPreview from '@/components/resume-previews/Multicolumn'
 import QuotationPreview from '@/components/resume-previews/Quotation'
 import ExecutivePreview from '@/components/resume-previews/Executive'
 import type { User } from '@supabase/supabase-js'
+import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
 
 function CheckATSButton({ user, onAuthRequired, data, accentColor, templateId }: {
   user: User | null
@@ -113,6 +114,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [savedMsg, setSavedMsg] = useState(false)
   const [savingVersion, setSavingVersion] = useState(false)
   const [savedVersion, setSavedVersion] = useState(false)
+  const [saveCount, setSaveCount] = useState(0)
   const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit')
   const [isPro, setIsPro] = useState(false)
   const [showProDownloadModal, setShowProDownloadModal] = useState(false)
@@ -241,12 +243,16 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       })
       if (!res.ok) { const err = await res.text(); alert(`Could not generate resume: ${err}`); return }
       const blob = await res.blob()
-      const name = `${data.personal.name?.replace(/\s+/g, '_') || 'resume'}_${templateId}.pdf`
+      const base = `${data.personal.name?.replace(/\s+/g, '_') || 'resume'}_${templateId}`
+      const version = saveCount + 1
+      const versionSuffix = version > 1 ? `_v${version}` : ''
+      const name = `${base}${versionSuffix}.pdf`
       const file = new File([blob], name, { type: 'application/pdf' })
       const form = new FormData()
       form.append('file', file)
       const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
-      if (!uploadRes.ok) { alert('Could not save to My Resumes. Please try again.'); return }
+      if (!uploadRes.ok) { alert('Could not save to Dashboard. Please try again.'); return }
+      setSaveCount(c => c + 1)
       setSavedVersion(true)
       setTimeout(() => setSavedVersion(false), 3000)
     } finally {
@@ -451,10 +457,10 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
               </svg>
             ) : (
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 3v13.5m-4.5-4.5L12 16.5l4.5-4.5" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
               </svg>
             )}
-            {savingVersion ? 'Saving…' : savedVersion ? 'Saved!' : 'Save'}
+            {savingVersion ? 'Saving…' : savedVersion ? 'Saved to Dashboard' : 'Save to Dashboard'}
           </button>
           <CheckATSButton user={user} onAuthRequired={() => setShowAuthModal(true)} data={data} accentColor={accentColor} templateId={templateId} />
           {isPro ? (
@@ -538,9 +544,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             </div>
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">PDF download is a Pro feature</h3>
             <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for lifetime access — unlimited downloads, unlimited ATS checks, and an expert session. ₹999, one-time.</p>
-            <Link href="/pricing" className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
-              Get Pro Access — ₹999
-            </Link>
+            <ProUpgradeCTAs layout="stack" source="download" />
           </div>
         </div>
       )}
