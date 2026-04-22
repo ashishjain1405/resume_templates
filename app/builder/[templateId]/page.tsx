@@ -143,9 +143,31 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     return () => subscription.unsubscribe()
   }, [])
 
-  // Load saved data: Supabase for logged-in, localStorage for guests
+  // Load saved data: sessionStorage (post-auth restore) > Supabase > localStorage
   useEffect(() => {
     async function load() {
+      // Restore guest state saved just before login/signup redirect
+      const sessionRaw = typeof window !== 'undefined' ? sessionStorage.getItem(`builder_session_${templateId}`) : null
+      if (sessionRaw) {
+        sessionStorage.removeItem(`builder_session_${templateId}`)
+        try {
+          const { data: saved, accentColor: savedColor } = JSON.parse(sessionRaw)
+          setData(saved)
+          if (savedColor) setAccentColor(savedColor)
+          // Persist restored state to Supabase immediately
+          if (user) {
+            await supabase.from('resumes').upsert({
+              user_id: user.id,
+              template_id: templateId,
+              data: saved,
+              accent_color: savedColor,
+              updated_at: new Date().toISOString(),
+            }, { onConflict: 'user_id,template_id' })
+          }
+        } catch {}
+        return
+      }
+
       if (user) {
         const { data: row } = await supabase
           .from('resumes')
@@ -520,10 +542,18 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             <h2 className="text-lg font-bold text-gray-900 mb-2">Save your progress</h2>
             <p className="text-sm text-gray-500 mb-5">Create a free account to save your resume and download it anytime.</p>
             <div className="flex flex-col gap-2">
-              <a href={`/auth/signup?redirect=/builder/${templateId}`} className="w-full text-center bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
+              <a
+                href={`/auth/signup?redirect=/builder/${templateId}`}
+                onClick={() => sessionStorage.setItem(`builder_session_${templateId}`, JSON.stringify({ data, accentColor }))}
+                className="w-full text-center bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors"
+              >
                 Create free account
               </a>
-              <a href={`/auth/login?redirect=/builder/${templateId}`} className="w-full text-center border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors">
+              <a
+                href={`/auth/login?redirect=/builder/${templateId}`}
+                onClick={() => sessionStorage.setItem(`builder_session_${templateId}`, JSON.stringify({ data, accentColor }))}
+                className="w-full text-center border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors"
+              >
                 Log in
               </a>
             </div>

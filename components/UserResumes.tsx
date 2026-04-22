@@ -19,7 +19,7 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-export default function UserResumes() {
+export default function UserResumes({ isPro = false }: { isPro?: boolean }) {
   const [resumes, setResumes] = useState<UploadedResume[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
@@ -145,20 +145,28 @@ export default function UserResumes() {
                 >
                   Check ATS
                 </Link>
-                <button
-                  onClick={() => handleDownload(r)}
-                  disabled={downloadingId === r.id}
-                  className="text-gray-400 hover:text-gray-700 transition-colors disabled:opacity-50"
-                  aria-label="Download"
-                >
-                  {downloadingId === r.id ? (
-                    <div className="w-4 h-4 border-2 border-gray-200 border-t-gray-400 rounded-full animate-spin" />
-                  ) : (
+                {isPro ? (
+                  <button
+                    onClick={() => handleDownload(r)}
+                    disabled={downloadingId === r.id}
+                    className="text-gray-400 hover:text-gray-700 transition-colors disabled:opacity-50"
+                    aria-label="Download"
+                  >
+                    {downloadingId === r.id ? (
+                      <div className="w-4 h-4 border-2 border-gray-200 border-t-gray-400 rounded-full animate-spin" />
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 3v13.5m-4.5-4.5L12 16.5l4.5-4.5" />
+                      </svg>
+                    )}
+                  </button>
+                ) : (
+                  <Link href="/pricing" aria-label="Upgrade to download" className="text-gray-300 hover:text-amber-500 transition-colors">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 3v13.5m-4.5-4.5L12 16.5l4.5-4.5" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                     </svg>
-                  )}
-                </button>
+                  </Link>
+                )}
                 <button
                   onClick={() => handleDelete(r.id)}
                   disabled={deletingId === r.id}

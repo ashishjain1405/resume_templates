@@ -143,7 +143,7 @@ export default async function DashboardPage() {
 
       {/* Uploaded resumes */}
       <div className="mt-10">
-        <UserResumes />
+        <UserResumes isPro={pro} />
       </div>
     </div>
   )
