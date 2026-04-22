@@ -111,6 +111,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [showProDocsModal, setShowProDocsModal] = useState(false)
   const [showChangeTemplateModal, setShowChangeTemplateModal] = useState(false)
   const [authForATS, setAuthForATS] = useState(false)
+  const [authForDownload, setAuthForDownload] = useState(false)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const Preview = PREVIEW_MAP[templateId] ?? ClassicPreview
@@ -158,6 +159,11 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             }, { onConflict: 'user_id,template_id' })
           }
         } catch {}
+        // Auto-open Pro upgrade modal if user just signed up to download
+        if (sessionStorage.getItem('download_pending')) {
+          sessionStorage.removeItem('download_pending')
+          setShowProDownloadModal(true)
+        }
         return
       }
 
@@ -297,7 +303,13 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   }
 
   async function handleDownload() {
-    if (!user) { setShowAuthModal(true); return }
+    if (!user) {
+      setAuthForDownload(true)
+      sessionStorage.setItem(`builder_session_${templateId}`, JSON.stringify({ data, accentColor }))
+      sessionStorage.setItem('download_pending', '1')
+      setShowAuthModal(true)
+      return
+    }
     const res = await fetch('/api/builder/pdf?pdf=1', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -570,15 +582,33 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       {showAuthModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
-            <h2 className="text-lg font-bold text-gray-900 mb-2">Save your progress</h2>
-            <p className="text-sm text-gray-500 mb-5">Sign in to save your resume and pick up where you left off.</p>
+            {authForDownload ? (
+              <>
+                <h2 className="text-lg font-bold text-gray-900 mb-1">Almost there — 2 quick steps</h2>
+                <div className="flex flex-col gap-2 mb-5 mt-3">
+                  <div className="flex items-center gap-3 bg-blue-50 rounded-xl px-3 py-2.5">
+                    <span className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
+                    <span className="text-sm text-gray-700 font-medium">Create a free account</span>
+                  </div>
+                  <div className="flex items-center gap-3 bg-gray-50 rounded-xl px-3 py-2.5">
+                    <span className="w-6 h-6 bg-gray-300 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
+                    <span className="text-sm text-gray-500">Unlock PDF downloads with Pro — ₹999 one-time</span>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 className="text-lg font-bold text-gray-900 mb-2">Save your progress</h2>
+                <p className="text-sm text-gray-500 mb-5">Sign in to save your resume and pick up where you left off.</p>
+              </>
+            )}
             <div className="flex flex-col gap-2">
               <a
                 href={`/auth/signup?redirect=${encodeURIComponent(authForATS ? '/ats-check' : `/builder/${templateId}`)}`}
                 onClick={() => { if (!authForATS) sessionStorage.setItem(`builder_session_${templateId}`, JSON.stringify({ data, accentColor })) }}
                 className="w-full text-center bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors"
               >
-                Create account
+                {authForDownload ? 'Create account to continue' : 'Create account'}
               </a>
               <a
                 href={`/auth/login?redirect=${encodeURIComponent(authForATS ? '/ats-check' : `/builder/${templateId}`)}`}
@@ -588,7 +618,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
                 Sign in
               </a>
             </div>
-            <button onClick={() => setShowAuthModal(false)} className="mt-3 w-full text-center text-xs text-gray-400 hover:text-gray-600">Cancel</button>
+            <button onClick={() => { setShowAuthModal(false); setAuthForDownload(false) }} className="mt-3 w-full text-center text-xs text-gray-400 hover:text-gray-600">Cancel</button>
           </div>
         </div>
       )}
