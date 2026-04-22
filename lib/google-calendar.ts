@@ -49,7 +49,7 @@ export async function getAvailableSlots(days = 14): Promise<Slot[]> {
 
   while (cursor < endDate) {
     const day = cursor.getDay()
-    if (day !== 0 && day !== 6) { cursor.setDate(cursor.getDate() + 1); cursor.setHours(5, 30, 0, 0); continue } // next day 11am IST = 5:30am UTC
+    if (day === 0 || day === 6) { cursor.setDate(cursor.getDate() + 1); cursor.setHours(5, 30, 0, 0); continue } // skip weekends; next day 11am IST = 5:30am UTC
 
     // Get IST hour
     const istMs = cursor.getTime() + IST_OFFSET

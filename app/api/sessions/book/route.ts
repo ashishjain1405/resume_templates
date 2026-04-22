@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     try {
       const resend = new Resend(process.env.RESEND_API_KEY)
       const scheduledDate = new Date(start).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'full', timeStyle: 'short' })
-      await resend.emails.send({
+      const { data: emailData, error: emailError } = await resend.emails.send({
         from: 'onboarding@resend.dev',
         to: process.env.EXPERT_EMAIL!,
         subject: `New session booked — ${userName || user.email}`,
@@ -64,8 +64,10 @@ export async function POST(request: NextRequest) {
                <strong>Time:</strong> ${scheduledDate} IST<br>
                <strong>Meet link:</strong> <a href="${meetLink}">${meetLink}</a></p>`,
       })
+      if (emailError) console.error('Expert email failed:', emailError)
+      else console.log('Expert email sent:', emailData?.id)
     } catch (emailErr) {
-      console.error('Expert email failed:', emailErr)
+      console.error('Expert email exception:', emailErr)
     }
 
     return Response.json({ meetLink, eventId, scheduledAt: start })
