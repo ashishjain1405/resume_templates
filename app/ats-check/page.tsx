@@ -245,6 +245,22 @@ function ATSCheckInner() {
         const form = new FormData()
         form.append('resumeText', text)
         autoAnalyse(form)
+        // Also generate PDF in background so "Save to Dashboard" uploads a proper PDF
+        if (pending.templateId) {
+          fetch('/api/builder/pdf?pdf=1', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ templateId: pending.templateId, data: d, accentColor: pending.accentColor }),
+          })
+            .then(r => r.ok ? r.blob() : null)
+            .then(blob => {
+              if (blob) {
+                const name = `${p.name?.replace(/\s+/g, '_') || 'resume'}_${pending.templateId}.pdf`
+                setFile(new File([blob], name, { type: 'application/pdf' }))
+              }
+            })
+            .catch(() => {/* file stays null, save will fall back to txt */})
+        }
       } else if (pending.tab === 'paste' && pending.resumeText) {
         setTab('paste')
         setResumeText(pending.resumeText)
@@ -372,7 +388,7 @@ function ATSCheckInner() {
       const version = saveCount + 1
       const versionSuffix = version > 1 ? `_v${version}` : ''
 
-      if (tab === 'upload' && file) {
+      if (file) {
         const base = file.name.replace(/\.[^.]+$/, '')
         const ext = file.name.split('.').pop() ?? 'pdf'
         fileToUpload = new File([file], `${base}${versionSuffix}.${ext}`, { type: file.type })
