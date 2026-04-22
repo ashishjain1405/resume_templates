@@ -1,15 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 
-export default function SignupPage() {
+function SignupForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
+  const searchParams = useSearchParams()
+  const redirect = searchParams.get('redirect') ?? '/dashboard'
   const supabase = createClient()
 
   async function handleSignup(e: React.FormEvent) {
@@ -23,7 +26,7 @@ export default function SignupPage() {
       if (!testRes.ok) { const d = await testRes.json(); setError(d.error ?? 'Test bypass unavailable'); setLoading(false); return }
       const { error } = await supabase.auth.signInWithPassword({ email, password: 'test1234' })
       if (error) { setError(error.message); setLoading(false); return }
-      window.location.href = '/dashboard'
+      window.location.href = redirect
       return
     }
 
@@ -31,7 +34,7 @@ export default function SignupPage() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirm`,
+        emailRedirectTo: `${window.location.origin}/auth/confirm?redirect=${encodeURIComponent(redirect)}`,
       },
     })
 
@@ -96,12 +99,20 @@ export default function SignupPage() {
 
           <p className="text-center text-sm text-gray-500 mt-6">
             Already have an account?{' '}
-            <Link href="/auth/login" className="text-blue-600 font-medium hover:underline">
+            <Link href={`/auth/login?redirect=${encodeURIComponent(redirect)}`} className="text-blue-600 font-medium hover:underline">
               Log in
             </Link>
           </p>
         </div>
       </div>
     </div>
+  )
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense>
+      <SignupForm />
+    </Suspense>
   )
 }

@@ -15,6 +15,7 @@ export default function ConfirmPage() {
       const params = new URLSearchParams(window.location.search)
       const tokenHash = params.get('token_hash')
       const type = params.get('type') as 'email' | 'recovery' | 'invite' | null
+      const redirect = params.get('redirect') ?? '/dashboard'
 
       if (tokenHash && type) {
         const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type })
@@ -23,7 +24,7 @@ export default function ConfirmPage() {
           return
         }
         setStatus('success')
-        setTimeout(() => router.push('/dashboard'), 2000)
+        setTimeout(() => router.push(redirect), 2000)
         return
       }
 
@@ -31,7 +32,7 @@ export default function ConfirmPage() {
       const { data } = await supabase.auth.getUser()
       if (data.user) {
         setStatus('success')
-        setTimeout(() => router.push('/dashboard'), 2000)
+        setTimeout(() => router.push(redirect), 2000)
       } else {
         setStatus('error')
       }
@@ -57,7 +58,7 @@ export default function ConfirmPage() {
               </svg>
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Email confirmed!</h2>
-            <p className="text-gray-500 text-sm">Redirecting you to your dashboard...</p>
+            <p className="text-gray-500 text-sm">Redirecting you now…</p>
           </>
         )}
         {status === 'error' && (
