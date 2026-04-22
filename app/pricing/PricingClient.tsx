@@ -148,7 +148,7 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <UpgradeButton className="w-full sm:w-auto px-10" />
             <Link href="/ats-check" className="text-sm text-gray-500 hover:text-gray-700 font-medium">
-              Try ATS Checker free first →
+              Try ATS Checker →
             </Link>
           </div>
           <p className="text-xs text-gray-400 mt-3">Secure payment via Razorpay · GST invoice on request</p>
