@@ -155,7 +155,26 @@ function ATSCheckInner() {
 
   // Auto-trigger Google Docs edit when returning from payment with ?openDocs=1
   useEffect(() => {
-    if (searchParams.get('openDocs') && isPro) handleEditInDocs()
+    if (!searchParams.get('openDocs') || !isPro) return
+    const resumeId = sessionStorage.getItem('docs_pending_resume_id')
+    if (!resumeId) return
+    sessionStorage.removeItem('docs_pending_resume_id')
+    setEditLoading(true)
+    fetch(`/api/resume/${resumeId}`)
+      .then(r => r.json())
+      .then(async ({ url }) => {
+        if (!url) return
+        const fileRes = await fetch(url)
+        const blob = await fileRes.blob()
+        const form = new FormData()
+        form.append('file', new File([blob], 'resume.pdf', { type: 'application/pdf' }))
+        const res = await fetch('/api/resume/edit', { method: 'POST', body: form })
+        const data = await res.json()
+        if (data.url) window.open(data.url, '_blank')
+        else setError(data.error ?? 'Failed to open in Google Docs')
+      })
+      .catch(() => setError('Something went wrong. Please try again.'))
+      .finally(() => setEditLoading(false))
   }, [isPro])
 
   // Load resume from dashboard "Check ATS" link (?resumeId=) and auto-analyse
@@ -439,7 +458,22 @@ function ATSCheckInner() {
   }
 
   async function handleEditInDocs() {
-    if (!isPro) { setModal('pro_docs'); return }
+    if (!isPro) {
+      // Upload resume now so we can retrieve it after payment redirect
+      if (tab === 'upload' && file) {
+        const form = new FormData()
+        form.append('file', file)
+        const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
+        const uploadData = await uploadRes.json()
+        if (uploadData.resume?.id) {
+          sessionStorage.setItem('docs_pending_resume_id', uploadData.resume.id)
+        }
+      } else if (selectedResumeId) {
+        sessionStorage.setItem('docs_pending_resume_id', selectedResumeId)
+      }
+      setModal('pro_docs')
+      return
+    }
     setEditLoading(true)
     try {
       const form = new FormData()
