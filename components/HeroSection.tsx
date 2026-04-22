@@ -19,6 +19,7 @@ function ATSAnimation() {
   const [started, setStarted] = useState(false)
   const [score, setScore] = useState(0)
   const [done, setDone] = useState(false)
+  const [flipped, setFlipped] = useState(false)
 
   const r = 54
   const circ = 2 * Math.PI * r
@@ -42,91 +43,145 @@ function ATSAnimation() {
     requestAnimationFrame(tick)
   }, [started])
 
+  // Trigger card-deck flip 600ms after score completes
+  useEffect(() => {
+    if (!done) return
+    const t = setTimeout(() => setFlipped(true), 600)
+    return () => clearTimeout(t)
+  }, [done])
+
   const fill = started ? circ - (score / 100) * circ : circ
   const ringColor = score >= 75 ? '#16a34a' : score >= 50 ? '#d97706' : '#dc2626'
 
+  const cardBase = 'absolute inset-0 w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-6'
+
   return (
-    <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
-      {/* Status pill */}
-      <div className="flex items-center justify-between mb-5">
-        <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">ATS Score Report</span>
-        <span className={`text-xs font-medium transition-colors duration-500 ${done ? 'text-green-600' : 'text-gray-400'}`}>
-          {done ? '✓ Analysis complete' : 'Analysing…'}
-        </span>
-      </div>
+    <div className="w-full max-w-sm" style={{ perspective: '1200px' }}>
+      <style>{`
+        @keyframes cardFlipBack {
+          from { transform: translateY(0) scale(1) translateZ(0); z-index: 2; }
+          to   { transform: translateY(18px) scale(0.95) translateZ(-40px); z-index: 0; }
+        }
+        @keyframes cardFlipFront {
+          from { transform: translateY(12px) scale(0.97) translateZ(-20px); opacity: 0; }
+          to   { transform: translateY(0) scale(1) translateZ(0); opacity: 1; }
+        }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(5px); }
+          to   { opacity: 1; transform: none; }
+        }
+      `}</style>
 
-      {/* Score ring */}
-      <div className="flex items-center gap-5 mb-6">
-        <div className="relative inline-flex items-center justify-center flex-shrink-0">
-          <svg width="128" height="128" className="-rotate-90">
-            <circle cx="64" cy="64" r={r} fill="none" stroke="#f3f4f6" strokeWidth="10" />
-            <circle
-              cx="64" cy="64" r={r} fill="none"
-              stroke={started ? ringColor : '#f3f4f6'}
-              strokeWidth="10"
-              strokeDasharray={circ}
-              strokeDashoffset={fill}
-              strokeLinecap="round"
-              style={{ transition: 'stroke-dashoffset 0.05s linear, stroke 0.3s ease' }}
-            />
-          </svg>
-          <div className="absolute text-center">
-            <div className="text-3xl font-bold text-gray-900">{score}</div>
-            <div className="text-[10px] text-gray-400 font-medium">/100</div>
-          </div>
-        </div>
-        <div>
-          <div className="text-base font-bold text-gray-900">
-            {score >= 75 ? 'Strong resume' : score >= 50 ? 'Needs improvement' : 'Significant gaps'}
-          </div>
-          <div className="text-xs text-gray-400 mt-0.5">ATS Compatibility</div>
-          <div className="flex flex-wrap gap-1 mt-2">
-            {['Python', 'SQL', 'Leadership'].map(kw => (
-              <span key={kw} className="bg-red-50 text-red-500 border border-red-100 text-[10px] px-2 py-0.5 rounded-full">{kw}</span>
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* Fixed-height container so size never changes */}
+      <div className="relative" style={{ height: '340px' }}>
 
-      {/* Section bars */}
-      <div className="space-y-3">
-        <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Section Breakdown</div>
-        {BARS.map(bar => (
-          <div key={bar.label}>
-            <div className="flex justify-between text-xs mb-1">
-              <span className="text-gray-600 font-medium">{bar.label}</span>
-              <span className="text-gray-400">{bar.value}/100</span>
+        {/* Back card — score (slides back when flipped) */}
+        <div
+          className={cardBase}
+          style={{
+            zIndex: flipped ? 0 : 2,
+            animation: flipped ? 'cardFlipBack 0.5s cubic-bezier(0.4,0,0.2,1) forwards' : undefined,
+          }}
+        >
+          <div className="flex items-center justify-between mb-5">
+            <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">ATS Score Report</span>
+            <span className={`text-xs font-medium transition-colors duration-500 ${done ? 'text-green-600' : 'text-gray-400'}`}>
+              {done ? '✓ Analysis complete' : 'Analysing…'}
+            </span>
+          </div>
+          <div className="flex items-center gap-5 mb-6">
+            <div className="relative inline-flex items-center justify-center flex-shrink-0">
+              <svg width="128" height="128" className="-rotate-90">
+                <circle cx="64" cy="64" r={r} fill="none" stroke="#f3f4f6" strokeWidth="10" />
+                <circle
+                  cx="64" cy="64" r={r} fill="none"
+                  stroke={started ? ringColor : '#f3f4f6'}
+                  strokeWidth="10"
+                  strokeDasharray={circ}
+                  strokeDashoffset={fill}
+                  strokeLinecap="round"
+                  style={{ transition: 'stroke-dashoffset 0.05s linear, stroke 0.3s ease' }}
+                />
+              </svg>
+              <div className="absolute text-center">
+                <div className="text-3xl font-bold text-gray-900">{score}</div>
+                <div className="text-[10px] text-gray-400 font-medium">/100</div>
+              </div>
             </div>
-            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-              <div
-                className={`h-full ${bar.color} rounded-full`}
-                style={{
-                  width: started ? `${bar.value}%` : '0%',
-                  transition: 'width 0.6s ease',
-                  transitionDelay: started ? bar.delay : '0s',
-                }}
-              />
+            <div>
+              <div className="text-base font-bold text-gray-900">
+                {score >= 75 ? 'Strong resume' : score >= 50 ? 'Needs improvement' : 'Significant gaps'}
+              </div>
+              <div className="text-xs text-gray-400 mt-0.5">ATS Compatibility</div>
+              <div className="flex flex-wrap gap-1 mt-2">
+                {['Python', 'SQL', 'Leadership'].map(kw => (
+                  <span key={kw} className="bg-red-50 text-red-500 border border-red-100 text-[10px] px-2 py-0.5 rounded-full">{kw}</span>
+                ))}
+              </div>
             </div>
           </div>
-        ))}
-      </div>
-
-      {/* Actionable suggestions — fade in after score animation completes */}
-      {done && (
-        <>
-          <style>{`@keyframes fadeInUp { from { opacity:0; transform:translateY(6px) } to { opacity:1; transform:none } }`}</style>
-          <div className="mt-4 border-t border-gray-100 pt-4 space-y-2">
-            <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Top Suggestions</div>
-            {SUGGESTIONS.map((s, i) => (
-              <div key={i} className="flex items-start gap-2 text-xs text-gray-600"
-                style={{ opacity: 0, animation: 'fadeInUp 0.35s ease forwards', animationDelay: `${i * 0.18}s` }}>
-                <span className="text-amber-500 mt-0.5 flex-shrink-0 font-bold">→</span>
-                <span>{s}</span>
+          <div className="space-y-3">
+            <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Section Breakdown</div>
+            {BARS.map(bar => (
+              <div key={bar.label}>
+                <div className="flex justify-between text-xs mb-1">
+                  <span className="text-gray-600 font-medium">{bar.label}</span>
+                  <span className="text-gray-400">{bar.value}/100</span>
+                </div>
+                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full ${bar.color} rounded-full`}
+                    style={{
+                      width: started ? `${bar.value}%` : '0%',
+                      transition: 'width 0.6s ease',
+                      transitionDelay: started ? bar.delay : '0s',
+                    }}
+                  />
+                </div>
               </div>
             ))}
           </div>
-        </>
-      )}
+        </div>
+
+        {/* Front card — suggestions (slides forward when flipped) */}
+        <div
+          className={cardBase}
+          style={{
+            zIndex: flipped ? 2 : 0,
+            opacity: 0,
+            transform: 'translateY(12px) scale(0.97) translateZ(-20px)',
+            animation: flipped ? 'cardFlipFront 0.5s cubic-bezier(0.4,0,0.2,1) forwards' : undefined,
+          }}
+        >
+          <div className="flex items-center justify-between mb-5">
+            <span className="text-xs font-semibold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full">Improvement Plan</span>
+            <span className="text-xs font-medium text-green-600">✓ Analysis complete</span>
+          </div>
+          <div className="flex flex-wrap gap-1 mb-5">
+            {['Python', 'SQL', 'Leadership'].map(kw => (
+              <span key={kw} className="bg-red-50 text-red-500 border border-red-100 text-[10px] px-2 py-0.5 rounded-full">{kw} missing</span>
+            ))}
+          </div>
+          <div className="space-y-3">
+            <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Top Suggestions</div>
+            {SUGGESTIONS.map((s, i) => (
+              <div
+                key={i}
+                className="flex items-start gap-3 bg-gray-50 rounded-xl p-3"
+                style={{
+                  opacity: flipped ? 1 : 0,
+                  animation: flipped ? `fadeInUp 0.3s ease forwards` : undefined,
+                  animationDelay: `${0.3 + i * 0.15}s`,
+                }}
+              >
+                <span className="text-amber-500 font-bold text-sm flex-shrink-0 mt-0.5">→</span>
+                <span className="text-xs text-gray-700 leading-relaxed">{s}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
     </div>
   )
 }
@@ -164,7 +219,7 @@ export default function HeroSection() {
               </div>
             </div>
 
-            {/* Right — animated ATS card */}
+            {/* Right — animated ATS card deck */}
             <div className="flex-1 flex justify-center lg:justify-end">
               <ATSAnimation />
             </div>
