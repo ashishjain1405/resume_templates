@@ -159,10 +159,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             }, { onConflict: 'user_id,template_id' })
           }
         } catch {}
-        return
-      }
-
-      if (user) {
+      } else if (user) {
         const { data: row } = await supabase
           .from('resumes')
           .select('data, accent_color')
@@ -180,7 +177,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         }
       }
 
-      // Auto-open Pro upgrade modal if user signed up/in to download (flag survives email confirmation)
+      // Auto-open Pro upgrade modal — checked unconditionally after all restore paths
       if (user) {
         const downloadPending = localStorage.getItem(`download_pending_${templateId}`)
         if (downloadPending) {
