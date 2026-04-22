@@ -49,7 +49,7 @@ export function useProUpgrade() {
             alert(`Payment verification failed: ${d.error ?? 'Unknown error'}`)
           }
         },
-        prefill: userEmail ? { email: userEmail } : {},
+        prefill: { email: userEmail ?? '' },
         theme: { color: '#2563eb' },
       })
       rzp.open()
