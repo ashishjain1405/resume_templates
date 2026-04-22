@@ -131,6 +131,7 @@ function ATSCheckInner() {
   const [savingToDashboard, setSavingToDashboard] = useState(false)
   const [savedToDashboard, setSavedToDashboard] = useState(false)
   const [saveCount, setSaveCount] = useState(0)
+  const [bannerDismissed, setBannerDismissed] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   // On mount: check pro status, fetch usage, load saved resumes
@@ -246,6 +247,14 @@ function ATSCheckInner() {
     } catch { /* ignore */ }
   }, [])
 
+  // Warn before tab close / hard navigation when result is unsaved
+  useEffect(() => {
+    if (!result || saveCount > 0) return
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = '' }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [result, saveCount])
+
   async function handleAnalyse() {
     setError('')
     setLoading(true)
@@ -302,6 +311,8 @@ function ATSCheckInner() {
       }
       const atsResult = data as ATSResult
       setResult(atsResult)
+      setSaveCount(0)
+      setBannerDismissed(false)
       if (atsResult._usage) setUsage(atsResult._usage)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.')
@@ -647,6 +658,25 @@ function ATSCheckInner() {
                   <div className="text-xs font-bold text-amber-800 mb-1">✦ Unlock Pro — ₹999 one-time</div>
                   <div className="text-xs text-amber-700 mb-3">Unlimited checks · PDF download · Edit in Google Docs · Expert session</div>
                   <ProUpgradeCTAs layout="row" userEmail={userEmail} source="ats" />
+                </div>
+              )}
+
+              {saveCount === 0 && !bannerDismissed && (
+                <div className="flex items-start justify-between gap-3 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-semibold text-blue-800 mb-0.5">Save your results before leaving</div>
+                    <div className="text-xs text-blue-600">Your ATS score won&apos;t be here when you come back.</div>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <button
+                      onClick={handleSaveToDashboard}
+                      disabled={savingToDashboard}
+                      className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-60"
+                    >
+                      {savingToDashboard ? 'Saving…' : 'Save to Dashboard'}
+                    </button>
+                    <button onClick={() => setBannerDismissed(true)} className="text-blue-400 hover:text-blue-600 text-lg leading-none">×</button>
+                  </div>
                 </div>
               )}
             </div>

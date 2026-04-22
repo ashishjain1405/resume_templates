@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef, use } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { TEMPLATES } from '@/lib/templates'
 import { EMPTY_RESUME, type ResumeData, type ExperienceEntry, type EducationEntry } from '@/lib/resume-data'
 import { createClient } from '@/lib/supabase'
@@ -49,15 +48,17 @@ function CheckATSButton({ user, onAuthRequired, data, accentColor, templateId }:
 
   if (resumeId) {
     return (
-      <Link
+      <a
         href={`/ats-check?resumeId=${resumeId}`}
+        target="_blank"
+        rel="noreferrer"
         className="border border-gray-200 text-gray-700 text-sm px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center gap-1.5 flex-shrink-0"
       >
         <svg className="w-3.5 h-3.5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
         Check ATS
-      </Link>
+      </a>
     )
   }
 
@@ -118,6 +119,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit')
   const [isPro, setIsPro] = useState(false)
   const [showProDownloadModal, setShowProDownloadModal] = useState(false)
+  const [showChangeTemplateModal, setShowChangeTemplateModal] = useState(false)
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const Preview = PREVIEW_MAP[templateId] ?? ClassicPreview
@@ -484,6 +486,12 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             )}
             {savingVersion ? 'Saving…' : savedVersion ? 'Saved to Dashboard' : 'Save to Dashboard'}
           </button>
+          <button
+            onClick={() => setShowChangeTemplateModal(true)}
+            className="border border-gray-200 text-gray-500 text-sm px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors font-medium flex-shrink-0"
+          >
+            Change template
+          </button>
           <CheckATSButton user={user} onAuthRequired={() => setShowAuthModal(true)} data={data} accentColor={accentColor} templateId={templateId} />
           {isPro ? (
             <button
@@ -558,6 +566,36 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
               </a>
             </div>
             <button onClick={() => setShowAuthModal(false)} className="mt-3 w-full text-center text-xs text-gray-400 hover:text-gray-600">Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* Change template modal */}
+      {showChangeTemplateModal && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowChangeTemplateModal(false)}>
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl relative" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowChangeTemplateModal(false)} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Change template?</h3>
+            <p className="text-sm text-gray-500 text-center mb-5">Your current progress will be lost unless you save it first.</p>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={async () => {
+                  await handleSaveVersion()
+                  router.push('/builder')
+                }}
+                disabled={savingVersion}
+                className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+              >
+                {savingVersion ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Saving…</> : 'Save to Dashboard'}
+              </button>
+              <button
+                onClick={() => { localStorage.removeItem(storageKey(templateId)); router.push('/builder') }}
+                className="w-full border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors"
+              >
+                Change anyway
+              </button>
+              <button onClick={() => setShowChangeTemplateModal(false)} className="text-xs text-gray-400 hover:text-gray-600 pt-1">Cancel</button>
+            </div>
           </div>
         </div>
       )}
