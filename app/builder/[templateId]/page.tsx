@@ -130,8 +130,8 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       if (session?.user) {
         const { data: row } = await supabase.from('pro_access').select('id').eq('user_id', session.user.id).maybeSingle()
         setIsPro(!!row)
-        // Check for pending download intent on sign-in (catches redirect-after-signup flow)
-        if (event === 'SIGNED_IN' && typeof window !== 'undefined') {
+        // Check for pending download intent on sign-in or initial session load
+        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && typeof window !== 'undefined') {
           const downloadPending = localStorage.getItem(`download_pending_${templateId}`)
           if (downloadPending) {
             localStorage.removeItem(`download_pending_${templateId}`)
