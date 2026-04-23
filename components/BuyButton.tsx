@@ -71,7 +71,7 @@ export default function BuyButton({ template, purchased }: Props) {
           key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
           amount,
           currency,
-          name: 'ResumeNow',
+          name: 'Resume Expert',
           description: `${template.name} Resume Template`,
           order_id: orderId,
           handler: async (response) => {

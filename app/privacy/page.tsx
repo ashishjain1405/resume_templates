@@ -4,7 +4,7 @@ export default function PrivacyPage() {
       <h1 className="text-3xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
       <p className="text-gray-400 text-sm mb-10">Last updated: April 2025</p>
       <div className="prose prose-gray text-gray-600 space-y-6 text-sm leading-relaxed">
-        <p>ResumeNow (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;) is committed to protecting your privacy. This policy explains what data we collect and how we use it.</p>
+        <p>Resume Expert (&quot;we&quot;, &quot;our&quot;, &quot;us&quot;) is committed to protecting your privacy. This policy explains what data we collect and how we use it.</p>
         <h2 className="text-base font-semibold text-gray-900">Data we collect</h2>
         <p>We collect your email address when you create an account. We store records of templates you have purchased. We do not store payment card details — all payments are processed securely by Razorpay.</p>
         <h2 className="text-base font-semibold text-gray-900">How we use your data</h2>

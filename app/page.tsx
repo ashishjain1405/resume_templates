@@ -8,7 +8,7 @@ import ATSPreview from '@/components/ATSPreview'
 import { TEMPLATES } from '@/lib/templates'
 
 export const metadata: Metadata = {
-  title: "India's Best Resume Templates — ATS-Friendly | ResumeNow",
+  title: "India's Best Resume Templates — ATS-Friendly | Resume Expert",
   description: 'Browse 35+ professionally designed, ATS-optimised resume templates for Indian job seekers. One-time purchase, lifetime access. Download in PDF & DOCX.',
   alternates: { canonical: 'https://www.resumenow.in' },
 }
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
-  name: 'ResumeNow',
+  name: 'Resume Expert',
   url: 'https://www.resumenow.in',
   description: "India's best ATS-friendly resume templates for job seekers.",
   potentialAction: {

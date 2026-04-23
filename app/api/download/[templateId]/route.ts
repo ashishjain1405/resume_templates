@@ -45,7 +45,8 @@ export async function GET(
     .createSignedUrl(storagePath, 60)
 
   if (error || !data) {
-    return Response.json({ error: 'Failed to generate download link' }, { status: 500 })
+    console.error('[download] Supabase storage error:', error, 'path:', storagePath)
+    return Response.json({ error: 'Failed to generate download link', detail: error?.message }, { status: 500 })
   }
 
   return Response.redirect(data.signedUrl)

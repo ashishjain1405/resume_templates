@@ -12,7 +12,7 @@ export default function Footer() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <span className="text-white font-bold">ResumeNow</span>
+              <span className="text-white font-bold">Resume Expert</span>
             </div>
             <p className="text-sm leading-relaxed">India&apos;s top resume template marketplace.</p>
           </div>
@@ -47,7 +47,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-800 pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-sm">
-          <p>© {new Date().getFullYear()} ResumeNow. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Resume Expert. All rights reserved.</p>
           <p>Payments secured by Razorpay</p>
         </div>
       </div>

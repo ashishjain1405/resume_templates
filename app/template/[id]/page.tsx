@@ -35,7 +35,7 @@ export async function generateMetadata({
     description: `${template.description} ATS-friendly, one-time purchase. Download instantly in PDF & DOCX.`,
     alternates: { canonical: `https://www.resumenow.in/template/${id}` },
     openGraph: {
-      title: `${template.name} Resume Template | ResumeNow`,
+      title: `${template.name} Resume Template | Resume Expert`,
       description: template.description,
       url: `https://www.resumenow.in/template/${id}`,
     },

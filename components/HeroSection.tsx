@@ -16,6 +16,7 @@ const SUGGESTIONS = [
 ]
 
 function ATSAnimation() {
+  const [cycle, setCycle] = useState(0)
   const [started, setStarted] = useState(false)
   const [score, setScore] = useState(0)
   const [done, setDone] = useState(false)
@@ -24,30 +25,42 @@ function ATSAnimation() {
   const r = 54
   const circ = 2 * Math.PI * r
 
+  // Reset all state for a new cycle
+  function reset() {
+    setFlipped(false)
+    setDone(false)
+    setScore(0)
+    setStarted(false)
+    setCycle(c => c + 1)
+  }
+
   useEffect(() => {
     const t = setTimeout(() => setStarted(true), 400)
     return () => clearTimeout(t)
-  }, [])
+  }, [cycle])
 
   useEffect(() => {
     if (!started) return
     const duration = 1200
     const start = performance.now()
+    let raf: number
     function tick(now: number) {
       const progress = Math.min((now - start) / duration, 1)
       const eased = 1 - Math.pow(1 - progress, 3)
       setScore(Math.round(eased * SCORE_TARGET))
-      if (progress < 1) requestAnimationFrame(tick)
+      if (progress < 1) { raf = requestAnimationFrame(tick) }
       else setDone(true)
     }
-    requestAnimationFrame(tick)
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
   }, [started])
 
-  // Trigger card-deck flip 600ms after score completes
+  // Flip card 600ms after score finishes, then loop after 3s on suggestions card
   useEffect(() => {
     if (!done) return
-    const t = setTimeout(() => setFlipped(true), 600)
-    return () => clearTimeout(t)
+    const t1 = setTimeout(() => setFlipped(true), 600)
+    const t2 = setTimeout(() => reset(), 600 + 1000 + 3000) // flip duration + pause
+    return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [done])
 
   const fill = started ? circ - (score / 100) * circ : circ
@@ -56,15 +69,15 @@ function ATSAnimation() {
   const cardBase = 'absolute inset-0 w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-6'
 
   return (
-    <div className="w-full max-w-sm" style={{ perspective: '1200px' }}>
+    <div className="w-full max-w-sm">
       <style>{`
-        @keyframes cardFlipBack {
-          from { transform: translateY(0) scale(1) translateZ(0); z-index: 2; }
-          to   { transform: translateY(18px) scale(0.95) translateZ(-40px); z-index: 0; }
+        @keyframes cardSlideBack {
+          from { transform: translateY(0) scale(1); opacity: 1; }
+          to   { transform: translateY(18px) scale(0.95); opacity: 0.6; }
         }
-        @keyframes cardFlipFront {
-          from { transform: translateY(12px) scale(0.97) translateZ(-20px); opacity: 0; }
-          to   { transform: translateY(0) scale(1) translateZ(0); opacity: 1; }
+        @keyframes cardSlideFront {
+          from { transform: translateY(12px) scale(0.97); opacity: 0; }
+          to   { transform: translateY(0) scale(1); opacity: 1; }
         }
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(5px); }
@@ -80,7 +93,7 @@ function ATSAnimation() {
           className={cardBase}
           style={{
             zIndex: flipped ? 0 : 2,
-            animation: flipped ? 'cardFlipBack 1s cubic-bezier(0.4,0,0.2,1) forwards' : undefined,
+            animation: flipped ? 'cardSlideBack 1s cubic-bezier(0.4,0,0.2,1) forwards' : undefined,
           }}
         >
           <div className="flex items-center justify-between mb-5">
@@ -150,7 +163,7 @@ function ATSAnimation() {
             zIndex: flipped ? 2 : 0,
             opacity: 0,
             transform: 'translateY(12px) scale(0.97) translateZ(-20px)',
-            animation: flipped ? 'cardFlipFront 1s cubic-bezier(0.4,0,0.2,1) forwards' : undefined,
+            animation: flipped ? 'cardSlideFront 1s cubic-bezier(0.4,0,0.2,1) forwards' : undefined,
           }}
         >
           <div className="flex items-center justify-between mb-5">

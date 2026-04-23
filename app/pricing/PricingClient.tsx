@@ -95,7 +95,7 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
             </svg>
-            ResumeNow Pro
+            Resume Expert Pro
           </div>
           <h1 className="text-4xl font-bold text-gray-900 tracking-tight mb-4">
             Everything you need to<br />land your next job
@@ -371,7 +371,7 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
       {/* Bottom CTA */}
       <section className="py-14 px-4 bg-blue-600 text-center">
         <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Ready to get hired faster?</h2>
-        <p className="text-blue-100 text-sm mb-6">Join thousands of Indian job seekers who landed their next role with ResumeNow Pro.</p>
+        <p className="text-blue-100 text-sm mb-6">Join thousands of Indian job seekers who landed their next role with Resume Expert Pro.</p>
         <UpgradeButton className="inline-block px-10" />
       </section>
 
