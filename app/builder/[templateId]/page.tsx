@@ -218,6 +218,12 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         if (row) {
           setData(row.data as ResumeData)
           if (row.accent_color) setAccentColor(row.accent_color)
+        } else {
+          // No Supabase row yet — fall back to localStorage draft (e.g. guest typed data, then signed up via ATS flow)
+          const stored = typeof window !== 'undefined' ? localStorage.getItem(storageKey(templateId)) : null
+          if (stored) {
+            try { setData(JSON.parse(stored)) } catch {}
+          }
         }
       } else {
         const stored = typeof window !== 'undefined' ? localStorage.getItem(storageKey(templateId)) : null
