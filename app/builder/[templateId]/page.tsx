@@ -115,6 +115,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [authForDocs, setAuthForDocs] = useState(false)
   const [autoOpenDocs, setAutoOpenDocs] = useState(false)
   const searchParams = useSearchParams()
+  const openDocsOnLoad = useRef(typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('openDocs') === '1')
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const Preview = PREVIEW_MAP[templateId] ?? ClassicPreview
@@ -221,14 +222,15 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   }, [user, isPro, templateId])
 
   // Auto-trigger Google Docs after Pro payment redirect (?openDocs=1)
+  // Read from ref (captured once on mount) so router.replace doesn't re-fire this
   useEffect(() => {
-    if (!isPro) return
-    if (searchParams.get('openDocs') !== '1') return
+    if (!openDocsOnLoad.current || !user || !isPro) return
+    openDocsOnLoad.current = false
     router.replace(`/builder/${templateId}`)
-    setAutoOpenDocs(true)
-  }, [isPro, searchParams])
+    handleEditInDocs()
+  }, [user, isPro])
 
-  // Execute Google Docs once user + Pro status are confirmed in React state
+  // Execute Google Docs once user + Pro status are confirmed in React state (docs_pending path)
   useEffect(() => {
     if (!autoOpenDocs || !user || !isPro) return
     setAutoOpenDocs(false)
