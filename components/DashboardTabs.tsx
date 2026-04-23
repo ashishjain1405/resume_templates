@@ -231,9 +231,20 @@ export default function DashboardTabs({
                 </div>
               </div>
             )}
-            <Link href="/ats-check" className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
-              Check my resume score →
-            </Link>
+            {pro ? (
+              <Link href="/ats-check" className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
+                Check my resume score →
+              </Link>
+            ) : (
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link href="/ats-check" className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
+                  Check my resume score →
+                </Link>
+                <Link href="/pricing" className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 border border-amber-200 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-amber-100 transition-colors">
+                  Upgrade for unlimited checks ✦
+                </Link>
+              </div>
+            )}
           </div>
 
           {latestResume && (

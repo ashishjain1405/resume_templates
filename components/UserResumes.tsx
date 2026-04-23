@@ -8,6 +8,7 @@ interface UploadedResume {
   filename: string
   mime_type: string
   size_bytes: number
+  ats_score: number | null
   created_at: string
 }
 
@@ -136,7 +137,14 @@ export default function UserResumes({ isPro = false }: { isPro?: boolean }) {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium text-gray-900 truncate">{r.filename}</div>
-                <div className="text-xs text-gray-400">{formatSize(r.size_bytes)} · {formatDate(r.created_at)}</div>
+                <div className="text-xs text-gray-400 flex items-center gap-2">
+                  <span>{formatSize(r.size_bytes)} · {formatDate(r.created_at)}</span>
+                  {r.ats_score != null && (
+                    <span className={`font-semibold ${r.ats_score >= 75 ? 'text-green-600' : r.ats_score >= 50 ? 'text-amber-600' : 'text-red-500'}`}>
+                      ATS {r.ats_score}/100
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 <Link

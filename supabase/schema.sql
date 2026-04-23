@@ -82,8 +82,10 @@ CREATE TABLE IF NOT EXISTS uploaded_resumes (
   storage_path TEXT NOT NULL,
   mime_type TEXT NOT NULL,
   size_bytes INTEGER NOT NULL,
+  ats_score INTEGER,
   created_at TIMESTAMPTZ DEFAULT now()
 );
+-- Migration: ALTER TABLE uploaded_resumes ADD COLUMN IF NOT EXISTS ats_score INTEGER;
 
 ALTER TABLE uploaded_resumes ENABLE ROW LEVEL SECURITY;
 

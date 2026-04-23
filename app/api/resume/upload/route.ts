@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: uploadError.message }, { status: 500 })
     }
 
+    const atsScore = form.get('ats_score')
     const { data: row, error: dbError } = await adminClient
       .from('uploaded_resumes')
       .insert({
@@ -39,8 +40,9 @@ export async function POST(request: NextRequest) {
         storage_path: storagePath,
         mime_type: file.type,
         size_bytes: file.size,
+        ...(atsScore !== null ? { ats_score: Number(atsScore) } : {}),
       })
-      .select('id, filename, mime_type, size_bytes, created_at')
+      .select('id, filename, mime_type, size_bytes, ats_score, created_at')
       .single()
 
     if (dbError) {

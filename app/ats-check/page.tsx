@@ -163,6 +163,7 @@ function ATSCheckInner() {
   const [showSaveModal, setShowSaveModal] = useState(false)
   const [pendingNavUrl, setPendingNavUrl] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+  const beforeUnloadRef = useRef<((e: BeforeUnloadEvent) => void) | null>(null)
 
   // On mount: check pro status, fetch usage, load saved resumes
   useEffect(() => {
@@ -359,10 +360,17 @@ function ATSCheckInner() {
 
   // Warn before tab close / hard navigation when result is unsaved
   useEffect(() => {
-    if (!result || saveCount > 0) return
+    if (!result || saveCount > 0) {
+      if (beforeUnloadRef.current) {
+        window.removeEventListener('beforeunload', beforeUnloadRef.current)
+        beforeUnloadRef.current = null
+      }
+      return
+    }
     const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = '' }
+    beforeUnloadRef.current = handler
     window.addEventListener('beforeunload', handler)
-    return () => window.removeEventListener('beforeunload', handler)
+    return () => { window.removeEventListener('beforeunload', handler); beforeUnloadRef.current = null }
   }, [result, saveCount])
 
   // Intercept in-app link clicks when result is unsaved
@@ -518,6 +526,7 @@ function ATSCheckInner() {
       if (!fileToUpload) return
       const form = new FormData()
       form.append('file', fileToUpload)
+      if (result?.score != null) form.append('ats_score', String(result.score))
       await fetch('/api/resume/upload', { method: 'POST', body: form })
       setSaveCount(c => c + 1)
       setSavedToDashboard(true)
@@ -590,6 +599,7 @@ function ATSCheckInner() {
                 onClick={async () => {
                   await handleSaveToDashboard()
                   setShowSaveModal(false)
+                  if (beforeUnloadRef.current) { window.removeEventListener('beforeunload', beforeUnloadRef.current); beforeUnloadRef.current = null }
                   if (pendingNavUrl) window.location.href = pendingNavUrl
                 }}
                 disabled={savingToDashboard}
@@ -598,7 +608,7 @@ function ATSCheckInner() {
                 {savingToDashboard ? 'Saving…' : 'Save to Dashboard'}
               </button>
               <button
-                onClick={() => { setShowSaveModal(false); if (pendingNavUrl) window.location.href = pendingNavUrl }}
+                onClick={() => { setShowSaveModal(false); if (beforeUnloadRef.current) { window.removeEventListener('beforeunload', beforeUnloadRef.current); beforeUnloadRef.current = null } if (pendingNavUrl) window.location.href = pendingNavUrl }}
                 className="w-full border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors"
               >
                 Leave anyway
