@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase'
 
 function loadRazorpayScript(): Promise<void> {
   if (typeof window !== 'undefined' && window.Razorpay) return Promise.resolve()
@@ -24,20 +23,13 @@ export function useProUpgrade() {
     try {
       // Ensure session cookie is fresh before hitting the API — newly signed-up users
       // may have a valid client-side session that hasn't been flushed to cookies yet
-      // Refresh session so cookie is current before hitting server API
-      const { data: sessionData } = await createClient().auth.getSession()
-      if (!sessionData.session) {
+      const res = await fetch('/api/razorpay/pro-order', { method: 'POST' })
+      if (res.status === 401) {
         const redirect = typeof window !== 'undefined'
           ? encodeURIComponent(window.location.pathname + window.location.search)
           : encodeURIComponent('/pricing')
         router.push(`/auth/login?redirect=${redirect}`)
         setLoading(false)
-        return
-      }
-      const res = await fetch('/api/razorpay/pro-order', { method: 'POST' })
-      if (res.status === 401) {
-        // Session exists client-side but server can't see it — force full reload to sync cookies
-        window.location.reload()
         return
       }
       if (!res.ok) { const d = await res.json(); alert(d.error ?? 'Failed to create order'); setLoading(false); return }
@@ -82,9 +74,7 @@ export function useProUpgrade() {
       })
       rzp.open()
     } catch (err) {
-      const msg = err instanceof Error ? `${err.message}\n${err.stack}` : String(err)
-      console.error('startUpgrade error:', msg)
-      alert(`Debug: ${err instanceof Error ? err.message : String(err)}`)
+      console.error('startUpgrade error:', err)
       setLoading(false)
     }
   }
