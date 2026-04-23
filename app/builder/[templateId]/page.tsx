@@ -225,17 +225,35 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     }
   }, [user, isPro, templateId])
 
-  // Auto-trigger Google Docs when user+isPro settle — covers both docs_pending and docs_open_after_pro flags
+  // Auto-trigger Google Docs — covers docs_open_after_pro (post-payment) and docs_pending (post-signup) flags
   useEffect(() => {
-    if (!user || !isPro) return
+    if (!user) return
     if (typeof window === 'undefined') return
     const openAfterPro = localStorage.getItem('docs_open_after_pro')
     if (openAfterPro) {
       localStorage.removeItem('docs_open_after_pro')
       router.replace(`/builder/${templateId}`)
-      handleEditInDocs()
+      // Poll /api/pro-status until DB confirms Pro (bypasses RLS replication lag)
+      let attempts = 0
+      const MAX = 20
+      function pollAndOpen() {
+        attempts++
+        fetch('/api/pro-status')
+          .then(r => r.json())
+          .then(d => {
+            if (d.pro) {
+              setIsPro(true)
+              handleEditInDocs()
+            } else if (attempts < MAX) {
+              setTimeout(pollAndOpen, 1000)
+            }
+          })
+          .catch(() => { if (attempts < MAX) setTimeout(pollAndOpen, 1000) })
+      }
+      pollAndOpen()
       return
     }
+    if (!isPro) return
     if (!autoOpenDocs) return
     setAutoOpenDocs(false)
     handleEditInDocs()
@@ -345,9 +363,10 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       return
     }
     if (!isPro) {
-      // Re-check Pro status from DB before showing upgrade modal — avoids stale state
-      const { data: proRow } = await supabase.from('pro_access').select('id').eq('user_id', user.id).maybeSingle()
-      if (proRow) { setIsPro(true) } else { setShowProDocsModal(true); return }
+      // Re-check via adminClient endpoint to bypass RLS replication lag
+      const res = await fetch('/api/pro-status')
+      const d = await res.json()
+      if (d.pro) { setIsPro(true) } else { setShowProDocsModal(true); return }
     }
     try {
       setDocsLoading(true)
