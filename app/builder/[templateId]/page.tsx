@@ -231,25 +231,28 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   // Auto-open Pro upgrade modal once user is resolved — runs after load() has restored data
   useEffect(() => {
     if (!user) return
-    const isAutoUpgrade = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('autoupgrade') === '1'
     const downloadPending = localStorage.getItem(`download_pending_${templateId}`)
     if (downloadPending) {
       localStorage.removeItem(`download_pending_${templateId}`)
-      // autoupgrade=1 handles this flow — skip showing the modal to avoid collision
-      if (!isAutoUpgrade) {
-        if (isPro) { setTimeout(() => handleDownload(), 0) } else { setShowProDownloadModal(true) }
-      }
+      if (isPro) { setTimeout(() => handleDownload(), 0) } else { setShowProDownloadModal(true) }
     }
     const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
     if (docsPending) {
       localStorage.removeItem(`docs_pending_${templateId}`)
       if (isPro) { setTimeout(() => handleEditInDocs(), 0) } else { setShowProDocsModal(true) }
     }
-    if (isAutoUpgrade && !isPro && !autoUpgradeFired.current) {
-      autoUpgradeFired.current = true
-      startUpgrade(user.email ?? '', 'builder_download')
-    }
   }, [user, isPro, templateId])
+
+  // autoupgrade=1: fires once on mount — same pattern as PricingClient
+  // Uses getUser() directly so it doesn't race against async state resolution
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('autoupgrade') !== '1') return
+    if (autoUpgradeFired.current) return
+    autoUpgradeFired.current = true
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) startUpgrade(data.user.email ?? '', 'builder_download')
+    })
+  }, [])
 
   // Auto-save with debounce
   const autoSave = useCallback((next: ResumeData, color: string) => {
