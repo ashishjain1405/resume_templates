@@ -1,13 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import Link from 'next/link'
 
 export default function ConfirmPage() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
-  const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
@@ -26,7 +24,7 @@ export default function ConfirmPage() {
           return
         }
         setStatus('success')
-        setTimeout(() => router.push(redirect), 2000)
+        setTimeout(() => { window.location.href = redirect }, 2000)
         return
       }
 
@@ -34,7 +32,7 @@ export default function ConfirmPage() {
       const { data } = await supabase.auth.getUser()
       if (data.user) {
         setStatus('success')
-        setTimeout(() => router.push(redirect), 2000)
+        setTimeout(() => { window.location.href = redirect }, 2000)
       } else {
         setStatus('error')
       }
