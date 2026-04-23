@@ -113,7 +113,6 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [authForATS, setAuthForATS] = useState(false)
   const [authForDownload, setAuthForDownload] = useState(false)
   const [authForDocs, setAuthForDocs] = useState(false)
-  const [autoOpenDocs, setAutoOpenDocs] = useState(false)
   const [docsLoading, setDocsLoading] = useState(false)
 
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -165,7 +164,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
             if (docsPending) {
               localStorage.removeItem(`docs_pending_${templateId}`)
-              if (row) { setAutoOpenDocs(true) } else { setShowProDocsModal(true) }
+              if (row) { setTimeout(() => handleEditInDocs(), 0) } else { setShowProDocsModal(true) }
             }
           }
         }
@@ -239,45 +238,9 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
     if (docsPending) {
       localStorage.removeItem(`docs_pending_${templateId}`)
-      if (isPro) { setAutoOpenDocs(true) } else { setShowProDocsModal(true) }
+      if (isPro) { setTimeout(() => handleEditInDocs(), 0) } else { setShowProDocsModal(true) }
     }
   }, [user, isPro, templateId])
-
-  // Auto-trigger Google Docs — covers docs_open_after_pro (post-payment) and docs_pending (post-signup) flags
-  useEffect(() => {
-    if (!user) return
-    if (typeof window === 'undefined') return
-    const openAfterPro = localStorage.getItem('docs_open_after_pro')
-    if (openAfterPro) {
-      localStorage.removeItem('docs_open_after_pro')
-      router.replace(`/builder/${templateId}`)
-      // Poll /api/pro-status (adminClient, bypasses RLS replication lag) then set flags
-      let attempts = 0
-      const MAX = 20
-      function pollAndOpen() {
-        attempts++
-        fetch('/api/pro-status')
-          .then(r => r.json())
-          .then(d => {
-            if (d.pro) {
-              localStorage.removeItem('pro_unlocked')
-              sessionStorage.removeItem('pro_unlocked')
-              setIsPro(true)
-              setAutoOpenDocs(true)  // let the isPro-gated branch below fire
-            } else if (attempts < MAX) {
-              setTimeout(pollAndOpen, 1000)
-            }
-          })
-          .catch(() => { if (attempts < MAX) setTimeout(pollAndOpen, 1000) })
-      }
-      pollAndOpen()
-      return
-    }
-    if (!isPro) return
-    if (!autoOpenDocs) return
-    setAutoOpenDocs(false)
-    handleEditInDocs()
-  }, [user, isPro, autoOpenDocs])
 
   // Auto-save with debounce
   const autoSave = useCallback((next: ResumeData, color: string) => {
