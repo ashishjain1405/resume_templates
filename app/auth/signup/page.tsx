@@ -12,14 +12,18 @@ function SignupForm() {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const searchParams = useSearchParams()
-  const redirect = searchParams.get('redirect') ?? '/dashboard'
   const supabase = createClient()
+
+  function getRedirect() {
+    return searchParams.get('redirect') ?? '/dashboard'
+  }
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
     setError('')
     setMessage('')
+    const redirect = getRedirect()
 
     if (email.startsWith('test')) {
       const testRes = await fetch('/api/auth/test-signin', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) })
