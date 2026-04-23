@@ -104,7 +104,7 @@ function Modal({ type, onClose, userEmail }: { type: 'login_required' | 'pro_doc
             </div>
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Save your results</h3>
             <p className="text-sm text-gray-500 text-center mb-5">Sign in to keep your ATS score and access it anytime from your dashboard.</p>
-            <Link href="/auth/login?redirect=/ats-check" className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
+            <Link href="/auth/signup?redirect=/ats-check" className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
               Sign in or create account
             </Link>
           </>
@@ -308,10 +308,14 @@ function ATSCheckInner() {
             body: JSON.stringify({ templateId: pending.templateId, data: d, accentColor: pending.accentColor }),
           })
             .then(r => r.ok ? r.blob() : null)
-            .then(blob => {
+            .then(async blob => {
               if (blob) {
                 const name = `${p.name?.replace(/\s+/g, '_') || 'resume'}_${pending.templateId}.pdf`
-                setFile(new File([blob], name, { type: 'application/pdf' }))
+                const file = new File([blob], name, { type: 'application/pdf' })
+                setFile(file)
+                const form = new FormData()
+                form.append('file', file)
+                await fetch('/api/resume/upload', { method: 'POST', body: form })
               }
             })
             .catch(() => {/* file stays null, save will fall back to txt */})

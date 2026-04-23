@@ -20,7 +20,7 @@ function formatDateTime(iso: string) {
 export default async function SessionsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/auth/login?redirect=/sessions')
+  if (!user) redirect('/auth/signup?redirect=/sessions')
 
   const { data: sessions } = await supabase
     .from('sessions')

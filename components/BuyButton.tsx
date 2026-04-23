@@ -49,7 +49,7 @@ export default function BuyButton({ template, purchased }: Props) {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
-        router.push(`/auth/login?redirect=/template/${template.id}`)
+        router.push(`/auth/signup?redirect=/template/${template.id}`)
         return
       }
 

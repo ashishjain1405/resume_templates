@@ -161,7 +161,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             const downloadPending = localStorage.getItem(`download_pending_${templateId}`)
             if (downloadPending) {
               localStorage.removeItem(`download_pending_${templateId}`)
-              setShowProDownloadModal(true)
+              if (row) { setTimeout(() => handleDownload(), 0) } else { setShowProDownloadModal(true) }
             }
             const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
             if (docsPending) {
@@ -241,7 +241,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     const downloadPending = localStorage.getItem(`download_pending_${templateId}`)
     if (downloadPending) {
       localStorage.removeItem(`download_pending_${templateId}`)
-      setShowProDownloadModal(true)
+      if (isPro) { setTimeout(() => handleDownload(), 0) } else { setShowProDownloadModal(true) }
     }
     const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
     if (docsPending) {

@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useProUpgrade } from '@/lib/use-pro-upgrade'
 
@@ -64,10 +64,17 @@ function Cross() {
 export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { startUpgrade, loading } = useProUpgrade()
 
+  useEffect(() => {
+    if (isLoggedIn && !isPro && searchParams.get('autoupgrade') === '1') {
+      startUpgrade(userEmail, 'pricing')
+    }
+  }, [])
+
   function handleUpgrade() {
-    if (!isLoggedIn) { router.push('/auth/login?redirect=/pricing'); return }
+    if (!isLoggedIn) { router.push('/auth/signup?redirect=/pricing?autoupgrade=1'); return }
     startUpgrade(userEmail, 'pricing')
   }
 
