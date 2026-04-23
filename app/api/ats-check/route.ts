@@ -2,6 +2,8 @@ import { NextRequest } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase-server'
 import { isPro } from '@/lib/pro'
 import OpenAI from 'openai'
+
+export const maxDuration = 60
 async function parsePdf(buf: Buffer): Promise<string> {
   const { extractText, getDocumentProxy } = await import('unpdf')
   const pdf = await getDocumentProxy(new Uint8Array(buf))

@@ -402,7 +402,21 @@ function ATSCheckInner() {
       }
       form.append('jobDescription', jobDescription)
 
-      const res = await fetch('/api/ats-check', { method: 'POST', body: form })
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 55000)
+      let res: Response
+      try {
+        res = await fetch('/api/ats-check', { method: 'POST', body: form, signal: controller.signal })
+      } catch (fetchErr) {
+        if (fetchErr instanceof Error && fetchErr.name === 'AbortError') {
+          setError('Analysis timed out. Please try pasting the resume text instead.')
+        } else {
+          setError('Network error. Please check your connection and try again.')
+        }
+        return
+      } finally {
+        clearTimeout(timeout)
+      }
       const raw = await res.text()
       let data: { error?: string; _usage?: { used: number; limit: number } | null } & Partial<ATSResult> = {}
       try { data = JSON.parse(raw) } catch { /* non-JSON */ }
