@@ -406,7 +406,11 @@ function ATSCheckInner() {
       try {
         res = await fetch('/api/ats-check', { method: 'POST', body: form })
       } catch {
-        setError('Could not reach the server. Please check your connection and try again.')
+        if (tab === 'upload') {
+          setError('PDF upload failed. Please try pasting your resume text instead.')
+        } else {
+          setError('Could not reach the server. Please check your connection and try again.')
+        }
         return
       }
       const raw = await res.text()

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef, use } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { TEMPLATES } from '@/lib/templates'
 import { EMPTY_RESUME, type ResumeData, type ExperienceEntry, type EducationEntry } from '@/lib/resume-data'
 import { createClient } from '@/lib/supabase'
@@ -112,6 +112,8 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [showChangeTemplateModal, setShowChangeTemplateModal] = useState(false)
   const [authForATS, setAuthForATS] = useState(false)
   const [authForDownload, setAuthForDownload] = useState(false)
+  const [authForDocs, setAuthForDocs] = useState(false)
+  const searchParams = useSearchParams()
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const Preview = PREVIEW_MAP[templateId] ?? ClassicPreview
@@ -136,6 +138,11 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
           if (downloadPending) {
             localStorage.removeItem(`download_pending_${templateId}`)
             setShowProDownloadModal(true)
+          }
+          const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
+          if (docsPending) {
+            localStorage.removeItem(`docs_pending_${templateId}`)
+            setShowProDocsModal(true)
           }
         }
       } else {
@@ -205,7 +212,20 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       localStorage.removeItem(`download_pending_${templateId}`)
       setShowProDownloadModal(true)
     }
+    const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
+    if (docsPending) {
+      localStorage.removeItem(`docs_pending_${templateId}`)
+      setShowProDocsModal(true)
+    }
   }, [user, templateId])
+
+  // Auto-trigger Google Docs after Pro payment redirect (?openDocs=1)
+  useEffect(() => {
+    if (!isPro) return
+    if (searchParams.get('openDocs') !== '1') return
+    router.replace(`/builder/${templateId}`)
+    handleEditInDocs()
+  }, [isPro, searchParams])
 
   // Auto-save with debounce
   const autoSave = useCallback((next: ResumeData, color: string) => {
@@ -301,7 +321,15 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   }
 
   async function handleEditInDocs() {
-    if (!user) { setShowAuthModal(true); return }
+    if (!user) {
+      setAuthForDocs(true)
+      const sessionSnapshot = JSON.stringify({ data, accentColor })
+      sessionStorage.setItem(`builder_session_${templateId}`, sessionSnapshot)
+      localStorage.setItem(`builder_session_restore_${templateId}`, sessionSnapshot)
+      localStorage.setItem(`docs_pending_${templateId}`, '1')
+      setShowAuthModal(true)
+      return
+    }
     if (!isPro) { setShowProDocsModal(true); return }
     try {
       const pdfRes = await fetch('/api/builder/pdf?pdf=1', {
@@ -604,7 +632,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       {showAuthModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
-            {authForDownload ? (
+            {(authForDownload || authForDocs) ? (
               <>
                 <h2 className="text-lg font-bold text-gray-900 mb-1">Almost there — 2 quick steps</h2>
                 <div className="flex flex-col gap-2 mb-5 mt-3">
@@ -614,7 +642,9 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
                   </div>
                   <div className="flex items-center gap-3 bg-gray-50 rounded-xl px-3 py-2.5">
                     <span className="w-6 h-6 bg-gray-300 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
-                    <span className="text-sm text-gray-500">Unlock PDF downloads with Pro — ₹999 one-time</span>
+                    <span className="text-sm text-gray-500">
+                      {authForDocs ? 'Unlock Google Docs editing with Pro — ₹999 one-time' : 'Unlock PDF downloads with Pro — ₹999 one-time'}
+                    </span>
                   </div>
                 </div>
               </>
@@ -630,7 +660,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
                 onClick={() => { if (!authForATS) sessionStorage.setItem(`builder_session_${templateId}`, JSON.stringify({ data, accentColor })) }}
                 className="w-full text-center bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors"
               >
-                {authForDownload ? 'Create account to continue' : 'Create account'}
+                {(authForDownload || authForDocs) ? 'Create account to continue' : 'Create account'}
               </a>
               <a
                 href={`/auth/login?redirect=${encodeURIComponent(authForATS ? '/ats-check' : `/builder/${templateId}`)}`}
@@ -640,7 +670,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
                 Sign in
               </a>
             </div>
-            <button onClick={() => { setShowAuthModal(false); setAuthForDownload(false) }} className="mt-3 w-full text-center text-xs text-gray-400 hover:text-gray-600">Cancel</button>
+            <button onClick={() => { setShowAuthModal(false); setAuthForDownload(false); setAuthForDocs(false) }} className="mt-3 w-full text-center text-xs text-gray-400 hover:text-gray-600">Cancel</button>
           </div>
         </div>
       )}
@@ -687,7 +717,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             </div>
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Edit in Google Docs is a Pro feature</h3>
             <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for lifetime access — edit in Google Docs, unlimited ATS checks, PDF downloads, and an expert session. ₹999, one-time.</p>
-            <ProUpgradeCTAs layout="stack" source="docs" />
+            <ProUpgradeCTAs layout="stack" source="docs" returnPath={`/builder/${templateId}`} />
           </div>
         </div>
       )}

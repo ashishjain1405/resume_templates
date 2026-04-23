@@ -18,7 +18,7 @@ const SOURCE_CONFIG: Record<string, { label: string; href: string; description: 
   },
   docs: {
     label: 'Edit in Google Docs →',
-    href: '/ats-check?openDocs=1',
+    href: '/builder?openDocs=1',
     description: 'Your resume is ready to open in Google Docs.',
   },
 }
@@ -32,11 +32,14 @@ const DEFAULT_SOURCE = {
 export default async function PaymentSuccessPage({
   searchParams,
 }: {
-  searchParams: Promise<{ type?: string; source?: string }>
+  searchParams: Promise<{ type?: string; source?: string; from?: string }>
 }) {
   const params = await searchParams
   const isPro = params.type === 'pro'
-  const primary = (params.source ? SOURCE_CONFIG[params.source] : undefined) ?? DEFAULT_SOURCE
+  let primary = (params.source ? SOURCE_CONFIG[params.source] : undefined) ?? DEFAULT_SOURCE
+  if (params.source === 'docs' && params.from) {
+    primary = { ...primary, href: `${params.from}?openDocs=1` }
+  }
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 bg-gray-50">

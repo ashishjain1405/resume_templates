@@ -7,14 +7,15 @@ interface Props {
   layout?: 'row' | 'stack'
   userEmail?: string
   source?: string
+  returnPath?: string
 }
 
-export default function ProUpgradeCTAs({ layout = 'row', userEmail, source }: Props) {
+export default function ProUpgradeCTAs({ layout = 'row', userEmail, source, returnPath }: Props) {
   const { startUpgrade, loading } = useProUpgrade()
   return (
     <div className={layout === 'stack' ? 'flex flex-col gap-2' : 'flex items-center gap-2 flex-wrap'}>
       <button
-        onClick={() => startUpgrade(userEmail, source)}
+        onClick={() => startUpgrade(userEmail, source, returnPath)}
         disabled={loading}
         className={`bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-60 ${layout === 'stack' ? 'w-full py-3' : 'px-4 py-2'}`}
       >

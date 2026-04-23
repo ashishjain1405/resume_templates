@@ -18,7 +18,7 @@ export function useProUpgrade() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  async function startUpgrade(userEmail?: string, source?: string) {
+  async function startUpgrade(userEmail?: string, source?: string, returnPath?: string) {
     setLoading(true)
     try {
       const res = await fetch('/api/razorpay/pro-order', { method: 'POST' })
@@ -50,7 +50,8 @@ export function useProUpgrade() {
             body: JSON.stringify(response),
           })
           if (verifyRes.ok) {
-            router.push(`/payment/success?type=pro${source ? `&source=${source}` : ''}`)
+            const successUrl = `/payment/success?type=pro${source ? `&source=${source}` : ''}${returnPath ? `&from=${encodeURIComponent(returnPath)}` : ''}`
+            router.push(successUrl)
           } else {
             const d = await verifyRes.json()
             alert(`Payment verification failed: ${d.error ?? 'Unknown error'}`)
