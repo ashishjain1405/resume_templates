@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef, use } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { TEMPLATES } from '@/lib/templates'
 import { EMPTY_RESUME, type ResumeData, type ExperienceEntry, type EducationEntry } from '@/lib/resume-data'
 import { createClient } from '@/lib/supabase'
@@ -115,7 +115,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [authForDocs, setAuthForDocs] = useState(false)
   const [autoOpenDocs, setAutoOpenDocs] = useState(false)
   const [docsLoading, setDocsLoading] = useState(false)
-  const searchParams = useSearchParams()
+
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const Preview = PREVIEW_MAP[templateId] ?? ClassicPreview
@@ -126,23 +126,8 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     supabase.auth.getUser().then(async ({ data }) => {
       setUser(data.user)
       if (data.user) {
-        const proUnlocked = typeof window !== 'undefined' &&
-          (localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked'))
-        if (proUnlocked) {
-          localStorage.removeItem('pro_unlocked')
-          sessionStorage.removeItem('pro_unlocked')
-          setIsPro(true)
-        } else {
-          const { data: row } = await supabase.from('pro_access').select('id').eq('user_id', data.user.id).maybeSingle()
-          if (!row) {
-            // Retry once after 2s to handle Supabase replication lag
-            await new Promise(r => setTimeout(r, 2000))
-            const { data: retryRow } = await supabase.from('pro_access').select('id').eq('user_id', data.user.id).maybeSingle()
-            setIsPro(!!retryRow)
-          } else {
-            setIsPro(true)
-          }
-        }
+        const { data: row } = await supabase.from('pro_access').select('id').eq('user_id', data.user.id).maybeSingle()
+        setIsPro(!!row)
       }
     })
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {

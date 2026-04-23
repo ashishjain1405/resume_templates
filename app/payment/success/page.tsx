@@ -1,4 +1,7 @@
-import Link from 'next/link'
+'use client'
+
+import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
 const SOURCE_CONFIG: Record<string, { label: string; href: string; description: string }> = {
   sessions: {
@@ -29,16 +32,20 @@ const DEFAULT_SOURCE = {
   description: 'You now have Pro access — unlimited ATS checks, PDF downloads, and an expert session.',
 }
 
-export default async function PaymentSuccessPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ type?: string; source?: string; from?: string }>
-}) {
-  const params = await searchParams
-  const isPro = params.type === 'pro'
-  let primary = (params.source ? SOURCE_CONFIG[params.source] : undefined) ?? DEFAULT_SOURCE
-  if (params.source === 'docs' && params.from) {
-    primary = { ...primary, href: `${params.from}?openDocs=1` }
+function PaymentSuccessContent() {
+  const searchParams = useSearchParams()
+  const source = searchParams.get('source') ?? ''
+  const from = searchParams.get('from') ?? ''
+  const isPro = searchParams.get('type') === 'pro'
+
+  let primary = (source ? SOURCE_CONFIG[source] : undefined) ?? DEFAULT_SOURCE
+  if (source === 'docs' && from) {
+    primary = { ...primary, href: `${from}?openDocs=1` }
+  }
+
+  // For Pro CTAs always do a full page reload so isPro state reloads fresh from DB
+  function navigate(href: string) {
+    window.location.href = href
   }
 
   return (
@@ -58,37 +65,45 @@ export default async function PaymentSuccessPage({
         <div className="flex flex-col gap-3">
           {isPro ? (
             <>
-              <Link
-                href={primary.href}
+              <button
+                onClick={() => navigate(primary.href)}
                 className="bg-blue-600 text-white py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm"
               >
                 {primary.label}
-              </Link>
-              <Link
-                href="/dashboard"
+              </button>
+              <button
+                onClick={() => navigate('/dashboard')}
                 className="border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
               >
                 Go to Dashboard
-              </Link>
+              </button>
             </>
           ) : (
             <>
-              <Link
-                href="/dashboard"
+              <button
+                onClick={() => navigate('/dashboard')}
                 className="bg-blue-600 text-white py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm"
               >
                 Go to Dashboard
-              </Link>
-              <Link
-                href="/templates"
+              </button>
+              <button
+                onClick={() => navigate('/templates')}
                 className="border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
               >
                 Browse more templates
-              </Link>
+              </button>
             </>
           )}
         </div>
       </div>
     </div>
+  )
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense>
+      <PaymentSuccessContent />
+    </Suspense>
   )
 }
