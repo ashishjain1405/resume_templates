@@ -135,6 +135,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         // Clear stale builder data on sign-out so next user sees empty fields
         if (typeof window !== 'undefined') {
           localStorage.removeItem(`resume_builder_${templateId}`)
+          localStorage.removeItem(`builder_session_restore_${templateId}`)
         }
       }
     })
@@ -145,9 +146,13 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   useEffect(() => {
     async function load() {
       // Restore guest state saved just before login/signup redirect
-      const sessionRaw = typeof window !== 'undefined' ? sessionStorage.getItem(`builder_session_${templateId}`) : null
+      // Check sessionStorage first (same tab), then localStorage fallback (email confirmation new tab)
+      const sessionRaw = typeof window !== 'undefined'
+        ? (sessionStorage.getItem(`builder_session_${templateId}`) ?? localStorage.getItem(`builder_session_restore_${templateId}`))
+        : null
       if (sessionRaw) {
         sessionStorage.removeItem(`builder_session_${templateId}`)
+        localStorage.removeItem(`builder_session_restore_${templateId}`)
         try {
           const { data: saved, accentColor: savedColor } = JSON.parse(sessionRaw)
           setData(saved)
@@ -180,17 +185,18 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
           try { setData(JSON.parse(stored)) } catch {}
         }
       }
-
-      // Auto-open Pro upgrade modal — checked unconditionally after all restore paths
-      if (user) {
-        const downloadPending = localStorage.getItem(`download_pending_${templateId}`)
-        if (downloadPending) {
-          localStorage.removeItem(`download_pending_${templateId}`)
-          setShowProDownloadModal(true)
-        }
-      }
     }
     load()
+  }, [user, templateId])
+
+  // Auto-open Pro upgrade modal once user is resolved — runs after load() has restored data
+  useEffect(() => {
+    if (!user) return
+    const downloadPending = localStorage.getItem(`download_pending_${templateId}`)
+    if (downloadPending) {
+      localStorage.removeItem(`download_pending_${templateId}`)
+      setShowProDownloadModal(true)
+    }
   }, [user, templateId])
 
   // Auto-save with debounce
@@ -310,7 +316,10 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   async function handleDownload() {
     if (!user) {
       setAuthForDownload(true)
-      sessionStorage.setItem(`builder_session_${templateId}`, JSON.stringify({ data, accentColor }))
+      const sessionSnapshot = JSON.stringify({ data, accentColor })
+      sessionStorage.setItem(`builder_session_${templateId}`, sessionSnapshot)
+      // Also persist to localStorage so it survives email confirmation (which opens a new tab)
+      localStorage.setItem(`builder_session_restore_${templateId}`, sessionSnapshot)
       localStorage.setItem(`download_pending_${templateId}`, '1')
       setShowAuthModal(true)
       return

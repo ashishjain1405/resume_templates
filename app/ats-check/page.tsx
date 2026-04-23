@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import ProBadge from '@/components/ProBadge'
 import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
+import { useProUpgrade } from '@/lib/use-pro-upgrade'
 import { createClient } from '@/lib/supabase'
 
 interface ATSResult {
@@ -61,7 +62,35 @@ function SectionBar({ label, score }: { label: string; score: number }) {
   )
 }
 
-function Modal({ type, onClose, userEmail }: { type: 'login_required' | 'pro_required' | 'pro_docs'; onClose: () => void; userEmail?: string }) {
+function ModalProRequired({ onClose, userEmail }: { onClose: () => void; userEmail?: string }) {
+  const { startUpgrade, loading } = useProUpgrade()
+  return (
+    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl relative" onClick={e => e.stopPropagation()}>
+        <button onClick={onClose} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+        <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Free limit reached</h3>
+        <p className="text-sm text-gray-500 text-center mb-5">You've used all 5 free checks. Upgrade once for unlimited ATS checks — ₹999, lifetime.</p>
+        <div className="flex flex-col gap-2">
+          <button
+            onClick={() => { onClose(); startUpgrade(userEmail, 'ats') }}
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-60"
+          >
+            {loading ? 'Processing…' : 'Upgrade to Pro — ₹999'}
+          </button>
+          <a href="/pricing" className="text-sm text-gray-500 hover:text-gray-700 font-medium text-center py-1">Explore Pro features →</a>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function Modal({ type, onClose, userEmail }: { type: 'login_required' | 'pro_docs'; onClose: () => void; userEmail?: string }) {
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4" onClick={onClose}>
       <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl relative" onClick={e => e.stopPropagation()}>
@@ -502,7 +531,8 @@ function ATSCheckInner() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
-      {modal && <Modal type={modal} onClose={() => setModal(null)} userEmail={userEmail} />}
+      {modal === 'pro_required' && <ModalProRequired onClose={() => setModal(null)} userEmail={userEmail} />}
+      {modal && modal !== 'pro_required' && <Modal type={modal as 'login_required' | 'pro_docs'} onClose={() => setModal(null)} userEmail={userEmail} />}
 
       {showSaveModal && saveCount === 0 && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4">

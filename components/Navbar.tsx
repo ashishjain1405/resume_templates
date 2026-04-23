@@ -48,7 +48,7 @@ export default function Navbar() {
 
   async function handleSignOut() {
     // Clear any locally cached builder drafts so the next user on this device starts fresh
-    Object.keys(localStorage).filter(k => k.startsWith('resume_builder_') || k.startsWith('download_pending_')).forEach(k => localStorage.removeItem(k))
+    Object.keys(localStorage).filter(k => k.startsWith('resume_builder_') || k.startsWith('download_pending_') || k.startsWith('builder_session_restore_')).forEach(k => localStorage.removeItem(k))
     localStorage.removeItem('auth_redirect')
     await supabase.auth.signOut()
     setMenuOpen(false)
