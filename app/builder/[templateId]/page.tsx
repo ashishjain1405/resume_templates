@@ -118,6 +118,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [docsLoading, setDocsLoading] = useState(false)
 
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const autoUpgradeFired = useRef(false)
 
   const Preview = PREVIEW_MAP[templateId] ?? ClassicPreview
 
@@ -240,18 +241,22 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   // Auto-open Pro upgrade modal once user is resolved — runs after load() has restored data
   useEffect(() => {
     if (!user) return
+    const isAutoUpgrade = searchParams.get('autoupgrade') === '1'
     const downloadPending = localStorage.getItem(`download_pending_${templateId}`)
     if (downloadPending) {
       localStorage.removeItem(`download_pending_${templateId}`)
-      if (isPro) { setTimeout(() => handleDownload(), 0) } else { setShowProDownloadModal(true) }
+      // autoupgrade=1 handles this flow — skip showing the modal to avoid collision
+      if (!isAutoUpgrade) {
+        if (isPro) { setTimeout(() => handleDownload(), 0) } else { setShowProDownloadModal(true) }
+      }
     }
     const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
     if (docsPending) {
       localStorage.removeItem(`docs_pending_${templateId}`)
       if (isPro) { setTimeout(() => handleEditInDocs(), 0) } else { setShowProDocsModal(true) }
     }
-    // autoupgrade=1: user returned from signup via Download PDF flow — trigger Pro upgrade
-    if (searchParams.get('autoupgrade') === '1' && !isPro) {
+    if (isAutoUpgrade && !isPro && !autoUpgradeFired.current) {
+      autoUpgradeFired.current = true
       startUpgrade(user.email ?? '', 'builder_download')
     }
   }, [user, isPro, templateId])
