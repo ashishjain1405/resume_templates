@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase'
 
 function loadRazorpayScript(): Promise<void> {
   if (typeof window !== 'undefined' && window.Razorpay) return Promise.resolve()
@@ -21,6 +22,9 @@ export function useProUpgrade() {
   async function startUpgrade(userEmail?: string, source?: string, returnPath?: string) {
     setLoading(true)
     try {
+      // Ensure session cookie is fresh before hitting the API — newly signed-up users
+      // may have a valid client-side session that hasn't been flushed to cookies yet
+      await createClient().auth.getSession()
       const res = await fetch('/api/razorpay/pro-order', { method: 'POST' })
       if (res.status === 401) {
         const redirect = typeof window !== 'undefined'
