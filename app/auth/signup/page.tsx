@@ -71,7 +71,7 @@ function SignupForm() {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Create your account</h1>
-          <p className="text-gray-500 text-sm mb-6">Sign up to purchase and download resume templates</p>
+          <p className="text-gray-500 text-sm mb-6">Stand out to recruiters with a polished resume</p>
 
           {message && (
             <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg px-4 py-3 text-sm mb-4">
