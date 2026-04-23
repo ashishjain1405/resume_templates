@@ -126,38 +126,44 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     supabase.auth.getUser().then(async ({ data }) => {
       setUser(data.user)
       if (data.user) {
-        if (typeof window !== 'undefined' && localStorage.getItem('pro_unlocked')) {
+        const proUnlocked = typeof window !== 'undefined' &&
+          (localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked'))
+        if (proUnlocked) {
           localStorage.removeItem('pro_unlocked')
+          sessionStorage.removeItem('pro_unlocked')
           setIsPro(true)
         } else {
           const { data: row } = await supabase.from('pro_access').select('id').eq('user_id', data.user.id).maybeSingle()
-          setIsPro(!!row)
+          if (!row) {
+            // Retry once after 2s to handle Supabase replication lag
+            await new Promise(r => setTimeout(r, 2000))
+            const { data: retryRow } = await supabase.from('pro_access').select('id').eq('user_id', data.user.id).maybeSingle()
+            setIsPro(!!retryRow)
+          } else {
+            setIsPro(true)
+          }
         }
       }
     })
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null)
       if (session?.user) {
-        // Skip DB query if getUser() already consumed pro_unlocked and set isPro
-        // Only re-query on explicit sign-in events, not INITIAL_SESSION (handled by getUser above)
-        let proRow: { id: string } | null = null
-        if (event !== 'INITIAL_SESSION') {
+        // Only re-query Pro status on explicit sign-in, not on TOKEN_REFRESHED or INITIAL_SESSION
+        // Those fire after page load and can overwrite isPro=true with stale DB reads
+        if (event === 'SIGNED_IN') {
           const { data: row } = await supabase.from('pro_access').select('id').eq('user_id', session.user.id).maybeSingle()
-          proRow = row
           setIsPro(!!row)
-        }
-        const row = proRow
-        // Check pending intents only on explicit SIGNED_IN — INITIAL_SESSION is handled by getUser().then() + useEffect([user,isPro])
-        if (event === 'SIGNED_IN' && typeof window !== 'undefined') {
-          const downloadPending = localStorage.getItem(`download_pending_${templateId}`)
-          if (downloadPending) {
-            localStorage.removeItem(`download_pending_${templateId}`)
-            setShowProDownloadModal(true)
-          }
-          const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
-          if (docsPending) {
-            localStorage.removeItem(`docs_pending_${templateId}`)
-            if (row) { setAutoOpenDocs(true) } else { setShowProDocsModal(true) }
+          if (typeof window !== 'undefined') {
+            const downloadPending = localStorage.getItem(`download_pending_${templateId}`)
+            if (downloadPending) {
+              localStorage.removeItem(`download_pending_${templateId}`)
+              setShowProDownloadModal(true)
+            }
+            const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
+            if (docsPending) {
+              localStorage.removeItem(`docs_pending_${templateId}`)
+              if (row) { setAutoOpenDocs(true) } else { setShowProDocsModal(true) }
+            }
           }
         }
       } else {
