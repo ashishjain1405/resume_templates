@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { getBuilderHref } from '@/components/BuilderLink'
 import { useEffect, useState, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
@@ -58,6 +59,7 @@ export default function Navbar() {
 
   const initial = user?.email?.[0]?.toUpperCase() ?? '?'
 
+
   const GoProLink = ({ className = '' }: { className?: string }) => (
     <Link
       href="/pricing"
@@ -87,9 +89,9 @@ export default function Navbar() {
               <Link href="/ats-check" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
                 Check ATS Score
               </Link>
-              <Link href="/builder" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
+              <button onClick={() => router.push(getBuilderHref())} className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
                 Create my Resume
-              </Link>
+              </button>
               {!isPro && <GoProLink />}
 
               {/* User dropdown */}
@@ -141,9 +143,9 @@ export default function Navbar() {
               <Link href="/ats-check" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
                 Check ATS Score
               </Link>
-              <Link href="/builder" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
+              <button onClick={() => router.push(getBuilderHref())} className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
                 Create my Resume
-              </Link>
+              </button>
               <GoProLink />
               <Link href="/auth/login" className="text-sm text-gray-500 hover:text-gray-900 transition-colors ml-1">Log in</Link>
             </>
@@ -155,9 +157,9 @@ export default function Navbar() {
           <Link href="/ats-check" className="text-xs text-gray-700 border border-gray-200 px-2.5 py-1.5 rounded-lg font-medium whitespace-nowrap">
             Check
           </Link>
-          <Link href="/builder" className="text-xs text-gray-700 border border-gray-200 px-2.5 py-1.5 rounded-lg font-medium whitespace-nowrap">
+          <button onClick={() => router.push(getBuilderHref())} className="text-xs text-gray-700 border border-gray-200 px-2.5 py-1.5 rounded-lg font-medium whitespace-nowrap">
             Build
-          </Link>
+          </button>
           <button className="p-2 text-gray-500" onClick={() => setMobileOpen(o => !o)} aria-label="Toggle menu">
             {mobileOpen ? (
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>

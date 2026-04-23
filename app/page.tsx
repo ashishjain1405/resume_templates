@@ -3,6 +3,7 @@ import Link from 'next/link'
 import HeroSection from '@/components/HeroSection'
 import TemplateCard from '@/components/TemplateCard'
 import BuilderDemo from '@/components/BuilderDemo'
+import BuilderLink from '@/components/BuilderLink'
 import HowItWorks from '@/components/HowItWorks'
 import ATSPreview from '@/components/ATSPreview'
 import { TEMPLATES } from '@/lib/templates'
@@ -149,12 +150,9 @@ export default function HomePage() {
           </div>
           <BuilderDemo />
           <div className="flex flex-col sm:flex-row gap-3 justify-center mt-10">
-            <Link
-              href="/builder"
-              className="bg-blue-600 text-white px-8 py-3.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm text-center"
-            >
+            <BuilderLink className="bg-blue-600 text-white px-8 py-3.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm text-center">
               Create my resume
-            </Link>
+            </BuilderLink>
             <Link
               href="/templates"
               className="border border-gray-300 text-gray-700 px-8 py-3.5 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm text-center"
