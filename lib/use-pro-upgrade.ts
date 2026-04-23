@@ -82,8 +82,9 @@ export function useProUpgrade() {
       })
       rzp.open()
     } catch (err) {
-      console.error('startUpgrade error:', err)
-      alert('Something went wrong. Please refresh and try again.')
+      const msg = err instanceof Error ? `${err.message}\n${err.stack}` : String(err)
+      console.error('startUpgrade error:', msg)
+      alert(`Debug: ${err instanceof Error ? err.message : String(err)}`)
       setLoading(false)
     }
   }
