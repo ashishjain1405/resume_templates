@@ -50,6 +50,8 @@ export function useProUpgrade() {
             body: JSON.stringify(response),
           })
           if (verifyRes.ok) {
+            // Flag so builder page can update isPro immediately without waiting for DB replication
+            localStorage.setItem('pro_unlocked', '1')
             const successUrl = `/payment/success?type=pro${source ? `&source=${source}` : ''}${returnPath ? `&from=${encodeURIComponent(returnPath)}` : ''}`
             router.push(successUrl)
           } else {
