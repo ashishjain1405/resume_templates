@@ -66,14 +66,12 @@ function ATSAnimation() {
   const fill = started ? circ - (score / 100) * circ : circ
   const ringColor = score >= 75 ? '#16a34a' : score >= 50 ? '#d97706' : '#dc2626'
 
-  const cardBase = 'absolute inset-0 w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-6'
-
   return (
     <div className="w-full max-w-sm">
       <style>{`
         @keyframes cardSlideBack {
           from { transform: translateY(0) scale(1); opacity: 1; }
-          to   { transform: translateY(18px) scale(0.95); opacity: 0.6; }
+          to   { transform: translateY(18px) scale(0.95); opacity: 0; }
         }
         @keyframes cardSlideFront {
           from { transform: translateY(12px) scale(0.97); opacity: 0; }
@@ -85,15 +83,16 @@ function ATSAnimation() {
         }
       `}</style>
 
-      {/* Fixed-height container so size never changes */}
+      {/* Fixed-height container — cards stacked, only one visible at a time */}
       <div className="relative" style={{ height: '420px' }}>
 
-        {/* Back card — score (slides back when flipped) */}
+        {/* Score card */}
         <div
-          className={cardBase}
+          className="absolute inset-0 w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-6"
           style={{
             zIndex: flipped ? 0 : 2,
-            animation: flipped ? 'cardSlideBack 1s cubic-bezier(0.4,0,0.2,1) forwards' : undefined,
+            animation: flipped ? 'cardSlideBack 0.6s cubic-bezier(0.4,0,0.2,1) forwards' : undefined,
+            visibility: flipped ? undefined : 'visible',
           }}
         >
           <div className="flex items-center justify-between mb-5">
@@ -156,14 +155,14 @@ function ATSAnimation() {
           </div>
         </div>
 
-        {/* Front card — suggestions (slides forward when flipped) */}
+        {/* Suggestions card — hidden until flipped */}
         <div
-          className={cardBase}
+          className="absolute inset-0 w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-6"
           style={{
             zIndex: flipped ? 2 : 0,
             opacity: 0,
-            transform: 'translateY(12px) scale(0.97) translateZ(-20px)',
-            animation: flipped ? 'cardSlideFront 1s cubic-bezier(0.4,0,0.2,1) forwards' : undefined,
+            pointerEvents: flipped ? 'auto' : 'none',
+            animation: flipped ? 'cardSlideFront 0.6s cubic-bezier(0.4,0,0.2,1) forwards' : undefined,
           }}
         >
           <div className="flex items-center justify-between mb-5">
@@ -182,9 +181,9 @@ function ATSAnimation() {
                 key={i}
                 className="flex items-start gap-3 bg-gray-50 rounded-xl p-3"
                 style={{
-                  opacity: flipped ? 1 : 0,
+                  opacity: 0,
                   animation: flipped ? `fadeInUp 0.3s ease forwards` : undefined,
-                  animationDelay: `${0.3 + i * 0.15}s`,
+                  animationDelay: `${0.4 + i * 0.15}s`,
                 }}
               >
                 <span className="text-amber-500 font-bold text-sm flex-shrink-0 mt-0.5">→</span>
