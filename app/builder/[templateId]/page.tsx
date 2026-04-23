@@ -160,18 +160,9 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
           const { data: row } = await supabase.from('pro_access').select('id').eq('user_id', session.user.id).maybeSingle()
           if (!proFlag) setIsPro(!!row)
           if (row) { localStorage.removeItem('pro_unlocked'); sessionStorage.removeItem('pro_unlocked') }
-          if (typeof window !== 'undefined') {
-            const downloadPending = localStorage.getItem(`download_pending_${templateId}`)
-            if (downloadPending) {
-              localStorage.removeItem(`download_pending_${templateId}`)
-              if (row) { setTimeout(() => handleDownload(), 0) } else { setShowProDownloadModal(true) }
-            }
-            const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
-            if (docsPending) {
-              localStorage.removeItem(`docs_pending_${templateId}`)
-              if (row) { setTimeout(() => handleEditInDocs(), 0) } else { setShowProDocsModal(true) }
-            }
-          }
+          // download_pending and docs_pending are handled by the useEffect below,
+          // which has awareness of autoupgrade=1. Do not handle them here to avoid collision.
+
         }
       } else {
         setIsPro(false)
