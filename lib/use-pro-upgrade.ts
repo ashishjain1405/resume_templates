@@ -50,8 +50,10 @@ export function useProUpgrade() {
             body: JSON.stringify(response),
           })
           if (verifyRes.ok) {
-            // Flag so builder page can update isPro immediately without waiting for DB replication
+            // Flag so builder page updates isPro immediately (avoids DB replication lag)
             localStorage.setItem('pro_unlocked', '1')
+            // Flag so builder auto-triggers Google Docs after returning from payment
+            if (source === 'docs') localStorage.setItem('docs_open_after_pro', '1')
             const successUrl = `/payment/success?type=pro${source ? `&source=${source}` : ''}${returnPath ? `&from=${encodeURIComponent(returnPath)}` : ''}`
             router.push(successUrl)
           } else {

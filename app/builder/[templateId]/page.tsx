@@ -114,8 +114,8 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [authForDownload, setAuthForDownload] = useState(false)
   const [authForDocs, setAuthForDocs] = useState(false)
   const [autoOpenDocs, setAutoOpenDocs] = useState(false)
+  const [docsLoading, setDocsLoading] = useState(false)
   const searchParams = useSearchParams()
-  const openDocsOnLoad = useRef(typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('openDocs') === '1')
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const Preview = PREVIEW_MAP[templateId] ?? ClassicPreview
@@ -235,21 +235,21 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     }
   }, [user, isPro, templateId])
 
-  // Auto-trigger Google Docs after Pro payment redirect (?openDocs=1)
-  // Read from ref (captured once on mount) so router.replace doesn't re-fire this
+  // Auto-trigger Google Docs when user+isPro settle — covers both docs_pending and docs_open_after_pro flags
   useEffect(() => {
-    if (!openDocsOnLoad.current || !user || !isPro) return
-    openDocsOnLoad.current = false
-    router.replace(`/builder/${templateId}`)
-    handleEditInDocs()
-  }, [user, isPro])
-
-  // Execute Google Docs once user + Pro status are confirmed in React state (docs_pending path)
-  useEffect(() => {
-    if (!autoOpenDocs || !user || !isPro) return
+    if (!user || !isPro) return
+    if (typeof window === 'undefined') return
+    const openAfterPro = localStorage.getItem('docs_open_after_pro')
+    if (openAfterPro) {
+      localStorage.removeItem('docs_open_after_pro')
+      router.replace(`/builder/${templateId}`)
+      handleEditInDocs()
+      return
+    }
+    if (!autoOpenDocs) return
     setAutoOpenDocs(false)
     handleEditInDocs()
-  }, [autoOpenDocs, user, isPro])
+  }, [user, isPro, autoOpenDocs])
 
   // Auto-save with debounce
   const autoSave = useCallback((next: ResumeData, color: string) => {
@@ -360,12 +360,13 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       if (proRow) { setIsPro(true) } else { setShowProDocsModal(true); return }
     }
     try {
+      setDocsLoading(true)
       const pdfRes = await fetch('/api/builder/pdf?pdf=1', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ templateId, data, accentColor }),
       })
-      if (!pdfRes.ok) return
+      if (!pdfRes.ok) { setDocsLoading(false); return }
       const blob = await pdfRes.blob()
       const form = new FormData()
       form.append('file', new File([blob], 'resume.pdf', { type: 'application/pdf' }))
@@ -374,6 +375,8 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       if (json.url) window.open(json.url, '_blank')
     } catch {
       alert('Failed to open in Google Docs. Please try again.')
+    } finally {
+      setDocsLoading(false)
     }
   }
 
@@ -762,6 +765,22 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">PDF download is a Pro feature</h3>
             <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for lifetime access — unlimited downloads, unlimited ATS checks, and an expert session. ₹999, one-time.</p>
             <ProUpgradeCTAs layout="stack" source="download" />
+          </div>
+        </div>
+      )}
+
+      {/* Google Docs loading overlay */}
+      {docsLoading && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-2xl p-8 max-w-xs w-full mx-4 text-center shadow-2xl">
+            <div className="w-12 h-12 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-10 h-10 animate-spin text-blue-600" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+              </svg>
+            </div>
+            <p className="text-base font-semibold text-gray-900 mb-1">Opening in Google Docs…</p>
+            <p className="text-sm text-gray-400">This takes a few seconds. Please don&apos;t close this tab.</p>
           </div>
         </div>
       )}
