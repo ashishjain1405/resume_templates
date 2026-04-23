@@ -106,7 +106,7 @@ function SignupForm() {
 
           <p className="text-center text-sm text-gray-500 mt-6">
             Already have an account?{' '}
-            <Link href={`/auth/login?redirect=${encodeURIComponent(redirect)}`} className="text-blue-600 font-medium hover:underline">
+            <Link href={`/auth/login?redirect=${encodeURIComponent(getRedirect())}`} className="text-blue-600 font-medium hover:underline">
               Log in
             </Link>
           </p>
