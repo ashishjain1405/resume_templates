@@ -122,10 +122,10 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
 
   // Load user + pro status
   useEffect(() => {
+    // getUser() is the authoritative load — runs once on mount
     supabase.auth.getUser().then(async ({ data }) => {
       setUser(data.user)
       if (data.user) {
-        // If payment just completed, trust the flag immediately so UI updates without DB lag
         if (typeof window !== 'undefined' && localStorage.getItem('pro_unlocked')) {
           localStorage.removeItem('pro_unlocked')
           setIsPro(true)
@@ -138,18 +138,17 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null)
       if (session?.user) {
+        // Skip DB query if getUser() already consumed pro_unlocked and set isPro
+        // Only re-query on explicit sign-in events, not INITIAL_SESSION (handled by getUser above)
         let proRow: { id: string } | null = null
-        if (typeof window !== 'undefined' && localStorage.getItem('pro_unlocked')) {
-          localStorage.removeItem('pro_unlocked')
-          setIsPro(true)
-        } else {
+        if (event !== 'INITIAL_SESSION') {
           const { data: row } = await supabase.from('pro_access').select('id').eq('user_id', session.user.id).maybeSingle()
           proRow = row
           setIsPro(!!row)
         }
         const row = proRow
-        // Check for pending download intent on sign-in or initial session load
-        if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && typeof window !== 'undefined') {
+        // Check pending intents only on explicit SIGNED_IN — INITIAL_SESSION is handled by getUser().then() + useEffect([user,isPro])
+        if (event === 'SIGNED_IN' && typeof window !== 'undefined') {
           const downloadPending = localStorage.getItem(`download_pending_${templateId}`)
           if (downloadPending) {
             localStorage.removeItem(`download_pending_${templateId}`)
