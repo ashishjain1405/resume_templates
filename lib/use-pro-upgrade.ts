@@ -52,26 +52,10 @@ export function useProUpgrade() {
             body: JSON.stringify(response),
           })
           if (verifyRes.ok) {
+            // Payment is server-verified (HMAC + DB insert confirmed). Trust it immediately.
             localStorage.setItem('pro_unlocked', '1')
             sessionStorage.setItem('pro_unlocked', '1')
-            // Poll until DB confirms Pro (adminClient bypasses RLS replication lag),
-            // then navigate directly to the return path — no success page redirect
-            const destination = returnPath ?? '/dashboard'
-            let attempts = 0
-            const MAX = 20
-            async function pollThenGo() {
-              attempts++
-              try {
-                const d = await fetch('/api/pro-status').then(r => r.json())
-                if (d.pro) {
-                  window.location.href = destination
-                  return
-                }
-              } catch { /* keep polling */ }
-              if (attempts < MAX) setTimeout(pollThenGo, 1000)
-              else window.location.href = destination
-            }
-            pollThenGo()
+            window.location.href = returnPath ?? '/dashboard'
           } else {
             const d = await verifyRes.json()
             alert(`Payment verification failed: ${d.error ?? 'Unknown error'}`)

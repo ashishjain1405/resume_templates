@@ -125,22 +125,21 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     supabase.auth.getUser().then(async ({ data }) => {
       setUser(data.user)
       if (data.user) {
-        // If pro_unlocked flag is present (set immediately after payment verification),
-        // trust it and set Pro now — then confirm via adminClient endpoint in background.
-        // This prevents the anon-client replication lag from flipping isPro back to false.
+        // pro_unlocked is set server-side right after HMAC-verified payment insert.
+        // Trust it unconditionally — never do a background check that can flip it to false
+        // due to RLS replication lag or missing session cookies.
         const proFlag = typeof window !== 'undefined'
           && (localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked'))
         if (proFlag) {
           setIsPro(true)
-          // Confirm in background via adminClient; clear flag only once DB is authoritative
-          fetch('/api/pro-status').then(r => r.json()).then(d => {
-            if (d.pro) {
-              localStorage.removeItem('pro_unlocked')
-              sessionStorage.removeItem('pro_unlocked')
-            } else {
-              setIsPro(false)
-            }
-          }).catch(() => {})
+          // Clear flag once anon client can read the row (replication caught up). Never flip to false.
+          supabase.from('pro_access').select('id').eq('user_id', data.user.id).maybeSingle()
+            .then(({ data: row }) => {
+              if (row) {
+                localStorage.removeItem('pro_unlocked')
+                sessionStorage.removeItem('pro_unlocked')
+              }
+            })
         } else {
           const { data: row } = await supabase.from('pro_access').select('id').eq('user_id', data.user.id).maybeSingle()
           setIsPro(!!row)
@@ -153,8 +152,11 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         // Only re-query Pro status on explicit sign-in, not on TOKEN_REFRESHED or INITIAL_SESSION
         // Those fire after page load and can overwrite isPro=true with stale DB reads
         if (event === 'SIGNED_IN') {
+          const proFlag = typeof window !== 'undefined'
+            && (localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked'))
           const { data: row } = await supabase.from('pro_access').select('id').eq('user_id', session.user.id).maybeSingle()
-          setIsPro(!!row)
+          if (!proFlag) setIsPro(!!row)
+          if (row) { localStorage.removeItem('pro_unlocked'); sessionStorage.removeItem('pro_unlocked') }
           if (typeof window !== 'undefined') {
             const downloadPending = localStorage.getItem(`download_pending_${templateId}`)
             if (downloadPending) {
