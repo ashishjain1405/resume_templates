@@ -142,7 +142,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
           const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
           if (docsPending) {
             localStorage.removeItem(`docs_pending_${templateId}`)
-            setShowProDocsModal(true)
+            if (row) { handleEditInDocs() } else { setShowProDocsModal(true) }
           }
         }
       } else {
@@ -215,9 +215,9 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
     if (docsPending) {
       localStorage.removeItem(`docs_pending_${templateId}`)
-      setShowProDocsModal(true)
+      if (isPro) { handleEditInDocs() } else { setShowProDocsModal(true) }
     }
-  }, [user, templateId])
+  }, [user, isPro, templateId])
 
   // Auto-trigger Google Docs after Pro payment redirect (?openDocs=1)
   useEffect(() => {

@@ -5,10 +5,10 @@ import OpenAI from 'openai'
 
 export const maxDuration = 60
 async function parsePdf(buf: Buffer): Promise<string> {
-  const { extractText, getDocumentProxy } = await import('unpdf')
-  const pdf = await getDocumentProxy(new Uint8Array(buf))
-  const { text } = await extractText(pdf, { mergePages: true })
-  return text
+  // pdf-parse is pure Node.js (no WASM), much faster cold start than unpdf
+  const pdfParse = (await import('pdf-parse')).default
+  const result = await pdfParse(buf)
+  return result.text
 }
 
 let _openai: OpenAI | null = null
