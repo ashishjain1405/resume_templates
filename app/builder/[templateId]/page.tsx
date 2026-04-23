@@ -126,8 +126,26 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     supabase.auth.getUser().then(async ({ data }) => {
       setUser(data.user)
       if (data.user) {
-        const { data: row } = await supabase.from('pro_access').select('id').eq('user_id', data.user.id).maybeSingle()
-        setIsPro(!!row)
+        // If pro_unlocked flag is present (set immediately after payment verification),
+        // trust it and set Pro now — then confirm via adminClient endpoint in background.
+        // This prevents the anon-client replication lag from flipping isPro back to false.
+        const proFlag = typeof window !== 'undefined'
+          && (localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked'))
+        if (proFlag) {
+          setIsPro(true)
+          // Confirm in background via adminClient; clear flag only once DB is authoritative
+          fetch('/api/pro-status').then(r => r.json()).then(d => {
+            if (d.pro) {
+              localStorage.removeItem('pro_unlocked')
+              sessionStorage.removeItem('pro_unlocked')
+            } else {
+              setIsPro(false)
+            }
+          }).catch(() => {})
+        } else {
+          const { data: row } = await supabase.from('pro_access').select('id').eq('user_id', data.user.id).maybeSingle()
+          setIsPro(!!row)
+        }
       }
     })
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -233,7 +251,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     if (openAfterPro) {
       localStorage.removeItem('docs_open_after_pro')
       router.replace(`/builder/${templateId}`)
-      // Poll /api/pro-status until DB confirms Pro (bypasses RLS replication lag)
+      // Poll /api/pro-status (adminClient, bypasses RLS replication lag) then set flags
       let attempts = 0
       const MAX = 20
       function pollAndOpen() {
@@ -242,8 +260,10 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
           .then(r => r.json())
           .then(d => {
             if (d.pro) {
+              localStorage.removeItem('pro_unlocked')
+              sessionStorage.removeItem('pro_unlocked')
               setIsPro(true)
-              handleEditInDocs()
+              setAutoOpenDocs(true)  // let the isPro-gated branch below fire
             } else if (attempts < MAX) {
               setTimeout(pollAndOpen, 1000)
             }
