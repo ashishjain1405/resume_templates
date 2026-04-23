@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef, use } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { TEMPLATES } from '@/lib/templates'
 import { EMPTY_RESUME, type ResumeData, type ExperienceEntry, type EducationEntry } from '@/lib/resume-data'
 import { createClient } from '@/lib/supabase'
@@ -12,10 +12,10 @@ import QuotationPreview from '@/components/resume-previews/Quotation'
 import ExecutivePreview from '@/components/resume-previews/Executive'
 import type { User } from '@supabase/supabase-js'
 import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
+import { useProUpgrade } from '@/lib/use-pro-upgrade'
 
-function CheckATSButton({ user, onAuthRequired, data, accentColor, templateId }: {
+function CheckATSButton({ user, data, accentColor, templateId }: {
   user: User | null
-  onAuthRequired: (forATS: boolean) => void
   data: ResumeData
   accentColor: string
   templateId: string
@@ -25,7 +25,8 @@ function CheckATSButton({ user, onAuthRequired, data, accentColor, templateId }:
   async function handleCheckATS() {
     if (!user) {
       sessionStorage.setItem('ats_pending', JSON.stringify({ fromBuilder: true, templateId, data, accentColor }))
-      onAuthRequired(true)
+      localStorage.setItem('ats_pending', JSON.stringify({ fromBuilder: true, templateId, data, accentColor }))
+      window.location.href = `/auth/signup?redirect=${encodeURIComponent('/ats-check')}`
       return
     }
     setSaving(true)
@@ -90,6 +91,7 @@ function storageKey(templateId: string) {
 export default function BuilderPage({ params }: { params: Promise<{ templateId: string }> }) {
   const { templateId } = use(params)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
 
   const template = TEMPLATES.find(t => t.id === templateId)
@@ -107,10 +109,10 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [saveCount, setSaveCount] = useState(0)
   const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit')
   const [isPro, setIsPro] = useState(false)
+  const { startUpgrade } = useProUpgrade()
   const [showProDownloadModal, setShowProDownloadModal] = useState(false)
   const [showProDocsModal, setShowProDocsModal] = useState(false)
   const [showChangeTemplateModal, setShowChangeTemplateModal] = useState(false)
-  const [authForATS, setAuthForATS] = useState(false)
   const [authForDownload, setAuthForDownload] = useState(false)
   const [authForDocs, setAuthForDocs] = useState(false)
   const [docsLoading, setDocsLoading] = useState(false)
@@ -248,6 +250,10 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       localStorage.removeItem(`docs_pending_${templateId}`)
       if (isPro) { setTimeout(() => handleEditInDocs(), 0) } else { setShowProDocsModal(true) }
     }
+    // autoupgrade=1: user returned from signup via Download PDF flow — trigger Pro upgrade
+    if (searchParams.get('autoupgrade') === '1' && !isPro) {
+      startUpgrade(user.email ?? '', 'builder_download')
+    }
   }, [user, isPro, templateId])
 
   // Auto-save with debounce
@@ -382,13 +388,11 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
 
   async function handleDownload() {
     if (!user) {
-      setAuthForDownload(true)
       const sessionSnapshot = JSON.stringify({ data, accentColor })
       sessionStorage.setItem(`builder_session_${templateId}`, sessionSnapshot)
-      // Also persist to localStorage so it survives email confirmation (which opens a new tab)
       localStorage.setItem(`builder_session_restore_${templateId}`, sessionSnapshot)
       localStorage.setItem(`download_pending_${templateId}`, '1')
-      setShowAuthModal(true)
+      window.location.href = `/auth/signup?redirect=${encodeURIComponent(`/builder/${templateId}?autoupgrade=1`)}`
       return
     }
     const res = await fetch('/api/builder/pdf?pdf=1', {
@@ -591,7 +595,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             )}
             {savingVersion ? 'Saving…' : savedVersion ? 'Saved to Dashboard' : 'Save to Dashboard'}
           </button>
-          <CheckATSButton user={user} onAuthRequired={(forATS) => { setAuthForATS(forATS); setShowAuthModal(true) }} data={data} accentColor={accentColor} templateId={templateId} />
+          <CheckATSButton user={user} data={data} accentColor={accentColor} templateId={templateId} />
           {isPro ? (
             <button
               onClick={handleDownload}
@@ -687,15 +691,15 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             )}
             <div className="flex flex-col gap-2">
               <a
-                href={`/auth/signup?redirect=${encodeURIComponent(authForATS ? '/ats-check' : `/builder/${templateId}`)}`}
-                onClick={() => { if (!authForATS) sessionStorage.setItem(`builder_session_${templateId}`, JSON.stringify({ data, accentColor })) }}
+                href={`/auth/signup?redirect=${encodeURIComponent(`/builder/${templateId}`)}`}
+                onClick={() => { sessionStorage.setItem(`builder_session_${templateId}`, JSON.stringify({ data, accentColor })) }}
                 className="w-full text-center bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors"
               >
                 {(authForDownload || authForDocs) ? 'Create account to continue' : 'Create account'}
               </a>
               <a
-                href={`/auth/login?redirect=${encodeURIComponent(authForATS ? '/ats-check' : `/builder/${templateId}`)}`}
-                onClick={() => { if (!authForATS) sessionStorage.setItem(`builder_session_${templateId}`, JSON.stringify({ data, accentColor })) }}
+                href={`/auth/login?redirect=${encodeURIComponent(`/builder/${templateId}`)}`}
+                onClick={() => { sessionStorage.setItem(`builder_session_${templateId}`, JSON.stringify({ data, accentColor })) }}
                 className="w-full text-center border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors"
               >
                 Sign in
