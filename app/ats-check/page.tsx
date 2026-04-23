@@ -381,7 +381,18 @@ function ATSCheckInner() {
 
   // Intercept in-app navigations (link clicks + router.push) when result is unsaved
   useEffect(() => {
-    if (!result || saveCount > 0) return
+    if (!result || saveCount > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (window as any).__atsNavGuard
+      return
+    }
+
+    // Expose a guard for router.push callers (e.g. Navbar buttons) to call before navigating
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(window as any).__atsNavGuard = (url: string) => {
+      setPendingNavUrl(url)
+      setShowSaveModal(true)
+    }
 
     const clickHandler = (e: MouseEvent) => {
       const anchor = (e.target as Element).closest('a')
@@ -398,7 +409,7 @@ function ATSCheckInner() {
     const origPushState = history.pushState.bind(history)
     history.pushState = function (state, title, url) {
       if (url && typeof url === 'string' && !url.includes('/ats-check')) {
-        setPendingNavUrl(url)
+        setPendingNavUrl(url as string)
         setShowSaveModal(true)
         return
       }
@@ -409,6 +420,8 @@ function ATSCheckInner() {
     return () => {
       document.removeEventListener('click', clickHandler, true)
       history.pushState = origPushState
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (window as any).__atsNavGuard
     }
   }, [result, saveCount])
 

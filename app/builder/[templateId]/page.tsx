@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef, use } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { TEMPLATES } from '@/lib/templates'
 import { EMPTY_RESUME, type ResumeData, type ExperienceEntry, type EducationEntry } from '@/lib/resume-data'
 import { createClient } from '@/lib/supabase'
@@ -91,7 +91,6 @@ function storageKey(templateId: string) {
 export default function BuilderPage({ params }: { params: Promise<{ templateId: string }> }) {
   const { templateId } = use(params)
   const router = useRouter()
-  const searchParams = useSearchParams()
   const supabase = createClient()
 
   const template = TEMPLATES.find(t => t.id === templateId)
@@ -232,7 +231,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   // Auto-open Pro upgrade modal once user is resolved — runs after load() has restored data
   useEffect(() => {
     if (!user) return
-    const isAutoUpgrade = searchParams.get('autoupgrade') === '1'
+    const isAutoUpgrade = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('autoupgrade') === '1'
     const downloadPending = localStorage.getItem(`download_pending_${templateId}`)
     if (downloadPending) {
       localStorage.removeItem(`download_pending_${templateId}`)
