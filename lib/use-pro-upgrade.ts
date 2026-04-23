@@ -55,7 +55,7 @@ export function useProUpgrade() {
             // Payment is server-verified (HMAC + DB insert confirmed). Trust it immediately.
             localStorage.setItem('pro_unlocked', '1')
             sessionStorage.setItem('pro_unlocked', '1')
-            window.location.href = returnPath ?? '/dashboard'
+            window.location.reload()
           } else {
             const d = await verifyRes.json()
             alert(`Payment verification failed: ${d.error ?? 'Unknown error'}`)
