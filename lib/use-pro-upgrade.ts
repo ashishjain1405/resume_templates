@@ -22,7 +22,14 @@ export function useProUpgrade() {
     setLoading(true)
     try {
       const res = await fetch('/api/razorpay/pro-order', { method: 'POST' })
-      if (res.status === 401) { router.push('/auth/login?redirect=/pricing'); setLoading(false); return }
+      if (res.status === 401) {
+        const redirect = typeof window !== 'undefined'
+          ? encodeURIComponent(window.location.pathname + window.location.search)
+          : encodeURIComponent('/pricing')
+        router.push(`/auth/login?redirect=${redirect}`)
+        setLoading(false)
+        return
+      }
       if (!res.ok) { const d = await res.json(); alert(d.error ?? 'Failed to create order'); setLoading(false); return }
       const { orderId, amount, currency } = await res.json()
 

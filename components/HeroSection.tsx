@@ -22,10 +22,9 @@ function ATSAnimation() {
   const [done, setDone] = useState(false)
   const [flipped, setFlipped] = useState(false)
 
-  const r = 54
+  const r = 40
   const circ = 2 * Math.PI * r
 
-  // Reset all state for a new cycle
   function reset() {
     setFlipped(false)
     setDone(false)
@@ -55,11 +54,10 @@ function ATSAnimation() {
     return () => cancelAnimationFrame(raf)
   }, [started])
 
-  // Flip card 600ms after score finishes, then loop after 3s on suggestions card
   useEffect(() => {
     if (!done) return
     const t1 = setTimeout(() => setFlipped(true), 600)
-    const t2 = setTimeout(() => reset(), 600 + 1000 + 3000) // flip duration + pause
+    const t2 = setTimeout(() => reset(), 600 + 1000 + 3000)
     return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [done])
 
@@ -83,32 +81,34 @@ function ATSAnimation() {
         }
       `}</style>
 
-      {/* Fixed-height container — cards stacked, only one visible at a time */}
-      <div className="relative" style={{ height: '420px' }}>
+      {/* Fixed-height container */}
+      <div className="relative" style={{ height: '380px' }}>
 
         {/* Score card */}
         <div
-          className="absolute inset-0 w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-6"
+          className="absolute inset-0 w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-5"
           style={{
             zIndex: flipped ? 0 : 2,
             animation: flipped ? 'cardSlideBack 0.6s cubic-bezier(0.4,0,0.2,1) forwards' : undefined,
             visibility: flipped ? undefined : 'visible',
           }}
         >
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-4">
             <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">ATS Score Report</span>
             <span className={`text-xs font-medium transition-colors duration-500 ${done ? 'text-green-600' : 'text-gray-400'}`}>
-              {done ? '✓ Analysis complete' : 'Analysing…'}
+              {done ? '✓ Done' : 'Analysing…'}
             </span>
           </div>
-          <div className="flex items-center gap-5 mb-6">
+
+          {/* Score row — compact ring + label + keywords */}
+          <div className="flex items-center gap-4 mb-4">
             <div className="relative inline-flex items-center justify-center flex-shrink-0">
-              <svg width="128" height="128" className="-rotate-90">
-                <circle cx="64" cy="64" r={r} fill="none" stroke="#f3f4f6" strokeWidth="10" />
+              <svg width="96" height="96" className="-rotate-90">
+                <circle cx="48" cy="48" r={r} fill="none" stroke="#f3f4f6" strokeWidth="8" />
                 <circle
-                  cx="64" cy="64" r={r} fill="none"
+                  cx="48" cy="48" r={r} fill="none"
                   stroke={started ? ringColor : '#f3f4f6'}
-                  strokeWidth="10"
+                  strokeWidth="8"
                   strokeDasharray={circ}
                   strokeDashoffset={fill}
                   strokeLinecap="round"
@@ -116,23 +116,24 @@ function ATSAnimation() {
                 />
               </svg>
               <div className="absolute text-center">
-                <div className="text-3xl font-bold text-gray-900">{score}</div>
-                <div className="text-[10px] text-gray-400 font-medium">/100</div>
+                <div className="text-2xl font-bold text-gray-900 leading-none">{score}</div>
+                <div className="text-[9px] text-gray-400 font-medium">/100</div>
               </div>
             </div>
-            <div>
-              <div className="text-base font-bold text-gray-900">
+            <div className="min-w-0">
+              <div className="text-sm font-bold text-gray-900">
                 {score >= 75 ? 'Strong resume' : score >= 50 ? 'Needs improvement' : 'Significant gaps'}
               </div>
-              <div className="text-xs text-gray-400 mt-0.5">ATS Compatibility</div>
-              <div className="flex flex-wrap gap-1 mt-2">
+              <div className="text-[11px] text-gray-400 mt-0.5 mb-2">ATS Compatibility</div>
+              <div className="flex flex-wrap gap-1">
                 {['Python', 'SQL', 'Leadership'].map(kw => (
-                  <span key={kw} className="bg-red-50 text-red-500 border border-red-100 text-[10px] px-2 py-0.5 rounded-full">{kw}</span>
+                  <span key={kw} className="bg-red-50 text-red-500 border border-red-100 text-[9px] px-1.5 py-0.5 rounded-full">{kw}</span>
                 ))}
               </div>
             </div>
           </div>
-          <div className="space-y-3">
+
+          <div className="space-y-2.5">
             <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Section Breakdown</div>
             {BARS.map(bar => (
               <div key={bar.label}>
@@ -157,7 +158,7 @@ function ATSAnimation() {
 
         {/* Suggestions card — hidden until flipped */}
         <div
-          className="absolute inset-0 w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-6"
+          className="absolute inset-0 w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-5"
           style={{
             zIndex: flipped ? 2 : 0,
             opacity: 0,
@@ -165,16 +166,16 @@ function ATSAnimation() {
             animation: flipped ? 'cardSlideFront 0.6s cubic-bezier(0.4,0,0.2,1) forwards' : undefined,
           }}
         >
-          <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center justify-between mb-4">
             <span className="text-xs font-semibold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full">Improvement Plan</span>
-            <span className="text-xs font-medium text-green-600">✓ Analysis complete</span>
+            <span className="text-xs font-medium text-green-600">✓ Done</span>
           </div>
-          <div className="flex flex-wrap gap-1 mb-5">
+          <div className="flex flex-wrap gap-1 mb-4">
             {['Python', 'SQL', 'Leadership'].map(kw => (
-              <span key={kw} className="bg-red-50 text-red-500 border border-red-100 text-[10px] px-2 py-0.5 rounded-full">{kw} missing</span>
+              <span key={kw} className="bg-red-50 text-red-500 border border-red-100 text-[9px] px-1.5 py-0.5 rounded-full">{kw} missing</span>
             ))}
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Top Suggestions</div>
             {SUGGESTIONS.map((s, i) => (
               <div
@@ -232,7 +233,7 @@ export default function HeroSection() {
             </div>
 
             {/* Right — animated ATS card deck */}
-            <div className="flex-1 flex justify-center lg:justify-end">
+            <div className="flex-1 flex justify-center lg:justify-end w-full">
               <ATSAnimation />
             </div>
 
