@@ -228,18 +228,6 @@ export default function HeroSection() {
         </div>
       </section>
 
-      {/* Hired-by strip */}
-      <div className="bg-gray-50 border-y border-gray-100 py-4 px-4">
-        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-6 md:gap-10">
-          <span className="text-xs text-gray-400 uppercase tracking-widest">Our customers have been hired by</span>
-          <span className="text-gray-400 font-black text-base tracking-tight hover:text-gray-600 transition-colors">TATA</span>
-          <span className="text-gray-400 font-normal text-base tracking-tight hover:text-gray-600 transition-colors" style={{ fontFamily: 'Arial, sans-serif' }}>Google</span>
-          <svg className="text-gray-400 hover:text-gray-600 transition-colors" width="48" height="18" viewBox="0 0 24 9" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M24 0.6L7.2 7.8C5.7 8.4 4.4 8.7 3.3 8.7c-1.3 0-2.2-.5-2.7-1.4C.1 6.5.3 5.1 1.1 3.6L2.4 1.2c.2-.4.1-.6-.2-.5L.6 1.1C.2 1.2 0 1.6 0 2.1c0 .3.1.6.2.9L1.9 6.3c.3.7.1 1.3-.5 1.6C.9 8.2.4 8 .1 7.4L0 7.1c-.1-.2 0-.4.1-.6L2.2.4C2.4.1 2.7 0 3 0c.2 0 .4.1.5.2L24 .6z"/>
-          </svg>
-          <span className="text-gray-400 font-semibold text-sm tracking-wide hover:text-gray-600 transition-colors">Microsoft</span>
-        </div>
-      </div>
     </>
   )
 }

@@ -59,7 +59,7 @@ export default function HomePage() {
               </div>
               <div>
                 <div className="text-2xl font-black text-blue-600 mb-1">5 templates</div>
-                <div className="text-base font-semibold text-gray-700 mb-1.5">Resume Builder</div>
+                <div className="text-base font-semibold text-gray-700 mb-1.5">Resume Creator</div>
                 <p className="text-sm text-gray-400 leading-relaxed">Build and download your resume in a professional template. No design skills needed.</p>
               </div>
             </div>
@@ -84,8 +84,8 @@ export default function HomePage() {
                 </svg>
               </div>
               <div>
-                <div className="text-2xl font-black text-blue-600 mb-1">30-min 1:1</div>
-                <div className="text-base font-semibold text-gray-700 mb-1.5">Expert Session</div>
+                <div className="text-2xl font-black text-blue-600 mb-1">1:1 Expert Session</div>
+                <div className="text-base font-semibold text-gray-700 mb-1.5">30 min session</div>
                 <p className="text-sm text-gray-400 leading-relaxed">Live resume review with an expert. Get actionable feedback before you apply.</p>
               </div>
             </div>
