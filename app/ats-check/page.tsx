@@ -380,6 +380,19 @@ function ATSCheckInner() {
     return () => document.removeEventListener('click', handler, true)
   }, [result, saveCount])
 
+  async function extractPdfText(blob: Blob): Promise<string> {
+    const pdfjsLib = await import('pdfjs-dist')
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`
+    const arrayBuffer = await blob.arrayBuffer()
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+    const pages = await Promise.all(
+      Array.from({ length: pdf.numPages }, (_, i) =>
+        pdf.getPage(i + 1).then(p => p.getTextContent()).then(c => c.items.map(it => ('str' in it ? it.str : '')).join(' '))
+      )
+    )
+    return pages.join('\n')
+  }
+
   async function handleAnalyse() {
     setError('')
     setLoading(true)
@@ -387,16 +400,30 @@ function ATSCheckInner() {
     try {
       const form = new FormData()
       if (tab === 'upload' && file) {
-        form.append('file', file)
+        // Parse PDF text in the browser — avoids server-side WASM cold start on mobile
+        try {
+          const text = await extractPdfText(file)
+          if (!text.trim()) { setError('Could not read text from this PDF. Please try pasting the text instead.'); return }
+          form.append('resumeText', text)
+        } catch {
+          setError('Could not parse this PDF. Please try pasting the text instead.')
+          return
+        }
       } else if (tab === 'saved' && selectedResumeId) {
-        // Fetch signed URL, download file, attach
+        // Fetch signed URL, download file, parse in browser
         const urlRes = await fetch(`/api/resume/${selectedResumeId}`)
         const urlData = await urlRes.json()
         if (!urlData.url) { setError('Could not load saved resume.'); return }
         const resp = await fetch(urlData.url)
         const blob = await resp.blob()
-        const resume = savedResumes.find(r => r.id === selectedResumeId)
-        form.append('file', blob, resume?.filename ?? 'resume.pdf')
+        try {
+          const text = await extractPdfText(blob)
+          if (!text.trim()) { setError('Could not read text from this PDF. Please try pasting the text instead.'); return }
+          form.append('resumeText', text)
+        } catch {
+          setError('Could not parse this PDF. Please try pasting the text instead.')
+          return
+        }
       } else {
         form.append('resumeText', resumeText)
       }

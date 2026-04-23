@@ -338,7 +338,11 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       setShowAuthModal(true)
       return
     }
-    if (!isPro) { setShowProDocsModal(true); return }
+    if (!isPro) {
+      // Re-check Pro status from DB before showing upgrade modal — avoids stale state
+      const { data: proRow } = await supabase.from('pro_access').select('id').eq('user_id', user.id).maybeSingle()
+      if (proRow) { setIsPro(true) } else { setShowProDocsModal(true); return }
+    }
     try {
       const pdfRes = await fetch('/api/builder/pdf?pdf=1', {
         method: 'POST',
