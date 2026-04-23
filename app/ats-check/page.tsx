@@ -252,9 +252,10 @@ function ATSCheckInner() {
 
   // Restore pending state on mount — fires after login redirect returns to this page
   useEffect(() => {
-    const raw = sessionStorage.getItem(STORAGE_KEY)
+    const raw = sessionStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(STORAGE_KEY)
     if (!raw) return
     sessionStorage.removeItem(STORAGE_KEY)
+    localStorage.removeItem(STORAGE_KEY)
     try {
       const pending = JSON.parse(raw)
       const jd = pending.jobDescription ?? ''
@@ -446,18 +447,21 @@ function ATSCheckInner() {
       if (!res.ok) {
         if (res.status === 401) {
           if (tab === 'paste' && resumeText.trim()) {
-            sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ tab: 'paste', resumeText, jobDescription }))
+            const payload = JSON.stringify({ tab: 'paste', resumeText, jobDescription })
+            sessionStorage.setItem(STORAGE_KEY, payload)
+            localStorage.setItem(STORAGE_KEY, payload)
           } else if (tab === 'upload' && file) {
-            // Encode file as base64 so it survives the auth redirect
             const reader = new FileReader()
             reader.onload = () => {
-              sessionStorage.setItem(STORAGE_KEY, JSON.stringify({
+              const payload = JSON.stringify({
                 tab: 'upload',
                 jobDescription,
                 fileData: reader.result as string,
                 fileName: file.name,
                 fileType: file.type,
-              }))
+              })
+              sessionStorage.setItem(STORAGE_KEY, payload)
+              localStorage.setItem(STORAGE_KEY, payload)
               setModal('login_required')
             }
             reader.readAsDataURL(file)
