@@ -369,24 +369,43 @@ function ATSCheckInner() {
     }
     const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = '' }
     beforeUnloadRef.current = handler
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(window as any).__atsBeforeUnload = handler
     window.addEventListener('beforeunload', handler)
-    return () => { window.removeEventListener('beforeunload', handler); beforeUnloadRef.current = null }
+    return () => { window.removeEventListener('beforeunload', handler); beforeUnloadRef.current = null; delete (window as any).__atsBeforeUnload }
   }, [result, saveCount])
 
-  // Intercept in-app link clicks when result is unsaved
+  // Intercept in-app navigations (link clicks + router.push) when result is unsaved
   useEffect(() => {
     if (!result || saveCount > 0) return
-    const handler = (e: MouseEvent) => {
+
+    const clickHandler = (e: MouseEvent) => {
       const anchor = (e.target as Element).closest('a')
       if (!anchor) return
       const href = anchor.getAttribute('href')
       if (!href || href.startsWith('#') || anchor.getAttribute('target') === '_blank') return
       e.preventDefault()
+      e.stopPropagation()
       setPendingNavUrl(href)
       setShowSaveModal(true)
     }
-    document.addEventListener('click', handler, true)
-    return () => document.removeEventListener('click', handler, true)
+
+    // Patch history.pushState so Next.js router.push calls are intercepted
+    const origPushState = history.pushState.bind(history)
+    history.pushState = function (state, title, url) {
+      if (url && typeof url === 'string' && !url.includes('/ats-check')) {
+        setPendingNavUrl(url)
+        setShowSaveModal(true)
+        return
+      }
+      origPushState(state, title, url)
+    }
+
+    document.addEventListener('click', clickHandler, true)
+    return () => {
+      document.removeEventListener('click', clickHandler, true)
+      history.pushState = origPushState
+    }
   }, [result, saveCount])
 
   async function extractPdfText(blob: Blob): Promise<string> {

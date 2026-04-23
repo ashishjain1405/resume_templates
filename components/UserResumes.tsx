@@ -169,14 +169,14 @@ export default function UserResumes({ isPro = false }: { isPro?: boolean }) {
                     )}
                   </button>
                 ) : (
-                  <Link href="/pricing" aria-label="Upgrade to download" className="text-gray-300 hover:text-amber-500 transition-colors">
+                  <span className="text-gray-300 cursor-default" aria-label="Pro required to download" title="Upgrade to Pro to download">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                     </svg>
-                  </Link>
+                  </span>
                 )}
                 <button
-                  onClick={() => handleDelete(r.id)}
+                  onClick={(e) => { e.stopPropagation(); handleDelete(r.id) }}
                   disabled={deletingId === r.id}
                   className="text-gray-300 hover:text-red-400 transition-colors disabled:opacity-50"
                   aria-label="Delete"
