@@ -4,11 +4,19 @@ import { isPro } from '@/lib/pro'
 import OpenAI from 'openai'
 
 export const maxDuration = 60
+
+// Cache unpdf module at module level so WASM is only initialized once per container
+let _unpdf: typeof import('unpdf') | null = null
+async function getUnpdf() {
+  if (!_unpdf) _unpdf = await import('unpdf')
+  return _unpdf
+}
+
 async function parsePdf(buf: Buffer): Promise<string> {
-  // pdf-parse is pure Node.js (no WASM), much faster cold start than unpdf
-  const pdfParse = (await import('pdf-parse')).default
-  const result = await pdfParse(buf)
-  return result.text
+  const { extractText, getDocumentProxy } = await getUnpdf()
+  const pdf = await getDocumentProxy(new Uint8Array(buf))
+  const { text } = await extractText(pdf, { mergePages: true })
+  return text
 }
 
 let _openai: OpenAI | null = null
