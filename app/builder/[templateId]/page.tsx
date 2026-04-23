@@ -113,6 +113,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [authForATS, setAuthForATS] = useState(false)
   const [authForDownload, setAuthForDownload] = useState(false)
   const [authForDocs, setAuthForDocs] = useState(false)
+  const [autoOpenDocs, setAutoOpenDocs] = useState(false)
   const searchParams = useSearchParams()
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -142,7 +143,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
           const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
           if (docsPending) {
             localStorage.removeItem(`docs_pending_${templateId}`)
-            if (row) { handleEditInDocs() } else { setShowProDocsModal(true) }
+            if (row) { setAutoOpenDocs(true) } else { setShowProDocsModal(true) }
           }
         }
       } else {
@@ -215,7 +216,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
     if (docsPending) {
       localStorage.removeItem(`docs_pending_${templateId}`)
-      if (isPro) { handleEditInDocs() } else { setShowProDocsModal(true) }
+      if (isPro) { setAutoOpenDocs(true) } else { setShowProDocsModal(true) }
     }
   }, [user, isPro, templateId])
 
@@ -224,8 +225,15 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     if (!isPro) return
     if (searchParams.get('openDocs') !== '1') return
     router.replace(`/builder/${templateId}`)
-    handleEditInDocs()
+    setAutoOpenDocs(true)
   }, [isPro, searchParams])
+
+  // Execute Google Docs once user + Pro status are confirmed in React state
+  useEffect(() => {
+    if (!autoOpenDocs || !user || !isPro) return
+    setAutoOpenDocs(false)
+    handleEditInDocs()
+  }, [autoOpenDocs, user, isPro])
 
   // Auto-save with debounce
   const autoSave = useCallback((next: ResumeData, color: string) => {
