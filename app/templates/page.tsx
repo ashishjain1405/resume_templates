@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import TemplateCard from '@/components/TemplateCard'
 import { TEMPLATES } from '@/lib/templates'
+import { createClient } from '@/lib/supabase-server'
+import { isPro } from '@/lib/pro'
 
 export const metadata: Metadata = {
   title: 'Resume Templates',
@@ -9,7 +11,11 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.resumenow.in/templates' },
 }
 
-export default function TemplatesPage() {
+export default async function TemplatesPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const pro = user ? await isPro(user.id, supabase) : false
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
       <div className="text-center mb-10">
@@ -24,7 +30,7 @@ export default function TemplatesPage() {
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
         {TEMPLATES.map((template) => (
-          <TemplateCard key={template.id} template={template} />
+          <TemplateCard key={template.id} template={template} purchased={pro} />
         ))}
       </div>
     </div>
