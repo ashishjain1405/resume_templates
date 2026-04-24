@@ -91,7 +91,7 @@ function ATSAnimation() {
 
   const card1Bars = BARS.slice(0, isMobile ? 2 : 3)
   const card2Bars = BARS.slice(0, isMobile ? 3 : 5)
-  const rewrites = REWRITES.slice(0, isMobile ? 1 : 2)
+  const rewrites = REWRITES
 
   return (
     <div className="w-full max-w-sm">
@@ -110,7 +110,7 @@ function ATSAnimation() {
         }
       `}</style>
 
-      <div className="relative h-[200px] lg:h-[340px]">
+      <div className="relative h-[220px] lg:h-[340px]">
 
         {/* Card 1 — Scores */}
         <div
