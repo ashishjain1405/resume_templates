@@ -73,7 +73,7 @@ export default function HomePage() {
               </div>
               <div>
                 <div className="text-2xl font-black text-blue-600 mb-1">Unlimited</div>
-                <div className="text-base font-semibold text-gray-700 mb-1.5">Unlimited Resume Checks</div>
+                <div className="text-base font-semibold text-gray-700 mb-1.5">Resume checks</div>
                 <p className="text-sm text-gray-400 leading-relaxed">Keep improving until your score is interview-ready. Check as many times as you need.</p>
               </div>
             </div>
