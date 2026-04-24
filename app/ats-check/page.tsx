@@ -408,10 +408,21 @@ function ATSCheckInner() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).__atsBeforeUnload = handler
     window.addEventListener('beforeunload', handler)
-    // Register persist callback so use-pro-upgrade can save state before reloading
+    // Register persist callback so use-pro-upgrade can save state before reloading.
+    // Async: if file exists but no resumeId, upload to storage first so re-hydration works.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(window as any).__atsPersist = () => {
-      sessionStorage.setItem('ats_result_persist', JSON.stringify({ result, resumeText, selectedResumeId: selectedResumeIdRef.current, tab }))
+    ;(window as any).__atsPersist = async () => {
+      let sid = selectedResumeIdRef.current
+      if (!sid && file) {
+        try {
+          const form = new FormData()
+          form.append('file', file)
+          const res = await fetch('/api/resume/upload', { method: 'POST', body: form })
+          const d = await res.json()
+          if (d.resume?.id) sid = d.resume.id
+        } catch { /* best-effort */ }
+      }
+      sessionStorage.setItem('ats_result_persist', JSON.stringify({ result, resumeText, selectedResumeId: sid, tab }))
     }
     return () => {
       window.removeEventListener('beforeunload', handler)
@@ -647,21 +658,29 @@ function ATSCheckInner() {
 
   async function handleEditInDocs() {
     if (!isPro) {
-      // Upload resume now so we can retrieve it after payment redirect
-      if (tab === 'upload' && file) {
-        const form = new FormData()
-        form.append('file', file)
-        const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
-        const uploadData = await uploadRes.json()
-        if (uploadData.resume?.id) {
-          sessionStorage.setItem('docs_pending_resume_id', uploadData.resume.id)
-          setResumeId(uploadData.resume.id)
+      // Re-check server first — local isPro may lag behind DB on fresh reload
+      const statusRes = await fetch('/api/pro-status')
+      const statusData = await statusRes.json()
+      if (statusData.pro) {
+        setIsPro(true)
+        // fall through to Pro path below
+      } else {
+        // Upload resume now so we can retrieve it after payment redirect
+        if (tab === 'upload' && file) {
+          const form = new FormData()
+          form.append('file', file)
+          const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
+          const uploadData = await uploadRes.json()
+          if (uploadData.resume?.id) {
+            sessionStorage.setItem('docs_pending_resume_id', uploadData.resume.id)
+            setResumeId(uploadData.resume.id)
+          }
+        } else if (selectedResumeId) {
+          sessionStorage.setItem('docs_pending_resume_id', selectedResumeId)
         }
-      } else if (selectedResumeId) {
-        sessionStorage.setItem('docs_pending_resume_id', selectedResumeId)
+        setModal('pro_docs')
+        return
       }
-      setModal('pro_docs')
-      return
     }
     setEditLoading(true)
     try {

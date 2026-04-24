@@ -73,7 +73,7 @@ export function useProUpgrade() {
             // Persist ATS result before reload so user can continue from where they left off
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const atsPersist = (window as any).__atsPersist
-            if (atsPersist) { atsPersist(); delete (window as any).__atsPersist }
+            if (atsPersist) { await atsPersist(); delete (window as any).__atsPersist }
             // Remove any page-level beforeunload handler (e.g. ATS unsaved result warning)
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const atsHandler = (window as any).__atsBeforeUnload
