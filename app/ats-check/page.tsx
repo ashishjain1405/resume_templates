@@ -304,50 +304,35 @@ function ATSCheckInner() {
           .finally(() => setLoading(false))
       }
 
-      if (pending.fromBuilder && pending.data) {
+      if (pending.fromBuilder && pending.data && pending.templateId) {
         const d = pending.data
-        const lines: string[] = []
         const p = d.personal ?? {}
-        if (p.name) lines.push(p.name)
-        if (p.title) lines.push(p.title)
-        if (p.email) lines.push(p.email)
-        if (p.phone) lines.push(p.phone)
-        if (p.location) lines.push(p.location)
-        if (p.linkedin) lines.push(p.linkedin)
-        for (const exp of d.experience ?? []) {
-          lines.push(`${exp.role} at ${exp.company} (${exp.startDate}–${exp.endDate})`)
-          for (const b of exp.bullets ?? []) if (b.trim()) lines.push(b)
-        }
-        for (const edu of d.education ?? []) {
-          lines.push(`${edu.degree}, ${edu.institution}, ${edu.year}`)
-        }
-        if ((d.skills ?? []).length) lines.push('Skills: ' + d.skills.join(', '))
-        const text = lines.join('\n')
-        setTab('paste')
-        setResumeText(text)
-        const form = new FormData()
-        form.append('resumeText', text)
-        autoAnalyse(form)
-        // Also generate PDF in background so "Save to Dashboard" uploads a proper PDF
-        if (pending.templateId) {
-          fetch('/api/builder/pdf?pdf=1', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ templateId: pending.templateId, data: d, accentColor: pending.accentColor }),
+        setLoading(true)
+        fetch('/api/builder/pdf?pdf=1', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ templateId: pending.templateId, data: d, accentColor: pending.accentColor }),
+        })
+          .then(r => r.ok ? r.blob() : null)
+          .then(async blob => {
+            if (!blob) { setLoading(false); setError('Could not generate PDF. Please try again.'); return }
+            const name = `${p.name?.replace(/\s+/g, '_') || 'resume'}_${pending.templateId}.pdf`
+            const file = new File([blob], name, { type: 'application/pdf' })
+            setFile(file)
+            setTab('upload')
+            const form = new FormData()
+            form.append('file', file)
+            const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
+            const uploadData = await uploadRes.json()
+            if (uploadData.resume?.id) {
+              window.location.href = `/ats-check?resumeId=${uploadData.resume.id}`
+            } else {
+              const fallbackForm = new FormData()
+              fallbackForm.append('file', file)
+              autoAnalyse(fallbackForm)
+            }
           })
-            .then(r => r.ok ? r.blob() : null)
-            .then(async blob => {
-              if (blob) {
-                const name = `${p.name?.replace(/\s+/g, '_') || 'resume'}_${pending.templateId}.pdf`
-                const file = new File([blob], name, { type: 'application/pdf' })
-                setFile(file)
-                const form = new FormData()
-                form.append('file', file)
-                await fetch('/api/resume/upload', { method: 'POST', body: form })
-              }
-            })
-            .catch(() => {/* file stays null, save will fall back to txt */})
-        }
+          .catch(() => { setLoading(false); setError('Something went wrong. Please try again.') })
       } else if (pending.tab === 'paste' && pending.resumeText) {
         setTab('paste')
         setResumeText(pending.resumeText)
