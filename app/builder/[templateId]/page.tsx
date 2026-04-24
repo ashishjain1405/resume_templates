@@ -229,14 +229,32 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   useEffect(() => {
     if (!user) return
     const downloadPending = localStorage.getItem(`download_pending_${templateId}`)
-    if (downloadPending && isPro) {
-      localStorage.removeItem(`download_pending_${templateId}`)
-      setTimeout(() => handleDownload(), 0)
+    if (downloadPending) {
+      if (isPro) {
+        localStorage.removeItem(`download_pending_${templateId}`)
+        setTimeout(() => handleDownload(), 0)
+      } else {
+        const proFlag = localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked')
+        if (!proFlag) {
+          // Free user returned after signup — show upgrade modal
+          localStorage.removeItem(`download_pending_${templateId}`)
+          setShowProDownloadModal(true)
+        }
+        // proFlag present: payment reload, isPro not yet resolved — keep flag, wait for re-run
+      }
     }
     const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
-    if (docsPending && isPro) {
-      localStorage.removeItem(`docs_pending_${templateId}`)
-      setTimeout(() => handleEditInDocs(), 0)
+    if (docsPending) {
+      if (isPro) {
+        localStorage.removeItem(`docs_pending_${templateId}`)
+        setTimeout(() => handleEditInDocs(), 0)
+      } else {
+        const proFlag = localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked')
+        if (!proFlag) {
+          localStorage.removeItem(`docs_pending_${templateId}`)
+          setShowProDocsModal(true)
+        }
+      }
     }
   }, [user, isPro, templateId])
 
