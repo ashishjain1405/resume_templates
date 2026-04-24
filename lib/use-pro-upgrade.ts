@@ -61,6 +61,10 @@ export function useProUpgrade() {
             // Payment is server-verified (HMAC + DB insert confirmed). Trust it immediately.
             localStorage.setItem('pro_unlocked', '1')
             sessionStorage.setItem('pro_unlocked', '1')
+            // Persist ATS result before reload so user can continue from where they left off
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const atsPersist = (window as any).__atsPersist
+            if (atsPersist) { atsPersist(); delete (window as any).__atsPersist }
             // Remove any page-level beforeunload handler (e.g. ATS unsaved result warning)
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const atsHandler = (window as any).__atsBeforeUnload

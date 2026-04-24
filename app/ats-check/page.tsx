@@ -165,8 +165,21 @@ function ATSCheckInner() {
   const fileRef = useRef<HTMLInputElement>(null)
   const beforeUnloadRef = useRef<((e: BeforeUnloadEvent) => void) | null>(null)
 
-  // On mount: check pro status, fetch usage, load saved resumes
+  // On mount: check pro status, fetch usage, load saved resumes, restore persisted ATS result
   useEffect(() => {
+    // Restore ATS result that was saved before Pro payment reload
+    const persisted = sessionStorage.getItem('ats_result_persist')
+    if (persisted) {
+      sessionStorage.removeItem('ats_result_persist')
+      try {
+        const { result: r, resumeText: rt, selectedResumeId: sid, tab: t } = JSON.parse(persisted)
+        if (r) setResult(r)
+        if (rt) setResumeText(rt)
+        if (sid) setSelectedResumeId(sid)
+        if (t) setTab(t)
+      } catch { /* ignore */ }
+    }
+
     const supabase = createClient()
     supabase.auth.getUser().then(async ({ data }) => {
       if (!data.user) return
@@ -369,6 +382,8 @@ function ATSCheckInner() {
         window.removeEventListener('beforeunload', beforeUnloadRef.current)
         beforeUnloadRef.current = null
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (window as any).__atsPersist
       return
     }
     const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = '' }
@@ -376,8 +391,20 @@ function ATSCheckInner() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).__atsBeforeUnload = handler
     window.addEventListener('beforeunload', handler)
-    return () => { window.removeEventListener('beforeunload', handler); beforeUnloadRef.current = null; delete (window as any).__atsBeforeUnload }
-  }, [result, saveCount])
+    // Register persist callback so use-pro-upgrade can save state before reloading
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(window as any).__atsPersist = () => {
+      sessionStorage.setItem('ats_result_persist', JSON.stringify({ result, resumeText, selectedResumeId, tab }))
+    }
+    return () => {
+      window.removeEventListener('beforeunload', handler)
+      beforeUnloadRef.current = null
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (window as any).__atsBeforeUnload
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (window as any).__atsPersist
+    }
+  }, [result, saveCount, resumeText, selectedResumeId, tab])
 
   // Intercept in-app navigations (link clicks + router.push) when result is unsaved
   useEffect(() => {
