@@ -369,8 +369,7 @@ function ATSCheckInner() {
           })
           .catch(() => { setInfo('Resume could not be restored — please re-upload.'); setLoading(false) })
       } else if (pending.tab === 'saved' && pending.selectedResumeId) {
-        // File was uploaded to storage before payment — fetch and analyse directly
-        setTab('saved')
+        // File was uploaded to storage before payment — fetch blob, show on upload tab, analyse
         setResumeId(pending.selectedResumeId)
         setLoading(true)
         fetch(`/api/resume/${pending.selectedResumeId}`)
@@ -380,9 +379,9 @@ function ATSCheckInner() {
             const blob = await fetch(url).then(r => r.blob())
             const f = new File([blob], filename ?? 'resume.pdf', { type: blob.type || 'application/pdf' })
             setFile(f)
+            setTab('upload')
             const form = new FormData()
-            form.append('resumeText', await extractPdfText(blob))
-            form.append('jobDescription', jd)
+            form.append('file', f)
             autoAnalyse(form)
           })
           .catch(() => { setInfo('Resume could not be restored — please re-upload.'); setLoading(false) })
