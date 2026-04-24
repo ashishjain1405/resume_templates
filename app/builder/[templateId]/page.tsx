@@ -231,12 +231,12 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     const downloadPending = localStorage.getItem(`download_pending_${templateId}`)
     if (downloadPending) {
       localStorage.removeItem(`download_pending_${templateId}`)
-      if (isPro) { setTimeout(() => handleDownload(), 600) } else { setShowProDownloadModal(true) }
+      if (isPro) { setTimeout(() => handleDownload(), 0) } else { setShowProDownloadModal(true) }
     }
     const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
     if (docsPending) {
       localStorage.removeItem(`docs_pending_${templateId}`)
-      if (isPro) { setTimeout(() => handleEditInDocs(), 600) } else { setShowProDocsModal(true) }
+      if (isPro) { setTimeout(() => handleEditInDocs(), 0) } else { setShowProDocsModal(true) }
     }
   }, [user, isPro, templateId])
 
@@ -384,17 +384,12 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       setShowProDownloadModal(true)
       return
     }
-    let res: Response | null = null
-    for (let attempt = 0; attempt < 3; attempt++) {
-      if (attempt > 0) await new Promise(r => setTimeout(r, 500))
-      res = await fetch('/api/builder/pdf?pdf=1', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ templateId, data, accentColor }),
-      })
-      if (res.ok) break
-    }
-    if (!res || !res.ok) { alert('Download failed. Please try again.'); return }
+    const res = await fetch('/api/builder/pdf?pdf=1', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ templateId, data, accentColor }),
+    })
+    if (!res.ok) { alert('Download failed. Please try again.'); return }
     const blob = await res.blob()
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
