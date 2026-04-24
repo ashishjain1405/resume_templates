@@ -124,48 +124,38 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
 
   // Load user + pro status
   useEffect(() => {
-    // Capture synchronously before any async code (e.g. SIGNED_IN handler) can clear it
+    // Capture synchronously before any async code can clear it
     const initialProFlag = typeof window !== 'undefined'
       && (localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked'))
 
-    // getUser() is the authoritative load — runs once on mount
     supabase.auth.getUser().then(async ({ data }) => {
       setUser(data.user)
       if (data.user) {
         if (initialProFlag) {
           setIsPro(true)
-          // Clear flag once DB confirms the row (replication caught up). Never flip isPro to false.
-          supabase.from('pro_access').select('id').eq('user_id', data.user.id).maybeSingle()
-            .then(({ data: row }) => {
-              if (row) {
-                localStorage.removeItem('pro_unlocked')
-                sessionStorage.removeItem('pro_unlocked')
-              }
-            })
+          // Clear flag once server confirms the row
+          fetch('/api/pro-status').then(r => r.json()).then(d => {
+            if (d.pro) { localStorage.removeItem('pro_unlocked'); sessionStorage.removeItem('pro_unlocked') }
+          })
         } else {
-          const { data: row } = await supabase.from('pro_access').select('id').eq('user_id', data.user.id).maybeSingle()
-          setIsPro(!!row)
+          // Use server-side endpoint (service role) to avoid RLS/replication lag
+          const d = await fetch('/api/pro-status').then(r => r.json())
+          setIsPro(!!d.pro)
         }
       }
     })
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null)
       if (session?.user) {
-        // Only re-query Pro status on explicit sign-in, not on TOKEN_REFRESHED or INITIAL_SESSION
-        // Those fire after page load and can overwrite isPro=true with stale DB reads
         if (event === 'SIGNED_IN') {
           const proFlag = initialProFlag
             || (typeof window !== 'undefined' && (localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked')))
-          const { data: row } = await supabase.from('pro_access').select('id').eq('user_id', session.user.id).maybeSingle()
-          if (!proFlag) setIsPro(!!row)
-          if (row) { localStorage.removeItem('pro_unlocked'); sessionStorage.removeItem('pro_unlocked') }
-          // download_pending and docs_pending are handled by the useEffect below,
-          // which has awareness of autoupgrade=1. Do not handle them here to avoid collision.
-
+          const d = await fetch('/api/pro-status').then(r => r.json())
+          if (!proFlag) setIsPro(!!d.pro)
+          if (d.pro) { localStorage.removeItem('pro_unlocked'); sessionStorage.removeItem('pro_unlocked') }
         }
       } else {
         setIsPro(false)
-        // Clear stale builder data on sign-out so next user sees empty fields
         if (typeof window !== 'undefined') {
           localStorage.removeItem(`resume_builder_${templateId}`)
           localStorage.removeItem(`builder_session_restore_${templateId}`)
