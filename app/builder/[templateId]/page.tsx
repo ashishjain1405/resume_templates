@@ -124,18 +124,17 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
 
   // Load user + pro status
   useEffect(() => {
+    // Capture synchronously before any async code (e.g. SIGNED_IN handler) can clear it
+    const initialProFlag = typeof window !== 'undefined'
+      && (localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked'))
+
     // getUser() is the authoritative load — runs once on mount
     supabase.auth.getUser().then(async ({ data }) => {
       setUser(data.user)
       if (data.user) {
-        // pro_unlocked is set server-side right after HMAC-verified payment insert.
-        // Trust it unconditionally — never do a background check that can flip it to false
-        // due to RLS replication lag or missing session cookies.
-        const proFlag = typeof window !== 'undefined'
-          && (localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked'))
-        if (proFlag) {
+        if (initialProFlag) {
           setIsPro(true)
-          // Clear flag once anon client can read the row (replication caught up). Never flip to false.
+          // Clear flag once DB confirms the row (replication caught up). Never flip isPro to false.
           supabase.from('pro_access').select('id').eq('user_id', data.user.id).maybeSingle()
             .then(({ data: row }) => {
               if (row) {
@@ -155,8 +154,8 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         // Only re-query Pro status on explicit sign-in, not on TOKEN_REFRESHED or INITIAL_SESSION
         // Those fire after page load and can overwrite isPro=true with stale DB reads
         if (event === 'SIGNED_IN') {
-          const proFlag = typeof window !== 'undefined'
-            && (localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked'))
+          const proFlag = initialProFlag
+            || (typeof window !== 'undefined' && (localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked')))
           const { data: row } = await supabase.from('pro_access').select('id').eq('user_id', session.user.id).maybeSingle()
           if (!proFlag) setIsPro(!!row)
           if (row) { localStorage.removeItem('pro_unlocked'); sessionStorage.removeItem('pro_unlocked') }
