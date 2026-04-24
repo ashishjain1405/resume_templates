@@ -107,6 +107,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [saveCount, setSaveCount] = useState(0)
   const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit')
   const [isPro, setIsPro] = useState(false)
+  const [proResolved, setProResolved] = useState(false)
   const [showProDownloadModal, setShowProDownloadModal] = useState(false)
   const [showProDocsModal, setShowProDocsModal] = useState(false)
   const [showChangeTemplateModal, setShowChangeTemplateModal] = useState(false)
@@ -129,14 +130,14 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       if (data.user) {
         if (initialProFlag) {
           setIsPro(true)
-          // Clear flag once server confirms the row
+          setProResolved(true)
           fetch('/api/pro-status').then(r => r.json()).then(d => {
             if (d.pro) { localStorage.removeItem('pro_unlocked'); sessionStorage.removeItem('pro_unlocked') }
           })
         } else {
-          // Use server-side endpoint (service role) to avoid RLS/replication lag
           const d = await fetch('/api/pro-status').then(r => r.json())
           setIsPro(!!d.pro)
+          setProResolved(true)
         }
       }
     })
@@ -147,14 +148,15 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
           const proFlag = initialProFlag
             || (typeof window !== 'undefined' && (localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked')))
           if (proFlag) {
-            // Restore isPro=true in case SIGNED_OUT fired first and wiped it
             setIsPro(true)
+            setProResolved(true)
             fetch('/api/pro-status').then(r => r.json()).then(d => {
               if (d.pro) { localStorage.removeItem('pro_unlocked'); sessionStorage.removeItem('pro_unlocked') }
             })
           } else {
             const d = await fetch('/api/pro-status').then(r => r.json())
             setIsPro(!!d.pro)
+            setProResolved(true)
           }
         }
       } else {
@@ -234,22 +236,21 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       if (isPro) {
         localStorage.removeItem(`download_pending_${templateId}`)
         setTimeout(() => handleDownload(), 0)
-      } else {
+      } else if (proResolved) {
         const proFlag = localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked')
         if (!proFlag) {
-          // Free user returned after signup — show upgrade modal
           localStorage.removeItem(`download_pending_${templateId}`)
           setShowProDownloadModal(true)
         }
-        // proFlag present: payment reload, isPro not yet resolved — keep flag, wait for re-run
       }
+      // else: proResolved=false — wait for next re-run when isPro/proResolved update
     }
     const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
     if (docsPending) {
       if (isPro) {
         localStorage.removeItem(`docs_pending_${templateId}`)
         setTimeout(() => handleEditInDocs(), 0)
-      } else {
+      } else if (proResolved) {
         const proFlag = localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked')
         if (!proFlag) {
           localStorage.removeItem(`docs_pending_${templateId}`)
@@ -257,7 +258,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         }
       }
     }
-  }, [user, isPro, templateId])
+  }, [user, isPro, proResolved, templateId])
 
   // Auto-save with debounce
   const autoSave = useCallback((next: ResumeData, color: string) => {
