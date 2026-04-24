@@ -13,6 +13,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const currentUserIdRef = useRef<string | null>(null)
   const router = useRouter()
   const pathname = usePathname()
   const supabase = createClient()
@@ -20,9 +21,11 @@ export default function Navbar() {
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user)
+      currentUserIdRef.current = data.user?.id ?? null
       if (data.user) checkPro(data.user.id)
     })
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      currentUserIdRef.current = session?.user?.id ?? null
       setUser(session?.user ?? null)
       if (session?.user) checkPro(session.user.id)
       else setIsPro(false)
@@ -34,12 +37,14 @@ export default function Navbar() {
     const proFlag = typeof window !== 'undefined'
       && (localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked'))
     if (proFlag) {
+      if (currentUserIdRef.current !== userId) return
       setIsPro(true)
       const { data } = await supabase.from('pro_access').select('id').eq('user_id', userId).maybeSingle()
       if (data) { localStorage.removeItem('pro_unlocked'); sessionStorage.removeItem('pro_unlocked') }
       return
     }
     const { data } = await supabase.from('pro_access').select('id').eq('user_id', userId).maybeSingle()
+    if (currentUserIdRef.current !== userId) return
     setIsPro(!!data)
   }
 
