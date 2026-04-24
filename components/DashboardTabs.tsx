@@ -232,20 +232,23 @@ export default function DashboardTabs({
       {active === 'ats' && (
         <div className="max-w-2xl space-y-6">
           <div className="bg-gray-50 border border-gray-100 rounded-2xl p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center">
-                <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center">
+                  <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <h2 className="text-base font-bold text-gray-900">ATS Score Checker</h2>
               </div>
-              <h2 className="text-base font-bold text-gray-900">ATS Score Checker</h2>
+              {isPro && (
+                <div className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-blue-100">
+                  Unlimited checks — Pro
+                </div>
+              )}
             </div>
             <p className="text-sm text-gray-500 mb-5">
               Most companies use ATS (Applicant Tracking Systems) to filter resumes before a human ever reads them. Upload your resume to get an instant score, see which keywords you&apos;re missing, and get specific suggestions to improve it.
             </p>
-            {isPro ? (
-              <div className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-blue-100 mb-4">
-                Unlimited checks — Pro
-              </div>
-            ) : (
+            {!isPro && (
               <div className="mb-5">
                 <div className="flex justify-between text-xs text-gray-500 mb-1.5">
                   <span>{atsChecksUsed} of {FREE_ATS_LIMIT} free checks used</span>
