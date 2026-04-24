@@ -150,9 +150,16 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         if (event === 'SIGNED_IN') {
           const proFlag = initialProFlag
             || (typeof window !== 'undefined' && (localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked')))
-          const d = await fetch('/api/pro-status').then(r => r.json())
-          if (!proFlag) setIsPro(!!d.pro)
-          if (d.pro) { localStorage.removeItem('pro_unlocked'); sessionStorage.removeItem('pro_unlocked') }
+          if (proFlag) {
+            // Restore isPro=true in case SIGNED_OUT fired first and wiped it
+            setIsPro(true)
+            fetch('/api/pro-status').then(r => r.json()).then(d => {
+              if (d.pro) { localStorage.removeItem('pro_unlocked'); sessionStorage.removeItem('pro_unlocked') }
+            })
+          } else {
+            const d = await fetch('/api/pro-status').then(r => r.json())
+            setIsPro(!!d.pro)
+          }
         }
       } else {
         setIsPro(false)
