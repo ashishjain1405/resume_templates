@@ -94,9 +94,9 @@ export default function HomePage() {
           <div className="text-center">
             <Link
               href="/pricing"
-              className="inline-block bg-blue-600 text-white px-8 py-3.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm"
+              className="inline-block bg-amber-50 text-amber-700 border border-amber-200 px-8 py-3.5 rounded-lg font-semibold hover:bg-amber-100 transition-colors text-sm"
             >
-              Get Pro Access — ₹999
+              Upgrade to Pro ✦
             </Link>
             <p className="text-xs text-gray-400 mt-2">One-time · no subscription · lifetime access</p>
           </div>

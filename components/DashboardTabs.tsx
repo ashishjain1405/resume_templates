@@ -316,7 +316,7 @@ export default function DashboardTabs({
 
           {effectiveAccessible.length === 0 && (
             <div className="text-center py-10 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-              <p className="text-sm text-gray-500 mb-4">Purchase a template to start building.</p>
+              <p className="text-sm text-gray-500 mb-4">Choose from 5 professionally designed ATS friendly templates.</p>
               <Link href="/templates" className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">Browse templates</Link>
             </div>
           )}
