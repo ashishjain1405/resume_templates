@@ -21,9 +21,15 @@ export function useProUpgrade() {
   async function startUpgrade(userEmail?: string, source?: string, returnPath?: string) {
     setLoading(true)
     try {
-      // Ensure session cookie is fresh before hitting the API — newly signed-up users
-      // may have a valid client-side session that hasn't been flushed to cookies yet
-      const res = await fetch('/api/razorpay/pro-order', { method: 'POST' })
+      // Retry up to 5 times with 500ms delay — newly signed-up users may redirect here
+      // before the session cookie has been flushed, causing a transient 401.
+      let res: Response | null = null
+      for (let attempt = 0; attempt < 5; attempt++) {
+        if (attempt > 0) await new Promise(r => setTimeout(r, 500))
+        res = await fetch('/api/razorpay/pro-order', { method: 'POST' })
+        if (res.status !== 401) break
+      }
+      if (!res) { setLoading(false); return }
       if (res.status === 401) {
         const redirect = typeof window !== 'undefined'
           ? encodeURIComponent(window.location.pathname + window.location.search)
