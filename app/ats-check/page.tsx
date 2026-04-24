@@ -45,7 +45,6 @@ function ScoreRing({ score, instant = false }: { score: number; instant?: boolea
       </svg>
       <div className="absolute text-center">
         <div className="text-2xl font-bold text-gray-900">{score}</div>
-        <div className="text-[10px] text-gray-400 font-medium">/100</div>
       </div>
     </div>
   )
@@ -998,13 +997,17 @@ function ATSCheckInner() {
                   <div className="text-lg font-bold text-gray-900">
                     {result.overall_score >= 75 ? 'Strong resume' : result.overall_score >= 50 ? 'Needs improvement' : 'Significant gaps found'}
                   </div>
-                  <div className="flex gap-3 mt-1">
-                    <span className="text-xs text-gray-500">ATS <span className="font-semibold text-gray-700">{result.ats_score}</span></span>
-                    <span className="text-xs text-gray-500">Recruiter <span className="font-semibold text-gray-700">{result.recruiter_score}</span></span>
+                  <div className="flex gap-4 mt-2">
+                    <div>
+                      <div className="text-[11px] text-gray-400 uppercase tracking-wide font-medium">ATS</div>
+                      <div className="text-xl font-bold text-blue-600">{result.ats_score}</div>
+                    </div>
+                    <div className="w-px bg-gray-200" />
+                    <div>
+                      <div className="text-[11px] text-gray-400 uppercase tracking-wide font-medium">Recruiter</div>
+                      <div className="text-xl font-bold text-violet-600">{result.recruiter_score}</div>
+                    </div>
                   </div>
-                  {result._usage && (
-                    <div className="text-xs text-gray-400 mt-1">{result._usage.limit - result._usage.used} free check{result._usage.limit - result._usage.used !== 1 ? 's' : ''} remaining</div>
-                  )}
                 </div>
               </div>
 
@@ -1015,7 +1018,7 @@ function ATSCheckInner() {
                   <SectionBar label="Formatting & Structure" score={result.section_scores.formatting} />
                   <SectionBar label="Contact Information" score={result.section_scores.contact} />
                   <SectionBar label="Measurable Achievements" score={result.section_scores.achievements} />
-                  {result.section_scores.relevance_to_job > 0 && (
+                  {jobDescription.trim() && (
                     <SectionBar label="Job Relevance" score={result.section_scores.relevance_to_job} />
                   )}
                 </div>
@@ -1035,31 +1038,14 @@ function ATSCheckInner() {
                 </div>
               )}
 
-              {result.missing_keywords.length > 0 && (
-                <div>
-                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Missing Keywords</div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {result.missing_keywords.map(kw => (
-                      <span key={kw} className="bg-red-50 text-red-600 border border-red-100 text-xs px-2.5 py-1 rounded-full">{kw}</span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               {result.bullet_improvements?.length > 0 && (
                 <div>
                   <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Suggested Rewrites</div>
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {result.bullet_improvements.map((b, i) => (
-                      <div key={i} className="rounded-lg overflow-hidden border border-gray-200 text-sm">
-                        <div className="bg-red-50 px-3 py-2 text-red-700">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-red-400 block mb-0.5">Before</span>
-                          {b.original}
-                        </div>
-                        <div className="bg-green-50 px-3 py-2 text-green-800">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-green-500 block mb-0.5">After</span>
-                          {b.improved}
-                        </div>
+                      <div key={i} className="text-sm space-y-1.5">
+                        <p className="text-gray-400 line-through leading-snug">{b.original}</p>
+                        <p className="text-gray-800 leading-snug flex gap-1.5"><span className="text-green-500 font-bold flex-shrink-0">→</span>{b.improved}</p>
                       </div>
                     ))}
                   </div>
@@ -1080,6 +1066,17 @@ function ATSCheckInner() {
                   })}
                 </ul>
               </div>
+
+              {result.missing_keywords.length > 0 && (
+                <div>
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Missing Keywords</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {result.missing_keywords.map(kw => (
+                      <span key={kw} className="bg-red-50 text-red-600 border border-red-100 text-xs px-2.5 py-1 rounded-full">{kw}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {!isPro && (
                 <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5">
