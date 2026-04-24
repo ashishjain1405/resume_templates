@@ -94,7 +94,7 @@ function ATSAnimation() {
   const rewrites = REWRITES
 
   return (
-    <div className="w-full max-w-sm">
+    <div className="w-full max-w-md">
       <style>{`
         @keyframes cardSlideBack {
           from { transform: translateY(0) scale(1); opacity: 1; }
