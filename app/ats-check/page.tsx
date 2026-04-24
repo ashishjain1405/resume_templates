@@ -9,10 +9,14 @@ import { useProUpgrade } from '@/lib/use-pro-upgrade'
 import { createClient } from '@/lib/supabase'
 
 interface ATSResult {
-  score: number
-  sections: { keywords: number; formatting: number; contact: number; achievements: number }
+  overall_score: number
+  ats_score: number
+  recruiter_score: number
+  section_scores: { keywords: number; formatting: number; contact: number; achievements: number; relevance_to_job: number }
+  top_issues: string[]
   missing_keywords: string[]
-  suggestions: string[]
+  bullet_improvements: { original: string; improved: string }[]
+  suggestions: { priority: 'high' | 'medium' | 'low'; action: string; example?: string }[]
   _usage?: { used: number; limit: number } | null
 }
 
@@ -272,7 +276,7 @@ function ATSCheckInner() {
           .then(txt => {
             try {
               const data = JSON.parse(txt)
-              if (data.score !== undefined) setResult(data)
+              if (data.overall_score !== undefined) setResult(data)
               else if (data.error) setError(data.error)
             } catch { setError('Analysis failed. Please try again.') }
           })
@@ -598,11 +602,11 @@ function ATSCheckInner() {
     try {
       // If we already have a resume ID (e.g. came from "Check ATS" on an existing resume),
       // just update the ats_score on the existing row instead of creating a duplicate.
-      if (selectedResumeId && result?.score != null) {
+      if (selectedResumeId && result?.overall_score != null) {
         await fetch(`/api/resume/${selectedResumeId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ats_score: result.score }),
+          body: JSON.stringify({ ats_score: result.overall_score }),
         })
         setSaveCount(c => c + 1)
         setSavedToDashboard(true)
@@ -636,7 +640,7 @@ function ATSCheckInner() {
       if (!fileToUpload) return
       const form = new FormData()
       form.append('file', fileToUpload)
-      if (result?.score != null) form.append('ats_score', String(result.score))
+      if (result?.overall_score != null) form.append('ats_score', String(result.overall_score))
       await fetch('/api/resume/upload', { method: 'POST', body: form })
       setSaveCount(c => c + 1)
       setSavedToDashboard(true)
@@ -989,12 +993,15 @@ function ATSCheckInner() {
               </div>
 
               <div className="flex items-center gap-6">
-                <ScoreRing score={result.score} instant={resultRestored} />
+                <ScoreRing score={result.overall_score} instant={resultRestored} />
                 <div>
                   <div className="text-lg font-bold text-gray-900">
-                    {result.score >= 75 ? 'Strong resume' : result.score >= 50 ? 'Needs improvement' : 'Significant gaps found'}
+                    {result.overall_score >= 75 ? 'Strong resume' : result.overall_score >= 50 ? 'Needs improvement' : 'Significant gaps found'}
                   </div>
-                  <div className="text-sm text-gray-500 mt-0.5">ATS Compatibility Score</div>
+                  <div className="flex gap-3 mt-1">
+                    <span className="text-xs text-gray-500">ATS <span className="font-semibold text-gray-700">{result.ats_score}</span></span>
+                    <span className="text-xs text-gray-500">Recruiter <span className="font-semibold text-gray-700">{result.recruiter_score}</span></span>
+                  </div>
                   {result._usage && (
                     <div className="text-xs text-gray-400 mt-1">{result._usage.limit - result._usage.used} free check{result._usage.limit - result._usage.used !== 1 ? 's' : ''} remaining</div>
                   )}
@@ -1004,12 +1011,29 @@ function ATSCheckInner() {
               <div>
                 <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Section Breakdown</div>
                 <div className="space-y-3">
-                  <SectionBar label="Keyword Matching" score={result.sections.keywords} />
-                  <SectionBar label="Formatting & Structure" score={result.sections.formatting} />
-                  <SectionBar label="Contact Information" score={result.sections.contact} />
-                  <SectionBar label="Measurable Achievements" score={result.sections.achievements} />
+                  <SectionBar label="Keyword Matching" score={result.section_scores.keywords} />
+                  <SectionBar label="Formatting & Structure" score={result.section_scores.formatting} />
+                  <SectionBar label="Contact Information" score={result.section_scores.contact} />
+                  <SectionBar label="Measurable Achievements" score={result.section_scores.achievements} />
+                  {result.section_scores.relevance_to_job > 0 && (
+                    <SectionBar label="Job Relevance" score={result.section_scores.relevance_to_job} />
+                  )}
                 </div>
               </div>
+
+              {result.top_issues?.length > 0 && (
+                <div>
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Top Issues</div>
+                  <ul className="space-y-2">
+                    {result.top_issues.map((issue, i) => (
+                      <li key={i} className="flex gap-2.5 text-sm text-gray-700">
+                        <span className="w-5 h-5 bg-red-50 text-red-600 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">!</span>
+                        {issue}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {result.missing_keywords.length > 0 && (
                 <div>
@@ -1022,15 +1046,38 @@ function ATSCheckInner() {
                 </div>
               )}
 
+              {result.bullet_improvements?.length > 0 && (
+                <div>
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Suggested Rewrites</div>
+                  <div className="space-y-3">
+                    {result.bullet_improvements.map((b, i) => (
+                      <div key={i} className="rounded-lg overflow-hidden border border-gray-200 text-sm">
+                        <div className="bg-red-50 px-3 py-2 text-red-700">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-red-400 block mb-0.5">Before</span>
+                          {b.original}
+                        </div>
+                        <div className="bg-green-50 px-3 py-2 text-green-800">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-green-500 block mb-0.5">After</span>
+                          {b.improved}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div>
                 <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">How to Improve</div>
                 <ul className="space-y-2">
-                  {result.suggestions.map((s, i) => (
-                    <li key={i} className="flex gap-2.5 text-sm text-gray-700">
-                      <span className="w-5 h-5 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">{i + 1}</span>
-                      {s}
-                    </li>
-                  ))}
+                  {result.suggestions.map((s, i) => {
+                    const badgeClass = s.priority === 'high' ? 'bg-red-50 text-red-600' : s.priority === 'medium' ? 'bg-amber-50 text-amber-600' : 'bg-gray-100 text-gray-500'
+                    return (
+                      <li key={i} className="flex gap-2.5 text-sm text-gray-700">
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide flex-shrink-0 mt-0.5 ${badgeClass}`}>{s.priority}</span>
+                        <span>{s.action}{s.example && <span className="text-gray-400"> — e.g. {s.example}</span>}</span>
+                      </li>
+                    )
+                  })}
                 </ul>
               </div>
 

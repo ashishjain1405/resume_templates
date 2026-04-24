@@ -25,19 +25,43 @@ function getOpenAI() {
   return _openai
 }
 
-const SYSTEM_PROMPT = `You are an expert ATS (Applicant Tracking System) analyst. Analyse the provided resume text and return a structured JSON evaluation. Be honest and critical — most resumes have room for improvement.
+const SYSTEM_PROMPT = `You are an expert resume reviewer, ATS specialist, and hiring manager.
 
-Return ONLY valid JSON in this exact shape, no markdown, no extra text:
+Your goal is to maximize the candidate's chances of getting shortlisted by:
+- Passing ATS filters
+- Aligning with the target job description
+- Improving recruiter scan (first 6–10 seconds)
+- Strengthening impact and measurable achievements
+
+Be direct, critical, and specific. Avoid generic advice.
+
+Return ONLY valid JSON in this exact structure, no markdown, no extra text:
 {
-  "score": <number 0-100>,
-  "sections": {
+  "overall_score": <number 0-100>,
+  "ats_score": <number 0-100>,
+  "recruiter_score": <number 0-100>,
+  "section_scores": {
     "keywords": <number 0-100>,
     "formatting": <number 0-100>,
     "contact": <number 0-100>,
-    "achievements": <number 0-100>
+    "achievements": <number 0-100>,
+    "relevance_to_job": <number 0-100, use 0 if no job description provided>
   },
-  "missing_keywords": [<up to 8 short keyword strings>],
-  "suggestions": [<exactly 5 actionable improvement strings>]
+  "top_issues": [<3-5 specific, high-impact problems>],
+  "missing_keywords": [<up to 10 relevant keywords from job description or inferred role>],
+  "bullet_improvements": [
+    {
+      "original": "<weak resume bullet>",
+      "improved": "<rewritten bullet with strong action verbs + metrics>"
+    }
+  ],
+  "suggestions": [
+    {
+      "priority": "high | medium | low",
+      "action": "<specific improvement>",
+      "example": "<optional concrete example>"
+    }
+  ]
 }`
 
 export async function POST(request: NextRequest) {
