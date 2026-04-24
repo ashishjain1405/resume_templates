@@ -191,9 +191,9 @@ export default function DashboardTabs({
 
           {/* Pro upsell — free users only, single line */}
           {!pro && (
-            <p className="text-sm text-gray-400">
-              <Link href="/pricing" className="text-blue-600 font-medium hover:underline">Upgrade to Pro →</Link>
-            </p>
+            <Link href="/pricing" className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-100 transition-colors self-start">
+              Upgrade to Pro ✦
+            </Link>
           )}
         </div>
       )}
@@ -239,7 +239,7 @@ export default function DashboardTabs({
                   Check my resume score →
                 </Link>
                 <Link href="/pricing" className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 border border-amber-200 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-amber-100 transition-colors">
-                  Upgrade for unlimited checks ✦
+                  Upgrade to Pro for Unlimited checks ✦
                 </Link>
               </div>
             )}
