@@ -1036,7 +1036,6 @@ function ATSCheckInner() {
 
               {!isPro && (
                 <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5">
-                  <div className="text-xs font-bold text-amber-800 mb-1">✦ Unlock Pro — ₹999 one-time</div>
                   <div className="text-xs text-amber-700 mb-3">Unlimited checks · PDF download · Edit in Google Docs · Expert session</div>
                   <ProUpgradeCTAs layout="row" userEmail={userEmail} source="ats" />
                 </div>
