@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     default: "Resume Expert — India's Best Resume Templates",
     template: '%s | Resume Expert',
   },
-  description: 'Download ATS-friendly, recruiter-approved resume templates designed for Indian job seekers. Get hired 2x faster with professional PDF & DOCX formats.',
+  description: 'Download ATS-friendly, recruiter-approved resume templates designed for Indian job seekers. Get hired 2x faster with professional PDF format.',
   keywords: ['resume templates India', 'ATS resume', 'professional resume', 'CV templates India', 'resume download', 'job resume India'],
   authors: [{ name: 'Resume Expert' }],
   creator: 'Resume Expert',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     url: BASE_URL,
     siteName: 'Resume Expert',
     title: "Resume Expert — India's Best Resume Templates",
-    description: 'ATS-friendly resume templates for Indian job seekers. Download in PDF & DOCX. Trusted by 1,000+ professionals.',
+    description: 'ATS-friendly resume templates for Indian job seekers. Download in PDF. Trusted by 1,000+ professionals.',
     images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Resume Expert — Resume Templates' }],
   },
   twitter: {

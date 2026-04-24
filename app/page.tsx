@@ -10,7 +10,7 @@ import { TEMPLATES } from '@/lib/templates'
 
 export const metadata: Metadata = {
   title: "Resume Review & Analysis Tool | Get Hire-Ready Faster",
-  description: 'Browse 35+ professionally designed, ATS-optimised resume templates for Indian job seekers. One-time purchase, lifetime access. Download in PDF & DOCX.',
+  description: 'Browse 35+ professionally designed, ATS-optimised resume templates for Indian job seekers. One-time purchase, lifetime access. Download in PDF.',
   alternates: { canonical: 'https://www.resumenow.in' },
 }
 

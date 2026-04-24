@@ -20,7 +20,7 @@ export async function generateMetadata({
   if (!template) return {}
   return {
     title: `${template.name} Resume Template`,
-    description: `${template.description} ATS-friendly, one-time purchase. Download instantly in PDF & DOCX.`,
+    description: `${template.description} ATS-friendly, one-time purchase. Download instantly as PDF.`,
     alternates: { canonical: `https://www.resumenow.in/template/${id}` },
     openGraph: {
       title: `${template.name} Resume Template | Resume Expert`,

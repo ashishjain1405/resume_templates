@@ -355,7 +355,7 @@ export default function DashboardTabs({
             </div>
             <div>
               <h2 className="text-base font-bold text-gray-900 mb-0.5">Resume Templates</h2>
-              <p className="text-sm text-gray-500">Each template is a one-time purchase — download as PDF or DOCX, use forever. Pro gives you instant access to all 5.</p>
+              <p className="text-sm text-gray-500">Each template is a one-time purchase — download as PDF, use forever. Pro gives you instant access to all 5.</p>
             </div>
           </div>
 
