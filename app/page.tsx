@@ -96,7 +96,7 @@ export default function HomePage() {
               href="/pricing"
               className="inline-block bg-amber-50 text-amber-700 border border-amber-200 px-8 py-3.5 rounded-lg font-semibold hover:bg-amber-100 transition-colors text-sm"
             >
-              Upgrade to Pro ✦
+              Upgrade to Pro — ₹999 ✦
             </Link>
             <p className="text-xs text-gray-400 mt-2">One-time · no subscription · lifetime access</p>
           </div>
