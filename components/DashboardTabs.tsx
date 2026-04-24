@@ -352,7 +352,7 @@ export default function DashboardTabs({
               <p className="text-sm text-gray-500 mb-4">You don&apos;t own any templates yet.</p>
               <div className="flex gap-3 justify-center flex-wrap">
                 <Link href="/templates" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">Browse templates</Link>
-                <Link href="/pricing" className="border border-blue-600 text-blue-600 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-50 transition-colors">Upgrade to Pro</Link>
+                <Link href="/pricing" className="bg-amber-50 text-amber-700 border border-amber-200 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-amber-100 transition-colors">Upgrade to Pro ✦</Link>
               </div>
             </div>
           )}
