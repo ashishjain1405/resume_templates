@@ -26,14 +26,16 @@ const REWRITES = [
   },
 ]
 
+const CARD_STYLE = 'absolute inset-0 w-full bg-white rounded-[20px] p-4 shadow-[0_4px_24px_rgba(0,0,0,0.08)] ring-1 ring-gray-100/70'
+
 function ATSAnimation() {
   const [cycle, setCycle] = useState(0)
   const [started, setStarted] = useState(false)
   const [score, setScore] = useState(0)
   const [done, setDone] = useState(false)
-  const [stage, setStage] = useState(0) // 0=card1, 1=card2, 2=card3
+  const [stage, setStage] = useState(0)
 
-  const r = 40
+  const r = 34
   const circ = 2 * Math.PI * r
 
   function reset() {
@@ -81,10 +83,10 @@ function ATSAnimation() {
       <style>{`
         @keyframes cardSlideBack {
           from { transform: translateY(0) scale(1); opacity: 1; }
-          to   { transform: translateY(18px) scale(0.95); opacity: 0; }
+          to   { transform: translateY(14px) scale(0.96); opacity: 0; }
         }
         @keyframes cardSlideFront {
-          from { transform: translateY(12px) scale(0.97); opacity: 0; }
+          from { transform: translateY(10px) scale(0.97); opacity: 0; }
           to   { transform: translateY(0) scale(1); opacity: 1; }
         }
         @keyframes fadeInUp {
@@ -93,28 +95,30 @@ function ATSAnimation() {
         }
       `}</style>
 
-      <div className="relative" style={{ height: '420px' }}>
+      {/* Responsive height: shorter on mobile, taller on desktop */}
+      <div className="relative h-[300px] lg:h-[340px]">
 
         {/* Card 1 — Scores */}
         <div
-          className="absolute inset-0 w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-5"
-          style={stage === 0 ? { zIndex: 2, animation: done && stage > 0 ? 'cardSlideBack 0.6s cubic-bezier(0.4,0,0.2,1) forwards' : undefined } : { zIndex: 0, opacity: 0, pointerEvents: 'none' }}
+          className={CARD_STYLE}
+          style={stage === 0
+            ? { zIndex: 2, animation: done && stage > 0 ? 'cardSlideBack 0.6s cubic-bezier(0.4,0,0.2,1) forwards' : undefined }
+            : { zIndex: 0, opacity: 0, pointerEvents: 'none' }}
         >
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">ATS Score Report</span>
-            <span className={`text-xs font-medium transition-colors duration-500 ${done ? 'text-green-600' : 'text-gray-400'}`}>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">ATS Score Report</span>
+            <span className={`text-[11px] font-medium transition-colors duration-500 ${done ? 'text-green-600' : 'text-gray-400'}`}>
               {done ? '✓ Done' : 'Analysing…'}
             </span>
           </div>
 
-          <div className="flex items-center gap-5 mb-5">
+          <div className="flex items-center gap-4 mb-3">
             <div className="relative inline-flex items-center justify-center flex-shrink-0">
-              <svg width="100" height="100" className="-rotate-90">
-                <circle cx="50" cy="50" r={r} fill="none" stroke="#f3f4f6" strokeWidth="8" />
-                <circle
-                  cx="50" cy="50" r={r} fill="none"
+              <svg width="84" height="84" className="-rotate-90">
+                <circle cx="42" cy="42" r={r} fill="none" stroke="#f3f4f6" strokeWidth="7" />
+                <circle cx="42" cy="42" r={r} fill="none"
                   stroke={started ? ringColor : '#f3f4f6'}
-                  strokeWidth="8"
+                  strokeWidth="7"
                   strokeDasharray={circ}
                   strokeDashoffset={fill}
                   strokeLinecap="round"
@@ -122,37 +126,38 @@ function ATSAnimation() {
                 />
               </svg>
               <div className="absolute text-center">
-                <div className="text-2xl font-bold text-gray-900 leading-none">{score}</div>
+                <div className="text-xl font-bold text-gray-900 leading-none">{score}</div>
               </div>
             </div>
             <div>
-              <div className="text-sm font-bold text-gray-900 mb-1">
+              <div className="text-sm font-bold text-gray-900 mb-1.5">
                 {score >= 75 ? 'Strong resume' : score >= 50 ? 'Needs improvement' : 'Significant gaps'}
               </div>
-              <div className="flex gap-3 mt-2">
+              <div className="flex gap-3">
                 <div>
                   <div className="text-[10px] text-gray-400 uppercase tracking-wide font-medium">ATS</div>
-                  <div className="text-base font-bold text-blue-600">{started ? ATS_SCORE : 0}</div>
+                  <div className="text-sm font-bold text-blue-600">{started ? ATS_SCORE : 0}</div>
                 </div>
                 <div className="w-px bg-gray-200" />
                 <div>
                   <div className="text-[10px] text-gray-400 uppercase tracking-wide font-medium">Recruiter</div>
-                  <div className="text-base font-bold text-violet-600">{started ? RECRUITER_SCORE : 0}</div>
+                  <div className="text-sm font-bold text-violet-600">{started ? RECRUITER_SCORE : 0}</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="space-y-2.5">
-            <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Section Breakdown</div>
+          <div className="space-y-2">
+            <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Section Breakdown</div>
             {BARS.slice(0, 3).map(bar => (
               <div key={bar.label}>
-                <div className="flex justify-between text-xs mb-1">
+                <div className="flex justify-between text-[11px] mb-0.5">
                   <span className="text-gray-600 font-medium">{bar.label}</span>
                   <span className="text-gray-400">{bar.value}</span>
                 </div>
                 <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div className={`h-full ${bar.color} rounded-full`} style={{ width: started ? `${bar.value}%` : '0%', transition: 'width 0.6s ease', transitionDelay: started ? bar.delay : '0s' }} />
+                  <div className={`h-full ${bar.color} rounded-full`}
+                    style={{ width: started ? `${bar.value}%` : '0%', transition: 'width 0.6s ease', transitionDelay: started ? bar.delay : '0s' }} />
                 </div>
               </div>
             ))}
@@ -161,29 +166,27 @@ function ATSAnimation() {
 
         {/* Card 2 — Section Breakdown */}
         <div
-          className="absolute inset-0 w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-5"
-          style={stage === 1 ? { zIndex: 2, animation: 'cardSlideFront 0.6s cubic-bezier(0.4,0,0.2,1) forwards' } : stage > 1 ? { zIndex: 0, animation: 'cardSlideBack 0.6s cubic-bezier(0.4,0,0.2,1) forwards', opacity: 0, pointerEvents: 'none' } : { zIndex: 0, opacity: 0, pointerEvents: 'none' }}
+          className={CARD_STYLE}
+          style={stage === 1
+            ? { zIndex: 2, animation: 'cardSlideFront 0.6s cubic-bezier(0.4,0,0.2,1) forwards' }
+            : stage > 1
+              ? { zIndex: 0, animation: 'cardSlideBack 0.6s cubic-bezier(0.4,0,0.2,1) forwards', opacity: 0, pointerEvents: 'none' }
+              : { zIndex: 0, opacity: 0, pointerEvents: 'none' }}
         >
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-semibold text-green-700 bg-green-50 px-2.5 py-1 rounded-full">Section Breakdown</span>
-            <span className="text-xs font-medium text-green-600">✓ Done</span>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] font-semibold text-green-700 bg-green-50 px-2.5 py-1 rounded-full">Section Breakdown</span>
+            <span className="text-[11px] font-medium text-green-600">✓ Done</span>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {BARS.map((bar, i) => (
               <div key={bar.label}>
-                <div className="flex justify-between text-xs mb-1">
+                <div className="flex justify-between text-[11px] mb-0.5">
                   <span className="text-gray-600 font-medium">{bar.label}</span>
                   <span className="text-gray-400">{bar.value}</span>
                 </div>
                 <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full ${bar.color} rounded-full`}
-                    style={{
-                      width: stage >= 1 ? `${bar.value}%` : '0%',
-                      transition: 'width 0.6s ease',
-                      transitionDelay: stage >= 1 ? `${i * 0.15}s` : '0s',
-                    }}
-                  />
+                  <div className={`h-full ${bar.color} rounded-full`}
+                    style={{ width: stage >= 1 ? `${bar.value}%` : '0%', transition: 'width 0.6s ease', transitionDelay: stage >= 1 ? `${i * 0.13}s` : '0s' }} />
                 </div>
               </div>
             ))}
@@ -192,22 +195,23 @@ function ATSAnimation() {
 
         {/* Card 3 — Suggested Rewrites */}
         <div
-          className="absolute inset-0 w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-5"
-          style={stage === 2 ? { zIndex: 2, animation: 'cardSlideFront 0.6s cubic-bezier(0.4,0,0.2,1) forwards' } : { zIndex: 0, opacity: 0, pointerEvents: 'none' }}
+          className={CARD_STYLE}
+          style={stage === 2
+            ? { zIndex: 2, animation: 'cardSlideFront 0.6s cubic-bezier(0.4,0,0.2,1) forwards' }
+            : { zIndex: 0, opacity: 0, pointerEvents: 'none' }}
         >
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-semibold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full">Suggested Rewrites</span>
-            <span className="text-xs font-medium text-green-600">✓ Done</span>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-full">Suggested Rewrites</span>
+            <span className="text-[11px] font-medium text-green-600">✓ Done</span>
           </div>
-          <div className="space-y-5">
-            {REWRITES.map((r, i) => (
-              <div
-                key={i}
-                className="text-xs space-y-1.5"
-                style={{ opacity: 0, animation: stage === 2 ? 'fadeInUp 0.3s ease forwards' : undefined, animationDelay: `${0.3 + i * 0.2}s` }}
-              >
-                <p className="text-gray-400 line-through leading-snug">{r.original}</p>
-                <p className="text-gray-800 leading-snug flex gap-1.5"><span className="text-green-500 font-bold flex-shrink-0">→</span>{r.improved}</p>
+          <div className="space-y-4">
+            {REWRITES.map((rw, i) => (
+              <div key={i} className="text-xs space-y-1.5"
+                style={{ opacity: 0, animation: stage === 2 ? 'fadeInUp 0.3s ease forwards' : undefined, animationDelay: `${0.3 + i * 0.2}s` }}>
+                <p className="text-gray-400 line-through leading-snug">{rw.original}</p>
+                <p className="text-gray-800 leading-snug flex gap-1.5">
+                  <span className="text-green-500 font-bold flex-shrink-0">→</span>{rw.improved}
+                </p>
               </div>
             ))}
           </div>
@@ -220,45 +224,36 @@ function ATSAnimation() {
 
 export default function HeroSection() {
   return (
-    <>
-      <section className="bg-white py-14 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col lg:flex-row items-center gap-12">
+    <section className="bg-white py-10 px-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex flex-col lg:flex-row items-center gap-10">
 
-            {/* Left — copy */}
-            <div className="flex-1 max-w-lg">
-              <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-4 tracking-tight">
-                <span className="whitespace-nowrap">Get hired faster with an</span><br />
-                <span className="text-blue-600">ATS-ready resume</span>
-              </h1>
-              <p className="text-gray-500 text-base mb-6 leading-relaxed">
-                Check your resume score for free. See exactly what&apos;s missing. Fix the gaps and land more interviews.
-              </p>
-
-              <div className="flex flex-col gap-3 mb-6">
-                <Link
-                  href="/ats-check"
-                  className="w-full text-center bg-blue-600 text-white py-3.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm"
-                >
-                  Check Resume Score
-                </Link>
-                <Link
-                  href="/templates"
-                  className="w-full text-center border border-gray-300 text-gray-700 py-3.5 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
-                >
-                  Browse templates
-                </Link>
-              </div>
+          {/* Left — copy */}
+          <div className="flex-1 max-w-lg">
+            <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-4 tracking-tight">
+              <span className="whitespace-nowrap">Get hired faster with an</span><br />
+              <span className="text-blue-600">ATS-ready resume</span>
+            </h1>
+            <p className="text-gray-500 text-base mb-5 leading-relaxed">
+              Check your resume score for free. See exactly what&apos;s missing. Fix the gaps and land more interviews.
+            </p>
+            <div className="flex flex-col gap-3">
+              <Link href="/ats-check" className="w-full text-center bg-blue-600 text-white py-3.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm">
+                Check Resume Score
+              </Link>
+              <Link href="/templates" className="w-full text-center border border-gray-300 text-gray-700 py-3.5 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm">
+                Browse templates
+              </Link>
             </div>
-
-            {/* Right — animated ATS card deck */}
-            <div className="flex-1 flex justify-center lg:justify-end w-full">
-              <ATSAnimation />
-            </div>
-
           </div>
+
+          {/* Right — animated card deck, hidden on mobile to keep section tight */}
+          <div className="hidden lg:flex flex-1 justify-end w-full">
+            <ATSAnimation />
+          </div>
+
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   )
 }
