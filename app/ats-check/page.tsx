@@ -189,9 +189,11 @@ function ATSCheckInner() {
     })
   }, [])
 
-  // Auto-trigger Google Docs edit when returning from payment with ?openDocs=1
+  // Auto-trigger Google Docs edit when returning from payment with ?openDocs=1 or sessionStorage flag
   useEffect(() => {
-    if (!searchParams.get('openDocs') || !isPro) return
+    const pendingAts = sessionStorage.getItem('docs_pending_ats')
+    if ((!searchParams.get('openDocs') && !pendingAts) || !isPro) return
+    sessionStorage.removeItem('docs_pending_ats')
     const resumeId = sessionStorage.getItem('docs_pending_resume_id')
     if (!resumeId) return
     sessionStorage.removeItem('docs_pending_resume_id')
@@ -666,10 +668,12 @@ function ATSCheckInner() {
           const uploadData = await uploadRes.json()
           if (uploadData.resume?.id) {
             sessionStorage.setItem('docs_pending_resume_id', uploadData.resume.id)
+            sessionStorage.setItem('docs_pending_ats', '1')
             setResumeId(uploadData.resume.id)
           }
         } else if (selectedResumeId) {
           sessionStorage.setItem('docs_pending_resume_id', selectedResumeId)
+          sessionStorage.setItem('docs_pending_ats', '1')
         }
         setShowProDocsModal(true)
         return
