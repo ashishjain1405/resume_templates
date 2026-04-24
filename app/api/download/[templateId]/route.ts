@@ -36,9 +36,9 @@ export async function GET(
     return Response.json({ error: 'Template not found' }, { status: 404 })
   }
 
-  const format = request.nextUrl.searchParams.get('format') ?? 'pdf'
-  const storagePath =
-    format === 'docx' ? template.storage_path_docx : template.storage_path_pdf
+  const color = request.nextUrl.searchParams.get('color')
+  const colorKey = color ? color.replace('#', '') : template.colors[0].replace('#', '')
+  const storagePath = `templates/${templateId}-${colorKey}.pdf`
 
   const { data, error } = await adminClient.storage
     .from('templates')

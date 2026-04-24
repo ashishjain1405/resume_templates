@@ -8,6 +8,7 @@ import { formatPrice, type Template } from '@/lib/templates'
 interface Props {
   template: Template
   purchased: boolean
+  selectedColor?: string
 }
 
 declare global {
@@ -39,7 +40,7 @@ interface RazorpayResponse {
   razorpay_signature: string
 }
 
-export default function BuyButton({ template, purchased }: Props) {
+export default function BuyButton({ template, purchased, selectedColor }: Props) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
@@ -110,21 +111,15 @@ export default function BuyButton({ template, purchased }: Props) {
   }
 
   if (purchased) {
+    const color = selectedColor ?? template.colors[0]
+    const downloadHref = `/api/download/${template.id}?color=${encodeURIComponent(color)}`
     return (
-      <div className="flex gap-3">
-        <a
-          href={`/api/download/${template.id}?format=pdf`}
-          className="flex-1 text-center bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
-        >
-          Download PDF
-        </a>
-        <a
-          href={`/api/download/${template.id}?format=docx`}
-          className="flex-1 text-center border border-green-600 text-green-700 py-3 rounded-lg font-semibold hover:bg-green-50 transition-colors"
-        >
-          Download DOCX
-        </a>
-      </div>
+      <a
+        href={downloadHref}
+        className="w-full block text-center bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+      >
+        Download PDF
+      </a>
     )
   }
 

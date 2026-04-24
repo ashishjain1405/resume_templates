@@ -82,7 +82,7 @@ export default function TemplateCard({ template, purchased }: Props) {
           </Link>
           {isOwned ? (
             <a
-              href={`/api/download/${template.id}?format=pdf`}
+              href={`/api/download/${template.id}?color=${encodeURIComponent(activeColor)}`}
               className="flex-1 text-center text-xs bg-green-600 text-white py-1.5 rounded-lg hover:bg-green-700 transition-colors font-medium"
             >
               Download
