@@ -14,7 +14,18 @@ export const metadata: Metadata = {
 export default async function TemplatesPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  const pro = user ? await isPro(user.id, supabase) : false
+
+  let pro = false
+  let purchasedIds = new Set<string>()
+
+  if (user) {
+    const [proResult, { data: purchases }] = await Promise.all([
+      isPro(user.id, supabase),
+      supabase.from('purchases').select('template_id').eq('user_id', user.id),
+    ])
+    pro = proResult
+    purchasedIds = new Set((purchases ?? []).map((p) => p.template_id))
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
@@ -30,7 +41,7 @@ export default async function TemplatesPage() {
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
         {TEMPLATES.map((template) => (
-          <TemplateCard key={template.id} template={template} purchased={pro} />
+          <TemplateCard key={template.id} template={template} purchased={pro || purchasedIds.has(template.id)} />
         ))}
       </div>
     </div>
