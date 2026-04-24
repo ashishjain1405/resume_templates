@@ -384,8 +384,8 @@ export default function DashboardTabs({
             ) : (
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
                 <p className="text-sm text-amber-800 font-medium mb-3">Expert sessions are included with Pro.</p>
-                <Link href="/pricing" className="inline-flex items-center gap-1.5 bg-amber-400 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-500 transition-colors">
-                  Upgrade to Pro
+                <Link href="/pricing" className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-100 transition-colors">
+                  Upgrade to Pro ✦
                 </Link>
               </div>
             )}

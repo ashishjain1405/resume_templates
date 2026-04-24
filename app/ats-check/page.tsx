@@ -890,7 +890,7 @@ function ATSCheckInner() {
                 <button
                   onClick={handleEditInDocs}
                   disabled={editLoading}
-                  className="flex-1 flex items-center justify-center gap-2 bg-blue-600 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-semibold text-sm transition-colors disabled:opacity-50 ${isPro ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'}`}
                 >
                   {editLoading ? (
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
