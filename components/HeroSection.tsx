@@ -106,7 +106,7 @@ function ATSAnimation() {
             : { zIndex: 0, opacity: 0, pointerEvents: 'none' }}
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">ATS Score Report</span>
+            <span className="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">Resume Score Report</span>
             <span className={`text-[11px] font-medium transition-colors duration-500 ${done ? 'text-green-600' : 'text-gray-400'}`}>
               {done ? '✓ Done' : 'Analysing…'}
             </span>
@@ -231,8 +231,8 @@ export default function HeroSection() {
           {/* Left — copy */}
           <div className="flex-1 max-w-lg">
             <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-4 tracking-tight">
-              <span className="whitespace-nowrap">Get hired faster with an</span><br />
-              <span className="text-blue-600">ATS-ready resume</span>
+              <span className="whitespace-nowrap">Not just ATS-ready.</span><br />
+              <span className="text-blue-600">Hire-ready.</span>
             </h1>
             <p className="text-gray-500 text-base mb-5 leading-relaxed">
               Check your resume score for free. See exactly what&apos;s missing. Fix the gaps and land more interviews.

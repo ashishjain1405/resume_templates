@@ -54,7 +54,7 @@ export default function ATSPreview() {
     <section className="py-16 px-4 bg-white">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10">
-          <h2 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">What your ATS report looks like</h2>
+          <h2 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">What your Resume report looks like</h2>
           <p className="text-gray-500 text-sm">Instant score. Clear gaps. Actionable fixes.</p>
         </div>
 

@@ -77,7 +77,7 @@ function ModalProRequired({ onClose, userEmail }: { onClose: () => void; userEma
           </svg>
         </div>
         <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Free limit reached</h3>
-        <p className="text-sm text-gray-500 text-center mb-5">You've used all 5 free checks. Upgrade once for unlimited ATS checks — ₹999, lifetime.</p>
+        <p className="text-sm text-gray-500 text-center mb-5">You've used all 5 free checks. Upgrade once for unlimited Resume checks — ₹999, lifetime.</p>
         <div className="flex flex-col gap-2">
           <button
             onClick={() => { onClose(); startUpgrade(userEmail, 'ats') }}
@@ -104,7 +104,7 @@ function Modal({ type, onClose, userEmail }: { type: 'login_required'; onClose: 
           </svg>
         </div>
         <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Save your results</h3>
-        <p className="text-sm text-gray-500 text-center mb-5">Sign in to keep your ATS score and access it anytime from your dashboard.</p>
+        <p className="text-sm text-gray-500 text-center mb-5">Sign in to keep your Resume score and access it anytime from your dashboard.</p>
         <Link href="/auth/signup?redirect=/ats-check" className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
           Sign in or create account
         </Link>
@@ -722,7 +722,7 @@ function ATSCheckInner() {
               </svg>
             </div>
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Edit in Google Docs is a Pro feature</h3>
-            <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for lifetime access — edit in Google Docs, unlimited ATS checks, PDF downloads, and an expert session. ₹999, one-time.</p>
+            <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for lifetime access — edit in Google Docs, unlimited Resume checks, PDF downloads, and an expert session. ₹999, one-time.</p>
             <ProUpgradeCTAs layout="stack" userEmail={userEmail} source="docs" returnPath="/ats-check" />
           </div>
         </div>
@@ -752,7 +752,7 @@ function ATSCheckInner() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Save your ATS results?</h3>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Save your Resume score results?</h3>
             <p className="text-sm text-gray-500 text-center mb-5">Your score and suggestions will be gone once you leave this page.</p>
             <div className="flex flex-col gap-2">
               <button
@@ -780,8 +780,8 @@ function ATSCheckInner() {
 
       <div className="mb-10 flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">ATS Resume Checker</h1>
-          <p className="text-gray-500 max-w-xl">Upload your resume and optionally paste a job description. Get an instant ATS score with actionable improvements.</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Resume Score Checker</h1>
+          <p className="text-gray-500 max-w-xl">Upload your resume and optionally paste a job description. Get an instant Resume score with actionable improvements.</p>
         </div>
         {limitReached && (
           <div className="flex items-center gap-2">
@@ -906,7 +906,7 @@ function ATSCheckInner() {
           {limitReached ? (
             <div className="w-full bg-amber-50 border border-amber-200 rounded-xl px-4 py-4 text-center">
               <p className="text-sm font-semibold text-amber-800 mb-1">You've used all 5 free checks</p>
-              <p className="text-xs text-amber-600 mb-3">Upgrade to Pro for unlimited ATS checks — ₹999, one-time.</p>
+              <p className="text-xs text-amber-600 mb-3">Upgrade to Pro for unlimited Resume checks — ₹999, one-time.</p>
               <div className="flex justify-center">
                 <ProUpgradeCTAs layout="row" userEmail={userEmail} source="ats" />
               </div>

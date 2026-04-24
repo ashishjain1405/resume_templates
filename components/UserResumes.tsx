@@ -141,7 +141,7 @@ export default function UserResumes({ isPro = false }: { isPro?: boolean }) {
                   <span>{formatSize(r.size_bytes)} · {formatDate(r.created_at)}</span>
                   {r.ats_score != null && (
                     <span className={`font-semibold ${r.ats_score >= 75 ? 'text-green-600' : r.ats_score >= 50 ? 'text-amber-600' : 'text-red-500'}`}>
-                      ATS {r.ats_score}/100
+                      Resume {r.ats_score}/100
                     </span>
                   )}
                 </div>
@@ -151,7 +151,7 @@ export default function UserResumes({ isPro = false }: { isPro?: boolean }) {
                   href={`/ats-check?resumeId=${r.id}`}
                   className="text-xs bg-blue-50 text-blue-600 border border-blue-100 px-2.5 py-1 rounded-lg font-medium hover:bg-blue-100 transition-colors"
                 >
-                  Check ATS
+                  Check Resume score
                 </Link>
                 {isPro ? (
                   <button

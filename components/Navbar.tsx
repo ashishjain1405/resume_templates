@@ -100,7 +100,7 @@ export default function Navbar() {
           {user ? (
             <>
               <Link href="/ats-check" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
-                Check ATS Score
+                Check Resume Score
               </Link>
               <button onClick={() => { const href = getBuilderHref(); const guard = (window as any).__atsNavGuard; if (guard) { guard(href); return } router.push(href) }} className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
                 Create my Resume
@@ -154,7 +154,7 @@ export default function Navbar() {
           ) : (
             <>
               <Link href="/ats-check" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
-                Check ATS Score
+                Check Resume Score
               </Link>
               <button onClick={() => { const href = getBuilderHref(); const guard = (window as any).__atsNavGuard; if (guard) { guard(href); return } router.push(href) }} className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
                 Create my Resume
@@ -168,7 +168,7 @@ export default function Navbar() {
         {/* Mobile: inline action buttons + hamburger */}
         <div className="md:hidden flex items-center gap-1.5">
           <Link href="/ats-check" className="text-xs text-gray-700 border border-gray-200 px-2.5 py-1.5 rounded-lg font-medium whitespace-nowrap">
-            ATS Check
+            Resume Check
           </Link>
           <button onClick={() => { const href = getBuilderHref(); const guard = (window as any).__atsNavGuard; if (guard) { guard(href); return } router.push(href) }} className="text-xs text-gray-700 border border-gray-200 px-2.5 py-1.5 rounded-lg font-medium whitespace-nowrap">
             Resume Creator

@@ -64,7 +64,7 @@ function CheckATSButton({ user, data, accentColor, templateId }: {
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       )}
-      {saving ? 'Preparing…' : 'Check ATS'}
+      {saving ? 'Preparing…' : 'Check Resume score'}
     </button>
   )
 }
@@ -760,7 +760,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
               </svg>
             </div>
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Edit in Google Docs is a Pro feature</h3>
-            <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for lifetime access — edit in Google Docs, unlimited ATS checks, PDF downloads, and an expert session. ₹999, one-time.</p>
+            <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for lifetime access — edit in Google Docs, unlimited Resume checks, PDF downloads, and an expert session. ₹999, one-time.</p>
             <ProUpgradeCTAs layout="stack" source="docs" returnPath={`/builder/${templateId}`} />
           </div>
         </div>
@@ -776,7 +776,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
               </svg>
             </div>
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">PDF download is a Pro feature</h3>
-            <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for lifetime access — unlimited downloads, unlimited ATS checks, and an expert session. ₹999, one-time.</p>
+            <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for lifetime access — unlimited downloads, unlimited Resume checks, and an expert session. ₹999, one-time.</p>
             <ProUpgradeCTAs layout="stack" source="download" returnPath={`/builder/${templateId}`} />
           </div>
         </div>

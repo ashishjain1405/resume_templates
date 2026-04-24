@@ -6,7 +6,7 @@ const STEPS: { n: string; title: string; desc: string; pro?: boolean }[] = [
   },
   {
     n: '2',
-    title: 'Check your ATS score',
+    title: 'Check your Resume score',
     desc: 'Get an instant score with specific gaps and improvements highlighted.',
   },
   {

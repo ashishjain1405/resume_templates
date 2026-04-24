@@ -9,7 +9,7 @@ import ATSPreview from '@/components/ATSPreview'
 import { TEMPLATES } from '@/lib/templates'
 
 export const metadata: Metadata = {
-  title: "India's Best Resume Templates — ATS-Friendly | Resume Expert",
+  title: "Resume Review & Analysis Tool | Get Hire-Ready Faster",
   description: 'Browse 35+ professionally designed, ATS-optimised resume templates for Indian job seekers. One-time purchase, lifetime access. Download in PDF & DOCX.',
   alternates: { canonical: 'https://www.resumenow.in' },
 }
@@ -73,7 +73,7 @@ export default function HomePage() {
               </div>
               <div>
                 <div className="text-2xl font-black text-blue-600 mb-1">Unlimited</div>
-                <div className="text-base font-semibold text-gray-700 mb-1.5">ATS Checks</div>
+                <div className="text-base font-semibold text-gray-700 mb-1.5">Unlimited Resume Checks</div>
                 <p className="text-sm text-gray-400 leading-relaxed">Keep improving until your score is interview-ready. Check as many times as you need.</p>
               </div>
             </div>

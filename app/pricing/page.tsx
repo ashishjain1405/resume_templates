@@ -5,7 +5,7 @@ import PricingClient from './PricingClient'
 
 export const metadata: Metadata = {
   title: 'Pro Access',
-  description: 'Get unlimited ATS checks, all resume templates, and the resume builder — one-time payment, no subscription.',
+  description: 'Get unlimited Resume checks, all resume templates, and the resume builder — one-time payment, no subscription.',
 }
 
 export default async function PricingPage() {

@@ -15,8 +15,8 @@ const COMPARISON = [
   { feature: 'Resume Builder (use)', free: true, pro: true },
   { feature: 'Browse all templates', free: true, pro: true },
   { feature: 'Save & sync resumes', free: true, pro: true },
-  { feature: 'ATS Checker (1 free check)', free: true, pro: true },
-  { feature: 'Unlimited ATS Checks', free: false, pro: true },
+  { feature: 'Resume Checker (1 free check)', free: true, pro: true },
+  { feature: 'Unlimited Resume Checks', free: false, pro: true },
   { feature: 'Resume Builder download', free: false, pro: true },
   { feature: '1:1 Expert Session', free: false, pro: true },
   { feature: 'Priority support', free: false, pro: true },
@@ -118,7 +118,7 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
               </Link>
             ) : (
               <Link href="/ats-check" className="text-sm text-gray-500 hover:text-gray-700 font-medium">
-                Try ATS Checker →
+                Try Resume Checker →
               </Link>
             )}
           </div>
@@ -134,9 +134,9 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div>
               <div className="inline-block bg-green-50 text-green-700 text-xs font-semibold px-3 py-1 rounded-full mb-4">Unlimited checks</div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-3 tracking-tight">ATS Checker</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-3 tracking-tight">Resume Score Checker</h2>
               <p className="text-gray-500 text-sm leading-relaxed mb-4">
-                Most resumes fail ATS screening before a human ever reads them. Our checker scores your resume across keyword matching, formatting, contact information, and measurable achievements — and tells you exactly how to fix each gap.
+                Most resumes don&apos;t fail just because of ATS — they fail because they don&apos;t convince recruiters either. Our analyzer evaluates your resume across both ATS requirements and real hiring criteria: keyword relevance, clarity, formatting, impact, and measurable achievements — then shows you exactly what&apos;s holding you back and how to fix it.
               </p>
               <ul className="space-y-2">
                 {['Instant score out of 100', 'Section-by-section breakdown', 'Missing keyword detection', '5 actionable improvement suggestions', 'Paste text or upload PDF'].map(f => (
@@ -163,7 +163,7 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
                 </div>
                 <div>
                   <div className="text-sm font-bold text-gray-900">Strong resume</div>
-                  <div className="text-xs text-gray-400 mt-0.5">ATS Compatibility Score</div>
+                  <div className="text-xs text-gray-400 mt-0.5">Resume Score</div>
                 </div>
               </div>
               {[['Keyword Matching', 78, 'bg-amber-500'], ['Formatting & Structure', 92, 'bg-green-500'], ['Measurable Achievements', 70, 'bg-amber-500']].map(([label, score, color]) => (
@@ -222,7 +222,7 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
               <div className="inline-block bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full mb-4">Pro download</div>
               <h2 className="text-2xl font-bold text-gray-900 mb-3 tracking-tight">Resume Builder</h2>
               <p className="text-gray-500 text-sm leading-relaxed mb-4">
-                Fill in your details and watch your resume update live. Choose from 5 professionally designed, ATS-optimised templates. When you&apos;re happy — download as PDF instantly.
+                Fill in your details and watch your resume update live. Choose from 5 professionally designed, recruiter-optimised templates. When you&apos;re happy — download as PDF instantly.
               </p>
               <ul className="space-y-2">
                 {['5 professional templates', 'Live preview as you type', 'Accent colour customisation', 'PDF download (Pro)', 'Auto-saves to your account'].map(f => (
@@ -313,7 +313,7 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
             {[
               { stat: '75%', label: 'of resumes are rejected by ATS before a human sees them' },
-              { stat: '2×', label: 'more interview callbacks for resumes with ATS scores above 75' },
+              { stat: '2×', label: 'more interview callbacks for resumes with resume scores above 75' },
               { stat: '30 min', label: 'expert session — enough to transform your entire job search' },
             ].map(({ stat, label }) => (
               <div key={stat} className="bg-blue-50 rounded-2xl p-6">
@@ -336,7 +336,7 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
             </div>
             <div className="text-sm text-gray-400 mb-6">One-time · lifetime access</div>
             <ul className="space-y-2.5 mb-7">
-              {['Unlimited ATS Checks', 'Resume Builder + PDF download', '1:1 Expert Review Session', 'All 5 templates', 'Priority support'].map(f => (
+              {['Unlimited Resume Checks', 'Resume Builder + PDF download', '1:1 Expert Review Session', 'All 5 templates', 'Priority support'].map(f => (
                 <li key={f} className="flex items-center gap-2.5 text-sm text-gray-700">
                   <Check />{f}
                 </li>
