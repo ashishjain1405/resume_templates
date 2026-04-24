@@ -106,11 +106,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [savedVersion, setSavedVersion] = useState(false)
   const [saveCount, setSaveCount] = useState(0)
   const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit')
-  const [isPro, setIsPro] = useState(() =>
-    typeof window !== 'undefined'
-      ? !!(localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked'))
-      : false
-  )
+  const [isPro, setIsPro] = useState(false)
   const [showProDownloadModal, setShowProDownloadModal] = useState(false)
   const [showProDocsModal, setShowProDocsModal] = useState(false)
   const [showChangeTemplateModal, setShowChangeTemplateModal] = useState(false)

@@ -78,7 +78,7 @@ export function useProUpgrade() {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const atsHandler = (window as any).__atsBeforeUnload
             if (atsHandler) { window.removeEventListener('beforeunload', atsHandler); delete (window as any).__atsBeforeUnload }
-            window.location.reload()
+            window.location.href = window.location.href
           } else {
             const d = await verifyRes.json()
             alert(`Payment verification failed: ${d.error ?? 'Unknown error'}`)
