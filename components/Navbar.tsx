@@ -168,10 +168,10 @@ export default function Navbar() {
         {/* Mobile: inline action buttons + hamburger */}
         <div className="md:hidden flex items-center gap-1.5">
           <Link href="/ats-check" className="text-xs text-gray-700 border border-gray-200 px-2.5 py-1.5 rounded-lg font-medium whitespace-nowrap">
-            Check
+            ATS Check
           </Link>
           <button onClick={() => { const href = getBuilderHref(); const guard = (window as any).__atsNavGuard; if (guard) { guard(href); return } router.push(href) }} className="text-xs text-gray-700 border border-gray-200 px-2.5 py-1.5 rounded-lg font-medium whitespace-nowrap">
-            Build
+            Resume Creator
           </button>
           <button className="p-2 text-gray-500" onClick={() => setMobileOpen(o => !o)} aria-label="Toggle menu">
             {mobileOpen ? (
