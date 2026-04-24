@@ -6,13 +6,18 @@ import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 
 function SignupForm() {
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState(() => {
+    if (typeof window === 'undefined') return ''
+    return new URLSearchParams(window.location.search).get('email') ?? ''
+  })
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
+  const [errorLink, setErrorLink] = useState<{ text: string; href: string } | null>(null)
   const searchParams = useSearchParams()
+  const infoMsg = searchParams.get('info')
   const supabase = createClient()
 
   function getRedirect() {
@@ -23,6 +28,7 @@ function SignupForm() {
     e.preventDefault()
     setLoading(true)
     setError('')
+    setErrorLink(null)
     setMessage('')
     const redirect = getRedirect()
 
@@ -38,7 +44,7 @@ function SignupForm() {
     // Store redirect in localStorage so confirm page can retrieve it even if URL params are lost
     localStorage.setItem('auth_redirect', redirect)
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -46,7 +52,21 @@ function SignupForm() {
       },
     })
 
-    if (error) {
+    // Supabase returns success with empty identities when the email already exists
+    const alreadyExists = error?.message?.toLowerCase().includes('already') ||
+      (!error && data.user && data.user.identities?.length === 0)
+
+    if (alreadyExists) {
+      // Auto sign-in with the credentials they just entered
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+      if (!signInError) {
+        window.location.href = redirect + (redirect.includes('?') ? '&' : '?') + 'welcome=1'
+        return
+      }
+      // Wrong password
+      setError('You already have an account. Check your password or ')
+      setErrorLink({ text: 'reset it →', href: `/auth/forgot-password?email=${encodeURIComponent(email)}` })
+    } else if (error) {
       setError(error.message)
     } else {
       setMessage('Check your inbox — we\'ve sent you a link to continue.')
@@ -73,6 +93,11 @@ function SignupForm() {
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Create your account</h1>
           <p className="text-gray-500 text-sm mb-6">Stand out to recruiters with a polished resume</p>
 
+          {infoMsg && (
+            <div className="bg-blue-50 border border-blue-200 text-blue-700 rounded-lg px-4 py-3 text-sm mb-4">
+              {infoMsg}
+            </div>
+          )}
           {message && (
             <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg px-4 py-3 text-sm mb-4">
               {message}
@@ -80,7 +105,7 @@ function SignupForm() {
           )}
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm mb-4">
-              {error}
+              {error}{errorLink && <Link href={errorLink.href} className="underline font-medium">{errorLink.text}</Link>}
             </div>
           )}
 

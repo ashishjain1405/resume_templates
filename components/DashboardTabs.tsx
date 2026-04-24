@@ -52,10 +52,23 @@ export default function DashboardTabs({
 }: Props) {
   const [active, setActive] = useState('overview')
   const [clientPro, setClientPro] = useState(false)
+  const [flashMsg, setFlashMsg] = useState<{ text: string; type: 'green' | 'blue' } | null>(null)
 
   useEffect(() => {
     const flag = localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked')
     if (flag) setClientPro(true)
+
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('welcome') === '1') {
+      setFlashMsg({ text: 'Welcome back! You already have an account — we\'ve signed you in.', type: 'green' })
+    } else if (params.get('info') === 'password_updated') {
+      setFlashMsg({ text: 'Password updated successfully.', type: 'green' })
+    }
+    // Clean URL without reload
+    if (params.has('welcome') || params.has('info')) {
+      const clean = window.location.pathname
+      window.history.replaceState({}, '', clean)
+    }
   }, [])
 
   const isPro = pro || clientPro
@@ -67,6 +80,12 @@ export default function DashboardTabs({
 
   return (
     <div>
+      {flashMsg && (
+        <div className={`rounded-xl px-4 py-3 text-sm mb-6 flex items-center justify-between ${flashMsg.type === 'green' ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-blue-50 border border-blue-200 text-blue-700'}`}>
+          {flashMsg.text}
+          <button onClick={() => setFlashMsg(null)} className="ml-4 opacity-60 hover:opacity-100 text-lg leading-none">×</button>
+        </div>
+      )}
       {/* Tab bar */}
       <div className="border-b border-gray-200 mb-8 overflow-x-auto">
         <div className="flex gap-0 min-w-max">

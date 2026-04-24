@@ -12,6 +12,7 @@ function LoginForm() {
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
   const [error, setError] = useState('')
+  const [errorLink, setErrorLink] = useState<{ text: string; href: string } | null>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
   const supabase = createClient()
@@ -24,6 +25,7 @@ function LoginForm() {
     e.preventDefault()
     setLoading(true)
     setError('')
+    setErrorLink(null)
     const redirect = getRedirect()
 
     if (email.startsWith('test')) {
@@ -37,7 +39,24 @@ function LoginForm() {
 
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
-      setError(error.message)
+      if (error.message.toLowerCase().includes('invalid login credentials')) {
+        // Check whether email exists — if not, redirect to sign-up
+        const res = await fetch('/api/auth/check-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        })
+        const { exists } = await res.json()
+        if (!exists) {
+          const signupUrl = `/auth/signup?redirect=${encodeURIComponent(redirect)}&email=${encodeURIComponent(email)}&info=${encodeURIComponent('No account found for that email — let\'s create one.')}`
+          window.location.href = signupUrl
+          return
+        }
+        setError('Incorrect password. ')
+        setErrorLink({ text: 'Forgot your password? →', href: `/auth/forgot-password?email=${encodeURIComponent(email)}` })
+      } else {
+        setError(error.message)
+      }
       setLoading(false)
     } else {
       // Use full navigation so destination page remounts (needed for sessionStorage restore)
@@ -66,7 +85,7 @@ function LoginForm() {
 
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm mb-4">
-              {error}
+              {error}{errorLink && <Link href={errorLink.href} className="underline font-medium">{errorLink.text}</Link>}
             </div>
           )}
 
@@ -83,7 +102,10 @@ function LoginForm() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-medium text-gray-700">Password</label>
+                <Link href={`/auth/forgot-password${email ? `?email=${encodeURIComponent(email)}` : ''}`} className="text-xs text-blue-600 hover:underline">Forgot password?</Link>
+              </div>
               <input
                 type="password"
                 value={password}
