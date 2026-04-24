@@ -164,6 +164,8 @@ function ATSCheckInner() {
   const [pendingNavUrl, setPendingNavUrl] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const beforeUnloadRef = useRef<((e: BeforeUnloadEvent) => void) | null>(null)
+  const selectedResumeIdRef = useRef<string | null>(null)
+  function setResumeId(id: string | null) { selectedResumeIdRef.current = id; setSelectedResumeId(id) }
 
   // On mount: check pro status, fetch usage, load saved resumes, restore persisted ATS result
   useEffect(() => {
@@ -175,7 +177,7 @@ function ATSCheckInner() {
         const { result: r, resumeText: rt, selectedResumeId: sid, tab: t } = JSON.parse(persisted)
         if (r) setResult(r)
         if (rt) setResumeText(rt)
-        if (sid) setSelectedResumeId(sid)
+        if (sid) setResumeId(sid)
         if (t) setTab(t)
         // Re-hydrate file from dashboard so upload tab shows the file and Edit in Docs works
         if (sid) {
@@ -403,7 +405,7 @@ function ATSCheckInner() {
     // Register persist callback so use-pro-upgrade can save state before reloading
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).__atsPersist = () => {
-      sessionStorage.setItem('ats_result_persist', JSON.stringify({ result, resumeText, selectedResumeId, tab }))
+      sessionStorage.setItem('ats_result_persist', JSON.stringify({ result, resumeText, selectedResumeId: selectedResumeIdRef.current, tab }))
     }
     return () => {
       window.removeEventListener('beforeunload', handler)
@@ -618,6 +620,7 @@ function ATSCheckInner() {
         const uploadData = await uploadRes.json()
         if (uploadData.resume?.id) {
           sessionStorage.setItem('docs_pending_resume_id', uploadData.resume.id)
+          setResumeId(uploadData.resume.id)
         }
       } else if (selectedResumeId) {
         sessionStorage.setItem('docs_pending_resume_id', selectedResumeId)
@@ -787,7 +790,7 @@ function ATSCheckInner() {
               {savedResumes.map(r => (
                 <button
                   key={r.id}
-                  onClick={() => setSelectedResumeId(r.id)}
+                  onClick={() => setResumeId(r.id)}
                   className={`w-full flex items-center gap-3 p-3.5 rounded-xl border text-left transition-colors ${selectedResumeId === r.id ? 'border-blue-400 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
                 >
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${r.mime_type === 'application/pdf' ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'}`}>
