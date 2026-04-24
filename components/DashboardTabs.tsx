@@ -5,6 +5,7 @@ import Link from 'next/link'
 import UserResumes from '@/components/UserResumes'
 import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
 import TemplateCard from '@/components/TemplateCard'
+import BuilderLink from '@/components/BuilderLink'
 import type { Template } from '@/lib/templates'
 
 const FREE_ATS_LIMIT = 5
@@ -23,7 +24,7 @@ interface Props {
 const TABS = [
   { id: 'overview', label: 'Overview' },
   { id: 'ats', label: 'ATS Score' },
-  { id: 'builder', label: 'Resume Builder' },
+  { id: 'builder', label: 'Resume Creator' },
   { id: 'templates', label: 'Templates' },
   { id: 'sessions', label: 'Sessions' },
   { id: 'resumes', label: 'My Resumes' },
@@ -139,9 +140,9 @@ export default function DashboardTabs({
                   <div className="text-sm font-bold text-gray-900 mb-0.5">No resume yet?</div>
                   <div className="text-xs text-gray-400">Build from scratch with our Resume Creator</div>
                 </div>
-                <Link href="/builder" className="mt-auto inline-flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors self-start">
+                <BuilderLink className="mt-auto inline-flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors self-start">
                   Create Resume →
-                </Link>
+                </BuilderLink>
               </div>
             </div>
           ) : isPro ? (
@@ -280,7 +281,7 @@ export default function DashboardTabs({
               <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center">
                 <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" /></svg>
               </div>
-              <h2 className="text-base font-bold text-gray-900">Resume Builder</h2>
+              <h2 className="text-base font-bold text-gray-900">Resume Creator</h2>
             </div>
             <p className="text-sm text-gray-500 mb-2">
               Build a polished resume from scratch using one of our professionally designed templates. Edit in real time with a live preview, then download as a PDF or open in Google Docs.
@@ -290,9 +291,9 @@ export default function DashboardTabs({
               <span className="flex items-center gap-1"><span className={`w-1.5 h-1.5 rounded-full inline-block ${isPro ? 'bg-green-400' : 'bg-gray-300'}`} />PDF download {!isPro && '(Pro)'}</span>
               <span className="flex items-center gap-1"><span className={`w-1.5 h-1.5 rounded-full inline-block ${isPro ? 'bg-green-400' : 'bg-gray-300'}`} />Edit in Google Docs {!isPro && '(Pro)'}</span>
             </div>
-            <Link href="/builder" className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
-              Open Builder →
-            </Link>
+            <BuilderLink className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
+              Open Resume Creator →
+            </BuilderLink>
           </div>
 
           {effectiveAccessible.length > 0 && (
