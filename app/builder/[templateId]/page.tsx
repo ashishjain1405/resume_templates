@@ -757,7 +757,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             </div>
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">PDF download is a Pro feature</h3>
             <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for lifetime access — unlimited downloads, unlimited ATS checks, and an expert session. ₹999, one-time.</p>
-            <ProUpgradeCTAs layout="stack" source="download" />
+            <ProUpgradeCTAs layout="stack" source="download" returnPath={`/builder/${templateId}`} />
           </div>
         </div>
       )}

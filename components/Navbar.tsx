@@ -31,6 +31,14 @@ export default function Navbar() {
   }, [])
 
   async function checkPro(userId: string) {
+    const proFlag = typeof window !== 'undefined'
+      && (localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked'))
+    if (proFlag) {
+      setIsPro(true)
+      const { data } = await supabase.from('pro_access').select('id').eq('user_id', userId).maybeSingle()
+      if (data) { localStorage.removeItem('pro_unlocked'); sessionStorage.removeItem('pro_unlocked') }
+      return
+    }
     const { data } = await supabase.from('pro_access').select('id').eq('user_id', userId).maybeSingle()
     setIsPro(!!data)
   }

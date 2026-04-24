@@ -61,6 +61,15 @@ export function useProUpgrade() {
             // Payment is server-verified (HMAC + DB insert confirmed). Trust it immediately.
             localStorage.setItem('pro_unlocked', '1')
             sessionStorage.setItem('pro_unlocked', '1')
+            // Re-queue the pending action so the builder auto-triggers it after reload
+            if (source === 'download' && returnPath) {
+              const templateId = returnPath.split('/builder/')[1]
+              if (templateId) localStorage.setItem(`download_pending_${templateId}`, '1')
+            }
+            if (source === 'docs' && returnPath) {
+              const templateId = returnPath.split('/builder/')[1]
+              if (templateId) localStorage.setItem(`docs_pending_${templateId}`, '1')
+            }
             // Persist ATS result before reload so user can continue from where they left off
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const atsPersist = (window as any).__atsPersist
