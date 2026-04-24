@@ -13,7 +13,6 @@ function MiniRing({ score }: { score: number }) {
       </svg>
       <div className="absolute text-center">
         <div className="text-2xl font-bold text-gray-900">{score}</div>
-        <div className="text-[10px] text-gray-400 font-medium">/100</div>
       </div>
     </div>
   )
@@ -24,7 +23,7 @@ function MiniBar({ label, score, color }: { label: string; score: number; color:
     <div>
       <div className="flex justify-between text-xs mb-1">
         <span className="text-gray-600 font-medium">{label}</span>
-        <span className="text-gray-500">{score}/100</span>
+        <span className="text-gray-500">{score}</span>
       </div>
       <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
         <div className={`h-full ${color} rounded-full`} style={{ width: `${score}%` }} />
@@ -32,6 +31,23 @@ function MiniBar({ label, score, color }: { label: string; score: number; color:
     </div>
   )
 }
+
+const TOP_ISSUES = [
+  'No quantified achievements in experience bullets',
+  'Missing key technical skills for this role',
+  'Contact section lacks LinkedIn URL',
+]
+
+const REWRITES = [
+  {
+    original: 'Responsible for managing a team of 5 engineers',
+    improved: 'Led 5-engineer team delivering 3 features on time, reducing backlog by 40%',
+  },
+  {
+    original: 'Worked on improving application performance',
+    improved: 'Optimised API response time by 35% (800ms → 520ms) via query indexing',
+  },
+]
 
 export default function ATSPreview() {
   return (
@@ -44,12 +60,23 @@ export default function ATSPreview() {
 
         <div className="max-w-xl mx-auto relative">
           <div className="border border-gray-200 rounded-2xl p-6 shadow-sm space-y-5">
+
             {/* Score row */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-5">
               <MiniRing score={58} />
               <div>
-                <div className="text-base font-bold text-gray-900">Needs improvement</div>
-                <div className="text-sm text-gray-500 mt-0.5">ATS Compatibility Score</div>
+                <div className="text-base font-bold text-gray-900 mb-1">Needs improvement</div>
+                <div className="flex gap-3">
+                  <div>
+                    <div className="text-[10px] text-gray-400 uppercase tracking-wide font-medium">ATS</div>
+                    <div className="text-base font-bold text-blue-600">54</div>
+                  </div>
+                  <div className="w-px bg-gray-200" />
+                  <div>
+                    <div className="text-[10px] text-gray-400 uppercase tracking-wide font-medium">Recruiter</div>
+                    <div className="text-base font-bold text-violet-600">62</div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -62,38 +89,51 @@ export default function ATSPreview() {
               <MiniBar label="Measurable Achievements" score={40} color="bg-red-500" />
             </div>
 
-            {/* Missing keywords */}
+            {/* Top Issues */}
             <div>
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Missing Keywords</div>
-              <div className="flex flex-wrap gap-1.5">
-                {['Python', 'SQL', 'Data Analysis', 'Stakeholder Management'].map(kw => (
-                  <span key={kw} className="bg-red-50 text-red-600 border border-red-100 text-xs px-2.5 py-1 rounded-full">{kw}</span>
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Top Issues</div>
+              <ul className="space-y-2">
+                {TOP_ISSUES.map((issue, i) => (
+                  <li key={i} className="flex gap-2.5 text-sm text-gray-700">
+                    <span className="w-5 h-5 bg-red-50 text-red-600 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">!</span>
+                    {issue}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Suggested Rewrites */}
+            <div>
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Suggested Rewrites</div>
+              <div className="space-y-4">
+                {REWRITES.map((r, i) => (
+                  <div key={i} className="text-sm space-y-1.5">
+                    <p className="text-gray-400 line-through leading-snug">{r.original}</p>
+                    <p className="text-gray-800 leading-snug flex gap-1.5"><span className="text-green-500 font-bold flex-shrink-0">→</span>{r.improved}</p>
+                  </div>
                 ))}
               </div>
             </div>
 
-            {/* Blurred suggestions */}
+            {/* How to Improve — partially visible, fades into CTA */}
             <div>
               <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">How to Improve</div>
               <ul className="space-y-2">
-                <li className="flex gap-2.5 text-sm text-gray-700">
-                  <span className="w-5 h-5 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">1</span>
-                  Add quantified achievements to each work experience bullet point.
+                <li className="flex gap-2.5 text-sm text-gray-300 blur-[2px] select-none">
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide flex-shrink-0 mt-0.5 bg-red-50 text-red-200">high</span>
+                  Add measurable outcomes to your internship bullets using the CAR format.
                 </li>
-                <li className="flex gap-2.5">
-                  <span className="w-5 h-5 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">2</span>
-                  <span className="text-sm text-gray-300 blur-[3px] select-none flex-1">Include a dedicated skills section with role-specific technical keywords.</span>
-                </li>
-                <li className="flex gap-2.5">
-                  <span className="w-5 h-5 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">3</span>
-                  <span className="text-sm text-gray-300 blur-[3px] select-none flex-1">Use a single-column layout to ensure correct ATS parsing order.</span>
+                <li className="flex gap-2.5 text-sm text-gray-300 blur-[3px] select-none">
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide flex-shrink-0 mt-0.5 bg-amber-50 text-amber-200">med</span>
+                  Include a dedicated Skills section listing tools and certifications explicitly.
                 </li>
               </ul>
             </div>
+
           </div>
 
           {/* CTA overlay */}
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white to-transparent rounded-b-2xl flex items-end justify-center pb-4">
+          <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-white via-white/90 to-transparent rounded-b-2xl flex items-end justify-center pb-5">
             <Link
               href="/ats-check"
               className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors shadow-lg"
