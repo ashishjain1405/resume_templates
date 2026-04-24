@@ -49,7 +49,7 @@ Return ONLY valid JSON in this exact structure, no markdown, no extra text:
   },
   "top_issues": [<3-5 specific, high-impact problems>],
   "missing_keywords": [<up to 10 relevant keywords from job description or inferred role>],
-  "bullet_improvements": [
+  "bullet_improvements": [<always exactly 3 items — pick the 3 weakest bullets and rewrite them with strong action verbs and metrics>
     {
       "original": "<weak resume bullet>",
       "improved": "<rewritten bullet with strong action verbs + metrics>"
