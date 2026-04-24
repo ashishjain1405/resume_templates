@@ -368,6 +368,24 @@ function ATSCheckInner() {
             }
           })
           .catch(() => { setInfo('Resume could not be restored — please re-upload.'); setLoading(false) })
+      } else if (pending.tab === 'saved' && pending.selectedResumeId) {
+        // File was uploaded to storage before payment — fetch and analyse directly
+        setTab('saved')
+        setResumeId(pending.selectedResumeId)
+        setLoading(true)
+        fetch(`/api/resume/${pending.selectedResumeId}`)
+          .then(r => r.json())
+          .then(async ({ url, filename }) => {
+            if (!url) throw new Error('no url')
+            const blob = await fetch(url).then(r => r.blob())
+            const f = new File([blob], filename ?? 'resume.pdf', { type: blob.type || 'application/pdf' })
+            setFile(f)
+            const form = new FormData()
+            form.append('resumeText', await extractPdfText(blob))
+            form.append('jobDescription', jd)
+            autoAnalyse(form)
+          })
+          .catch(() => { setInfo('Resume could not be restored — please re-upload.'); setLoading(false) })
       } else if (pending.tab === 'upload') {
         setTab('upload')
         setInfo('You\'re signed in — re-upload your PDF and click Analyse.')
@@ -540,27 +558,33 @@ function ATSCheckInner() {
           }
           setModal('login_required')
         } else if (res.status === 403) {
-          // Save pending state so analysis auto-re-runs after payment reload
+          // Save pending state so analysis auto-re-runs after payment reload.
+          // For upload tab: upload file to storage now so resumeId survives reload
+          // and Edit in Google Docs can reference it.
           if (tab === 'paste' && resumeText.trim()) {
             const payload = JSON.stringify({ tab: 'paste', resumeText, jobDescription })
             sessionStorage.setItem(STORAGE_KEY, payload)
             localStorage.setItem(STORAGE_KEY, payload)
             setModal('pro_required')
-          } else if (tab === 'saved' && selectedResumeId) {
+          } else if ((tab === 'saved' || tab === 'upload') && selectedResumeId) {
             const payload = JSON.stringify({ tab: 'saved', selectedResumeId, jobDescription })
             sessionStorage.setItem(STORAGE_KEY, payload)
             localStorage.setItem(STORAGE_KEY, payload)
             setModal('pro_required')
           } else if (tab === 'upload' && file) {
-            const reader = new FileReader()
-            reader.onload = () => {
-              const payload = JSON.stringify({ tab: 'upload', jobDescription, fileData: reader.result as string, fileName: file.name, fileType: file.type })
+            // Upload file to storage so we have a stable resumeId for post-payment restore
+            const uploadForm = new FormData()
+            uploadForm.append('file', file)
+            const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: uploadForm })
+            const uploadData = await uploadRes.json()
+            const resumeId = uploadData.resume?.id ?? null
+            if (resumeId) {
+              setResumeId(resumeId)
+              const payload = JSON.stringify({ tab: 'saved', selectedResumeId: resumeId, jobDescription })
               sessionStorage.setItem(STORAGE_KEY, payload)
               localStorage.setItem(STORAGE_KEY, payload)
-              setModal('pro_required')
             }
-            reader.readAsDataURL(file)
-            return
+            setModal('pro_required')
           } else {
             setModal('pro_required')
           }
