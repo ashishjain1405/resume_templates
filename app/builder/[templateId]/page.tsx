@@ -380,6 +380,10 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       setShowAuthModal(true)
       return
     }
+    if (!isPro) {
+      setShowProDownloadModal(true)
+      return
+    }
     const res = await fetch('/api/builder/pdf?pdf=1', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -590,7 +594,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             </button>
           ) : (
             <button
-              onClick={() => setShowProDownloadModal(true)}
+              onClick={handleDownload}
               className="bg-amber-50 border border-amber-200 text-amber-700 text-sm px-4 py-2 rounded-lg hover:bg-amber-100 transition-colors font-semibold flex-shrink-0 flex items-center gap-1.5"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
