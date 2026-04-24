@@ -24,7 +24,7 @@ interface UploadedResume {
   created_at: string
 }
 
-function ScoreRing({ score }: { score: number }) {
+function ScoreRing({ score, instant = false }: { score: number; instant?: boolean }) {
   const r = 36
   const circ = 2 * Math.PI * r
   const fill = circ - (score / 100) * circ
@@ -36,7 +36,7 @@ function ScoreRing({ score }: { score: number }) {
         <circle cx="48" cy="48" r={r} fill="none" stroke={color} strokeWidth="8"
           strokeDasharray={circ} strokeDashoffset={fill}
           strokeLinecap="round"
-          style={{ transition: 'stroke-dashoffset 1s ease' }}
+          style={{ transition: instant ? 'none' : 'stroke-dashoffset 1s ease' }}
         />
       </svg>
       <div className="absolute text-center">
@@ -161,6 +161,7 @@ function ATSCheckInner() {
   const [savedToDashboard, setSavedToDashboard] = useState(false)
   const [saveCount, setSaveCount] = useState(0)
   const [showSaveModal, setShowSaveModal] = useState(false)
+  const [resultRestored, setResultRestored] = useState(false)
   const [pendingNavUrl, setPendingNavUrl] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const beforeUnloadRef = useRef<((e: BeforeUnloadEvent) => void) | null>(null)
@@ -173,9 +174,12 @@ function ATSCheckInner() {
     const persisted = sessionStorage.getItem('ats_result_persist')
     if (persisted) {
       sessionStorage.removeItem('ats_result_persist')
+      // Prevent ats_pending effect from overwriting the restored result with a fresh analysis
+      sessionStorage.removeItem(STORAGE_KEY)
+      localStorage.removeItem(STORAGE_KEY)
       try {
         const { result: r, resumeText: rt, selectedResumeId: sid, tab: t } = JSON.parse(persisted)
-        if (r) setResult(r)
+        if (r) { setResult(r); setResultRestored(true) }
         if (rt) setResumeText(rt)
         if (sid) setResumeId(sid)
         if (t) setTab(t)
@@ -919,7 +923,7 @@ function ATSCheckInner() {
               </div>
 
               <div className="flex items-center gap-6">
-                <ScoreRing score={result.score} />
+                <ScoreRing score={result.score} instant={resultRestored} />
                 <div>
                   <div className="text-lg font-bold text-gray-900">
                     {result.score >= 75 ? 'Strong resume' : result.score >= 50 ? 'Needs improvement' : 'Significant gaps found'}
