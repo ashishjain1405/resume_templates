@@ -177,6 +177,15 @@ function ATSCheckInner() {
         if (rt) setResumeText(rt)
         if (sid) setSelectedResumeId(sid)
         if (t) setTab(t)
+        // Re-hydrate file from dashboard so upload tab shows the file and Edit in Docs works
+        if (sid) {
+          fetch(`/api/resume/${sid}`)
+            .then(r => r.json())
+            .then(({ url, filename }) => url && fetch(url).then(r => r.blob()).then(blob => {
+              setFile(new File([blob], filename ?? 'resume.pdf', { type: blob.type || 'application/pdf' }))
+            }))
+            .catch(() => { /* file stays null, user can re-upload */ })
+        }
       } catch { /* ignore */ }
     }
 
@@ -621,6 +630,12 @@ function ATSCheckInner() {
       const form = new FormData()
       if (tab === 'upload' && file) {
         form.append('file', file)
+      } else if (tab === 'upload' && selectedResumeId) {
+        // file was lost on reload — re-fetch from dashboard
+        const { url, filename } = await fetch(`/api/resume/${selectedResumeId}`).then(r => r.json())
+        if (!url) { setError('Could not retrieve your resume. Please re-upload.'); setEditLoading(false); return }
+        const blob = await fetch(url).then(r => r.blob())
+        form.append('file', new File([blob], filename ?? 'resume.pdf', { type: blob.type || 'application/pdf' }))
       } else {
         const blob = new Blob([resumeText], { type: 'text/plain' })
         form.append('file', blob, 'resume.txt')
