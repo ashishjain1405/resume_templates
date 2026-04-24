@@ -108,6 +108,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit')
   const [isPro, setIsPro] = useState(false)
   const [proResolved, setProResolved] = useState(false)
+  const [purchased, setPurchased] = useState(false)
   const [showProDownloadModal, setShowProDownloadModal] = useState(false)
   const [showProDocsModal, setShowProDocsModal] = useState(false)
   const [showChangeTemplateModal, setShowChangeTemplateModal] = useState(false)
@@ -128,6 +129,8 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     supabase.auth.getUser().then(async ({ data }) => {
       setUser(data.user)
       if (data.user) {
+        supabase.from('purchases').select('id').eq('user_id', data.user.id).eq('template_id', templateId).maybeSingle()
+          .then(({ data: row }) => setPurchased(!!row))
         if (initialProFlag) {
           setIsPro(true)
           setProResolved(true)
@@ -233,7 +236,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     if (!user) return
     const downloadPending = localStorage.getItem(`download_pending_${templateId}`)
     if (downloadPending) {
-      if (isPro) {
+      if (isPro || purchased) {
         localStorage.removeItem(`download_pending_${templateId}`)
         setTimeout(() => handleDownload(), 0)
       } else if (proResolved) {
@@ -258,7 +261,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         }
       }
     }
-  }, [user, isPro, proResolved, templateId])
+  }, [user, isPro, proResolved, purchased, templateId])
 
   // Auto-save with debounce
   const autoSave = useCallback((next: ResumeData, color: string) => {
@@ -400,7 +403,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       setShowAuthModal(true)
       return
     }
-    if (!isPro) {
+    if (!isPro && !purchased) {
       const statusRes = await fetch('/api/pro-status')
       const statusData = await statusRes.json()
       if (statusData.pro) { setIsPro(true) } else { setShowProDownloadModal(true); return }
@@ -605,7 +608,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             )}
             {savingVersion ? 'Saving…' : savedVersion ? 'Saved to Dashboard' : 'Save to Dashboard'}
           </button>
-          {isPro ? (
+          {(isPro || purchased) ? (
             <button
               onClick={handleDownload}
               className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium flex-shrink-0"
