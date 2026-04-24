@@ -90,7 +90,7 @@ export default function BuyButton({ template, purchased, selectedColor }: Props)
             })
             const verifyData = await verifyRes.json()
             if (verifyRes.ok) {
-              router.push('/payment/success')
+              window.location.href = `/template/${template.id}`
             } else {
               alert(`Payment verification failed: ${verifyData.error ?? verifyRes.status}`)
               setLoading(false)
