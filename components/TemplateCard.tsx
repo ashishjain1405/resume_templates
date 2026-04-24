@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { formatPrice, type Template } from '@/lib/templates'
 import ClassicPreview from './resume-previews/Classic'
 import ModernPreview from './resume-previews/Modern'
@@ -24,6 +24,12 @@ interface Props {
 
 export default function TemplateCard({ template, purchased }: Props) {
   const [activeColor, setActiveColor] = useState(template.colors[0])
+  const [clientPro, setClientPro] = useState(false)
+  useEffect(() => {
+    const flag = localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked')
+    if (flag) setClientPro(true)
+  }, [])
+  const isOwned = purchased || clientPro
   const Preview = PREVIEW_MAP[template.id] ?? ClassicPreview
 
   return (
@@ -39,7 +45,7 @@ export default function TemplateCard({ template, purchased }: Props) {
           {formatPrice(template.price_inr)}
         </div>
 
-        {purchased && (
+        {isOwned && (
           <div className="absolute top-2 left-2 bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
             Owned
           </div>
@@ -74,7 +80,7 @@ export default function TemplateCard({ template, purchased }: Props) {
           >
             Preview
           </Link>
-          {purchased ? (
+          {isOwned ? (
             <a
               href={`/api/download/${template.id}?format=pdf`}
               className="flex-1 text-center text-xs bg-green-600 text-white py-1.5 rounded-lg hover:bg-green-700 transition-colors font-medium"
