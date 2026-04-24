@@ -540,7 +540,30 @@ function ATSCheckInner() {
           }
           setModal('login_required')
         } else if (res.status === 403) {
-          setModal('pro_required')
+          // Save pending state so analysis auto-re-runs after payment reload
+          if (tab === 'paste' && resumeText.trim()) {
+            const payload = JSON.stringify({ tab: 'paste', resumeText, jobDescription })
+            sessionStorage.setItem(STORAGE_KEY, payload)
+            localStorage.setItem(STORAGE_KEY, payload)
+            setModal('pro_required')
+          } else if (tab === 'saved' && selectedResumeId) {
+            const payload = JSON.stringify({ tab: 'saved', selectedResumeId, jobDescription })
+            sessionStorage.setItem(STORAGE_KEY, payload)
+            localStorage.setItem(STORAGE_KEY, payload)
+            setModal('pro_required')
+          } else if (tab === 'upload' && file) {
+            const reader = new FileReader()
+            reader.onload = () => {
+              const payload = JSON.stringify({ tab: 'upload', jobDescription, fileData: reader.result as string, fileName: file.name, fileType: file.type })
+              sessionStorage.setItem(STORAGE_KEY, payload)
+              localStorage.setItem(STORAGE_KEY, payload)
+              setModal('pro_required')
+            }
+            reader.readAsDataURL(file)
+            return
+          } else {
+            setModal('pro_required')
+          }
         } else {
           setError(data.error ?? `Server error (${res.status}). Please try again.`)
         }
