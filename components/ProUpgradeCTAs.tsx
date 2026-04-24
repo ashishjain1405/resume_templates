@@ -17,7 +17,7 @@ export default function ProUpgradeCTAs({ layout = 'row', userEmail, source, retu
       <button
         onClick={() => startUpgrade(userEmail, source, returnPath)}
         disabled={loading}
-        className={`bg-amber-50 text-amber-700 border border-amber-200 rounded-lg text-sm font-semibold hover:bg-amber-100 transition-colors disabled:opacity-60 ${layout === 'stack' ? 'w-full py-3' : 'px-4 py-2'}`}
+        className={`bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-60 ${layout === 'stack' ? 'w-full py-3' : 'px-4 py-2'}`}
       >
         {loading ? 'Processing…' : 'Upgrade to Pro — ₹999'}
       </button>

@@ -79,7 +79,7 @@ function ModalProRequired({ onClose, userEmail }: { onClose: () => void; userEma
           <button
             onClick={() => { onClose(); startUpgrade(userEmail, 'ats') }}
             disabled={loading}
-            className="w-full bg-amber-50 text-amber-700 border border-amber-200 py-3 rounded-lg text-sm font-semibold hover:bg-amber-100 transition-colors disabled:opacity-60"
+            className="w-full bg-blue-600 text-white py-3 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-60"
           >
             {loading ? 'Processing…' : 'Upgrade to Pro — ₹999'}
           </button>
