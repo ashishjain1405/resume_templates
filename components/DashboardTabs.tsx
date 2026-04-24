@@ -192,8 +192,7 @@ export default function DashboardTabs({
           {/* Pro upsell — free users only, single line */}
           {!pro && (
             <p className="text-sm text-gray-400">
-              Unlock unlimited ATS checks, PDF downloads &amp; expert sessions —{' '}
-              <Link href="/pricing" className="text-blue-600 font-medium hover:underline">Upgrade for ₹999 →</Link>
+              <Link href="/pricing" className="text-blue-600 font-medium hover:underline">Upgrade to Pro →</Link>
             </p>
           )}
         </div>
@@ -340,7 +339,7 @@ export default function DashboardTabs({
             <>
               <div className="flex items-center justify-between">
                 <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider">More templates</div>
-                <Link href="/pricing" className="text-sm text-blue-600 font-medium hover:text-blue-700">Get Pro for all →</Link>
+                <Link href="/pricing" className="text-sm text-blue-600 font-medium hover:text-blue-700">Upgrade to Pro →</Link>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                 {lockedTemplates.map((t) => <TemplateCard key={t.id} template={t} />)}
@@ -353,7 +352,7 @@ export default function DashboardTabs({
               <p className="text-sm text-gray-500 mb-4">You don&apos;t own any templates yet.</p>
               <div className="flex gap-3 justify-center flex-wrap">
                 <Link href="/templates" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">Browse templates</Link>
-                <Link href="/pricing" className="border border-blue-600 text-blue-600 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-50 transition-colors">Get Pro — ₹999</Link>
+                <Link href="/pricing" className="border border-blue-600 text-blue-600 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-50 transition-colors">Upgrade to Pro</Link>
               </div>
             </div>
           )}
@@ -385,7 +384,9 @@ export default function DashboardTabs({
             ) : (
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
                 <p className="text-sm text-amber-800 font-medium mb-3">Expert sessions are included with Pro.</p>
-                <ProUpgradeCTAs layout="row" userEmail={userEmail} source="sessions" />
+                <Link href="/pricing" className="inline-flex items-center gap-1.5 bg-amber-400 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-500 transition-colors">
+                  Upgrade to Pro
+                </Link>
               </div>
             )}
           </div>

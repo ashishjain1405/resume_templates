@@ -584,7 +584,6 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             )}
             {savingVersion ? 'Saving…' : savedVersion ? 'Saved to Dashboard' : 'Save to Dashboard'}
           </button>
-          <CheckATSButton user={user} data={data} accentColor={accentColor} templateId={templateId} />
           {isPro ? (
             <button
               onClick={handleDownload}
@@ -595,12 +594,12 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
           ) : (
             <button
               onClick={handleDownload}
-              className="bg-amber-50 border border-amber-200 text-amber-700 text-sm px-4 py-2 rounded-lg hover:bg-amber-100 transition-colors font-semibold flex-shrink-0 flex items-center gap-1.5"
+              className="bg-amber-400 text-white text-sm px-4 py-2 rounded-lg hover:bg-amber-500 transition-colors font-semibold flex-shrink-0 flex items-center gap-1.5"
             >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-              </svg>
               Download PDF
+              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clipRule="evenodd" />
+              </svg>
             </button>
           )}
         </div>
@@ -625,14 +624,14 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             ))}
           </div>
           <div className="ml-auto flex items-center gap-2">
+            <CheckATSButton user={user} data={data} accentColor={accentColor} templateId={templateId} />
             <button
               onClick={handleEditInDocs}
-              className="flex items-center gap-1.5 text-xs border border-gray-200 text-gray-600 bg-white hover:bg-gray-50 px-2.5 py-1 rounded-lg font-medium transition-colors"
+              className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg font-medium transition-colors ${isPro ? 'border border-gray-200 text-gray-600 bg-white hover:bg-gray-50' : 'bg-amber-400 text-white hover:bg-amber-500'}`}
             >
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-              {isPro ? 'Edit in Google Docs' : (
-                <span className="flex items-center gap-1">Edit in Google Docs <svg className="w-2.5 h-2.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg></span>
-              )}
+              Edit in Google Docs
+              {!isPro && <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clipRule="evenodd" /></svg>}
             </button>
             <button
               onClick={() => setShowChangeTemplateModal(true)}
