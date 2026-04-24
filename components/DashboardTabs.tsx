@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import UserResumes from '@/components/UserResumes'
 import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
@@ -50,7 +50,14 @@ export default function DashboardTabs({
   atsChecksUsed, latestResume, upcomingSession,
 }: Props) {
   const [active, setActive] = useState('overview')
+  const [clientPro, setClientPro] = useState(false)
 
+  useEffect(() => {
+    const flag = localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked')
+    if (flag) setClientPro(true)
+  }, [])
+
+  const isPro = pro || clientPro
   const firstName = userEmail?.split('@')[0]?.split('.')[0] ?? 'there'
   const atsRemaining = Math.max(0, FREE_ATS_LIMIT - atsChecksUsed)
 
@@ -82,7 +89,7 @@ export default function DashboardTabs({
           {/* Greeting */}
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-semibold text-gray-900">Good morning, {firstName}</h2>
-            {pro && (
+            {isPro && (
               <span className="text-xs font-bold bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full">Pro</span>
             )}
           </div>
@@ -134,7 +141,7 @@ export default function DashboardTabs({
                 </Link>
               </div>
             </div>
-          ) : pro ? (
+          ) : isPro ? (
             /* Has resume + Pro: two tiles */
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-3 p-6 bg-white border border-gray-200 rounded-2xl">
@@ -190,7 +197,7 @@ export default function DashboardTabs({
           )}
 
           {/* Pro upsell — free users only, single line */}
-          {!pro && (
+          {!isPro && (
             <Link href="/pricing" className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-100 transition-colors self-start">
               Upgrade to Pro ✦
             </Link>
@@ -211,7 +218,7 @@ export default function DashboardTabs({
             <p className="text-sm text-gray-500 mb-5">
               Most companies use ATS (Applicant Tracking Systems) to filter resumes before a human ever reads them. Upload your resume to get an instant score, see which keywords you&apos;re missing, and get specific suggestions to improve it.
             </p>
-            {pro ? (
+            {isPro ? (
               <div className="inline-flex items-center gap-1.5 bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-blue-100 mb-4">
                 Unlimited checks — Pro
               </div>
@@ -229,7 +236,7 @@ export default function DashboardTabs({
                 </div>
               </div>
             )}
-            {pro ? (
+            {isPro ? (
               <Link href="/ats-check" className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
                 Check my resume score →
               </Link>
@@ -277,8 +284,8 @@ export default function DashboardTabs({
             </p>
             <div className="flex flex-wrap gap-3 text-xs text-gray-400 mb-5">
               <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />Live preview</span>
-              <span className="flex items-center gap-1"><span className={`w-1.5 h-1.5 rounded-full inline-block ${pro ? 'bg-green-400' : 'bg-gray-300'}`} />PDF download {!pro && '(Pro)'}</span>
-              <span className="flex items-center gap-1"><span className={`w-1.5 h-1.5 rounded-full inline-block ${pro ? 'bg-green-400' : 'bg-gray-300'}`} />Edit in Google Docs {!pro && '(Pro)'}</span>
+              <span className="flex items-center gap-1"><span className={`w-1.5 h-1.5 rounded-full inline-block ${isPro ? 'bg-green-400' : 'bg-gray-300'}`} />PDF download {!isPro && '(Pro)'}</span>
+              <span className="flex items-center gap-1"><span className={`w-1.5 h-1.5 rounded-full inline-block ${isPro ? 'bg-green-400' : 'bg-gray-300'}`} />Edit in Google Docs {!isPro && '(Pro)'}</span>
             </div>
             <Link href="/builder" className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
               Open Builder →
@@ -328,14 +335,14 @@ export default function DashboardTabs({
 
           {accessibleTemplates.length > 0 && (
             <>
-              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{pro ? 'All templates' : 'My templates'}</div>
+              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{isPro ? 'All templates' : 'My templates'}</div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                 {accessibleTemplates.map((t) => <TemplateCard key={t.id} template={t} purchased />)}
               </div>
             </>
           )}
 
-          {!pro && lockedTemplates.length > 0 && (
+          {!isPro && lockedTemplates.length > 0 && (
             <>
               <div className="flex items-center justify-between">
                 <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider">More templates</div>
@@ -372,7 +379,7 @@ export default function DashboardTabs({
             <p className="text-sm text-gray-500 mb-5">
               A 30-minute 1:1 video call with a resume expert. You&apos;ll get personalised feedback on your resume, tips tailored to your target role, and a clear action plan to improve your chances.
             </p>
-            {pro ? (
+            {isPro ? (
               <div className="flex gap-3 flex-wrap">
                 <Link href="/sessions/book" className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
                   Book a session →
@@ -422,7 +429,7 @@ export default function DashboardTabs({
               <p className="text-sm text-gray-500">Upload your existing resume to run an ATS check or edit it in Google Docs. Files are stored securely and only accessible by you.</p>
             </div>
           </div>
-          <UserResumes isPro={pro} />
+          <UserResumes isPro={isPro} />
         </div>
       )}
     </div>

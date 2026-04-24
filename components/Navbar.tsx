@@ -10,6 +10,7 @@ import type { User } from '@supabase/supabase-js'
 export default function Navbar() {
   const [user, setUser] = useState<User | null>(null)
   const [isPro, setIsPro] = useState(false)
+  const [proResolved, setProResolved] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -39,6 +40,7 @@ export default function Navbar() {
     if (proFlag) {
       if (currentUserIdRef.current !== userId) return
       setIsPro(true)
+      setProResolved(true)
       const { data } = await supabase.from('pro_access').select('id').eq('user_id', userId).maybeSingle()
       if (data) { localStorage.removeItem('pro_unlocked'); sessionStorage.removeItem('pro_unlocked') }
       return
@@ -46,6 +48,7 @@ export default function Navbar() {
     const { data } = await supabase.from('pro_access').select('id').eq('user_id', userId).maybeSingle()
     if (currentUserIdRef.current !== userId) return
     setIsPro(!!data)
+    setProResolved(true)
   }
 
   useEffect(() => {
@@ -105,7 +108,7 @@ export default function Navbar() {
               <button onClick={() => { const href = getBuilderHref(); const guard = (window as any).__atsNavGuard; if (guard) { guard(href); return } router.push(href) }} className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
                 Create my Resume
               </button>
-              {!isPro && <GoProLink />}
+              {proResolved && !isPro && <GoProLink />}
 
               {/* User dropdown */}
               <div className="relative ml-1" ref={menuRef}>
@@ -227,7 +230,7 @@ export default function Navbar() {
                     <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" /></svg>
                     Sessions
                   </Link>
-                  {!isPro && (
+                  {proResolved && !isPro && (
                     <div className="pt-2">
                       <GoProLink className="block text-center w-full" />
                     </div>

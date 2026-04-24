@@ -183,15 +183,8 @@ function ATSCheckInner() {
         if (rt) setResumeText(rt)
         if (sid) setResumeId(sid)
         if (t) setTab(t)
-        // Re-hydrate file from dashboard so upload tab shows the file and Edit in Docs works
-        if (sid) {
-          fetch(`/api/resume/${sid}`)
-            .then(r => r.json())
-            .then(({ url, filename }) => url && fetch(url).then(r => r.blob()).then(blob => {
-              setFile(new File([blob], filename ?? 'resume.pdf', { type: blob.type || 'application/pdf' }))
-            }))
-            .catch(() => { /* file stays null, user can re-upload */ })
-        }
+        // If a saved resume ID is present, switch to saved tab so the user can see/select it
+        if (sid) setTab('saved')
       } catch { /* ignore */ }
     }
 
