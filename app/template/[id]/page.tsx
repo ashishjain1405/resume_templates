@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { TEMPLATES } from '@/lib/templates'
 import { createClient } from '@/lib/supabase-server'
@@ -52,7 +53,9 @@ export default async function TemplateDetailPage({
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
-      <TemplateDetailClient template={template} purchased={purchased} />
+      <Suspense>
+        <TemplateDetailClient template={template} purchased={purchased} />
+      </Suspense>
     </div>
   )
 }

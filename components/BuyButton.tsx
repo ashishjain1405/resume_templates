@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, useRef } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { formatPrice, type Template } from '@/lib/templates'
 
@@ -43,14 +43,16 @@ interface RazorpayResponse {
 export default function BuyButton({ template, purchased, selectedColor }: Props) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
+  const autoTriggered = useRef(false)
 
   async function handleBuy() {
     setLoading(true)
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
-        router.push(`/auth/signup?redirect=/template/${template.id}`)
+        router.push(`/auth/signup?redirect=/template/${template.id}%3Faction%3Dbuy`)
         return
       }
 
@@ -109,6 +111,18 @@ export default function BuyButton({ template, purchased, selectedColor }: Props)
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (purchased || autoTriggered.current) return
+    if (searchParams.get('action') !== 'buy') return
+    autoTriggered.current = true
+    // Clean the URL param without a navigation
+    const url = new URL(window.location.href)
+    url.searchParams.delete('action')
+    window.history.replaceState({}, '', url.toString())
+    handleBuy()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   if (purchased) {
     const color = selectedColor ?? template.colors[0]
