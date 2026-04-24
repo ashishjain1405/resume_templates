@@ -229,14 +229,14 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   useEffect(() => {
     if (!user) return
     const downloadPending = localStorage.getItem(`download_pending_${templateId}`)
-    if (downloadPending) {
+    if (downloadPending && isPro) {
       localStorage.removeItem(`download_pending_${templateId}`)
-      if (isPro) { setTimeout(() => handleDownload(), 0) } else { setShowProDownloadModal(true) }
+      setTimeout(() => handleDownload(), 0)
     }
     const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
-    if (docsPending) {
+    if (docsPending && isPro) {
       localStorage.removeItem(`docs_pending_${templateId}`)
-      if (isPro) { setTimeout(() => handleEditInDocs(), 0) } else { setShowProDocsModal(true) }
+      setTimeout(() => handleEditInDocs(), 0)
     }
   }, [user, isPro, templateId])
 
@@ -381,8 +381,9 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       return
     }
     if (!isPro) {
-      setShowProDownloadModal(true)
-      return
+      const statusRes = await fetch('/api/pro-status')
+      const statusData = await statusRes.json()
+      if (statusData.pro) { setIsPro(true) } else { setShowProDownloadModal(true); return }
     }
     const res = await fetch('/api/builder/pdf?pdf=1', {
       method: 'POST',
