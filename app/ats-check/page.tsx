@@ -225,6 +225,7 @@ function ATSCheckInner() {
         const f = new File([blob], filename, { type: contentType })
         setFile(f)
         setTab('upload')
+        setResumeId(resumeId)
         // Auto-trigger analysis
         setError('')
         setLoading(true)
@@ -595,6 +596,20 @@ function ATSCheckInner() {
   async function handleSaveToDashboard() {
     setSavingToDashboard(true)
     try {
+      // If we already have a resume ID (e.g. came from "Check ATS" on an existing resume),
+      // just update the ats_score on the existing row instead of creating a duplicate.
+      if (selectedResumeId && result?.score != null) {
+        await fetch(`/api/resume/${selectedResumeId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ats_score: result.score }),
+        })
+        setSaveCount(c => c + 1)
+        setSavedToDashboard(true)
+        setTimeout(() => setSavedToDashboard(false), 3000)
+        return
+      }
+
       let fileToUpload: File | null = null
       const version = saveCount + 1
       const versionSuffix = version > 1 ? `_v${version}` : ''

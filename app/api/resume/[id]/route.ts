@@ -26,6 +26,25 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   return Response.json({ url: signed.signedUrl, filename: row.filename })
 }
 
+// PATCH /api/resume/[id] — update ats_score
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const body = await req.json()
+  const adminClient = await createAdminClient()
+  const { error } = await adminClient
+    .from('uploaded_resumes')
+    .update({ ats_score: body.ats_score })
+    .eq('id', id)
+    .eq('user_id', user.id)
+
+  if (error) return Response.json({ error: error.message }, { status: 500 })
+  return Response.json({ ok: true })
+}
+
 // DELETE /api/resume/[id]
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
