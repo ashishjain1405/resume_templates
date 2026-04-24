@@ -162,10 +162,15 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
           }
         }
       } else {
-        setIsPro(false)
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem(`resume_builder_${templateId}`)
-          localStorage.removeItem(`builder_session_restore_${templateId}`)
+        // Don't wipe isPro if pro_unlocked is present — SIGNED_OUT fires transiently during payment reload
+        const proFlag = typeof window !== 'undefined'
+          && (localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked'))
+        if (!proFlag) {
+          setIsPro(false)
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem(`resume_builder_${templateId}`)
+            localStorage.removeItem(`builder_session_restore_${templateId}`)
+          }
         }
       }
     })
