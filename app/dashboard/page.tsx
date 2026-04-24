@@ -20,7 +20,7 @@ export default async function DashboardPage() {
     supabase.from('purchases').select('template_id').eq('user_id', user.id),
     isPro(user.id, supabase),
     supabase.from('ats_checks').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
-    supabase.from('uploaded_resumes').select('id, filename, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).maybeSingle(),
+    supabase.from('uploaded_resumes').select('id, filename, created_at, ats_score').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).maybeSingle(),
     supabase.from('sessions').select('id, scheduled_at, meet_link, status').eq('user_id', user.id).eq('status', 'confirmed').gte('scheduled_at', new Date().toISOString()).order('scheduled_at', { ascending: true }).limit(1).maybeSingle(),
   ])
 
