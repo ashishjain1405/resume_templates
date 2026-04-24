@@ -73,9 +73,10 @@ export default function Navbar() {
   const initial = user?.email?.[0]?.toUpperCase() ?? '?'
 
 
-  const GoProLink = ({ className = '' }: { className?: string }) => (
+  const GoProLink = ({ className = '', onClick }: { className?: string; onClick?: () => void }) => (
     <Link
       href="/pricing"
+      onClick={onClick}
       className={`text-sm bg-amber-50 text-amber-700 border border-amber-200 px-4 py-2 rounded-lg hover:bg-amber-100 transition-colors font-semibold ${className}`}
     >
       Upgrade to Pro ✦
@@ -229,7 +230,7 @@ export default function Navbar() {
                   </Link>
                   {!isPro && (
                     <div className="pt-2">
-                      <GoProLink className="block text-center w-full" />
+                      <GoProLink className="block text-center w-full" onClick={() => setMobileOpen(false)} />
                     </div>
                   )}
                   <div className="border-t border-gray-100 mt-2 pt-2">
