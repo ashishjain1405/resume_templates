@@ -12,7 +12,6 @@ import QuotationPreview from '@/components/resume-previews/Quotation'
 import ExecutivePreview from '@/components/resume-previews/Executive'
 import type { User } from '@supabase/supabase-js'
 import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
-import { useProUpgrade } from '@/lib/use-pro-upgrade'
 
 function CheckATSButton({ user, data, accentColor, templateId }: {
   user: User | null
@@ -108,7 +107,6 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [saveCount, setSaveCount] = useState(0)
   const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit')
   const [isPro, setIsPro] = useState(false)
-  const { startUpgrade } = useProUpgrade()
   const [showProDownloadModal, setShowProDownloadModal] = useState(false)
   const [showProDocsModal, setShowProDocsModal] = useState(false)
   const [showChangeTemplateModal, setShowChangeTemplateModal] = useState(false)
@@ -117,7 +115,6 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [docsLoading, setDocsLoading] = useState(false)
 
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const autoUpgradeFired = useRef(false)
 
   const Preview = PREVIEW_MAP[templateId] ?? ClassicPreview
 
@@ -242,17 +239,6 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       if (isPro) { setTimeout(() => handleEditInDocs(), 0) } else { setShowProDocsModal(true) }
     }
   }, [user, isPro, templateId])
-
-  // autoupgrade=1: fires once on mount — same pattern as PricingClient
-  // Uses getUser() directly so it doesn't race against async state resolution
-  useEffect(() => {
-    if (new URLSearchParams(window.location.search).get('autoupgrade') !== '1') return
-    if (autoUpgradeFired.current) return
-    autoUpgradeFired.current = true
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) startUpgrade(data.user.email ?? '', 'builder_download')
-    })
-  }, [])
 
   // Auto-save with debounce
   const autoSave = useCallback((next: ResumeData, color: string) => {
@@ -386,11 +372,12 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
 
   async function handleDownload() {
     if (!user) {
+      setAuthForDownload(true)
       const sessionSnapshot = JSON.stringify({ data, accentColor })
       sessionStorage.setItem(`builder_session_${templateId}`, sessionSnapshot)
       localStorage.setItem(`builder_session_restore_${templateId}`, sessionSnapshot)
       localStorage.setItem(`download_pending_${templateId}`, '1')
-      window.location.href = `/auth/signup?redirect=${encodeURIComponent(`/builder/${templateId}?autoupgrade=1`)}`
+      setShowAuthModal(true)
       return
     }
     const res = await fetch('/api/builder/pdf?pdf=1', {
