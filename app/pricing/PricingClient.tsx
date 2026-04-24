@@ -86,9 +86,9 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
     <button
       onClick={handleUpgrade}
       disabled={loading}
-      className={`bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${className}`}
+      className={`bg-amber-50 text-amber-700 border border-amber-200 py-3 rounded-xl font-semibold text-sm hover:bg-amber-100 transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${className}`}
     >
-      {loading ? 'Processing…' : 'Get Pro Access — ₹999'}
+      {loading ? 'Processing…' : 'Upgrade to Pro — ₹999'}
     </button>
   )
 
