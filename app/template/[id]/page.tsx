@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { TEMPLATES, formatPrice } from '@/lib/templates'
 import { createClient } from '@/lib/supabase-server'
+import { isPro } from '@/lib/pro'
 import BuyButton from '@/components/BuyButton'
 import ClassicPreview from '@/components/resume-previews/Classic'
 import ModernPreview from '@/components/resume-previews/Modern'
@@ -56,13 +57,11 @@ export default async function TemplateDetailPage({
 
   let purchased = false
   if (user) {
-    const { data } = await supabase
-      .from('purchases')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('template_id', id)
-      .maybeSingle()
-    purchased = !!data
+    const [{ data }, pro] = await Promise.all([
+      supabase.from('purchases').select('id').eq('user_id', user.id).eq('template_id', id).maybeSingle(),
+      isPro(user.id, supabase),
+    ])
+    purchased = !!data || pro
   }
 
   const Preview = PREVIEW_MAP[id] ?? ClassicPreview
