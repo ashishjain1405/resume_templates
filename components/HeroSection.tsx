@@ -26,7 +26,7 @@ const REWRITES = [
   },
 ]
 
-const CARD_STYLE = 'absolute inset-0 w-full bg-white rounded-[20px] p-4 shadow-[0_4px_24px_rgba(0,0,0,0.08)] ring-1 ring-gray-100/70'
+const CARD_STYLE = 'absolute inset-0 w-full bg-blue-50/40 rounded-[28px] p-4'
 
 function ATSAnimation() {
   const [cycle, setCycle] = useState(0)
