@@ -69,7 +69,7 @@ export default function BuySessionButton({ userEmail }: { userEmail: string }) {
       disabled={loading}
       className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors disabled:opacity-60"
     >
-      {loading ? 'Processing…' : 'Buy another session — ₹299'}
+      {loading ? 'Processing…' : 'Book another session — ₹299'}
     </button>
   )
 }

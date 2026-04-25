@@ -7,6 +7,7 @@ import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
 import TemplateCard from '@/components/TemplateCard'
 import BuilderLink from '@/components/BuilderLink'
 import type { Template } from '@/lib/templates'
+import BuySessionButton from '@/app/sessions/BuySessionButton'
 
 const FREE_ATS_LIMIT = 5
 
@@ -19,6 +20,7 @@ interface Props {
   templateCount: number
   latestResume: { id: string; filename: string; created_at: string; ats_score: number | null } | null
   upcomingSession: { id: string; scheduled_at: string; meet_link: string | null; status: string } | null
+  hasRemainingCredits: boolean
 }
 
 const TABS = [
@@ -48,7 +50,7 @@ function formatSession(dateStr: string) {
 
 export default function DashboardTabs({
   pro, userEmail, accessibleTemplates, lockedTemplates,
-  atsChecksUsed, latestResume, upcomingSession,
+  atsChecksUsed, latestResume, upcomingSession, hasRemainingCredits,
 }: Props) {
   const [active, setActive] = useState('overview')
   const [clientPro, setClientPro] = useState(false)
@@ -406,10 +408,14 @@ export default function DashboardTabs({
               A 30-minute 1:1 video call with a resume expert. You&apos;ll get personalised feedback on your resume, tips tailored to your target role, and a clear action plan to improve your chances.
             </p>
             {isPro ? (
-              <div className="flex gap-3 flex-wrap">
-                <Link href="/sessions/book" className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
-                  Book a session →
-                </Link>
+              <div className="flex gap-3 flex-wrap items-center">
+                {hasRemainingCredits ? (
+                  <Link href="/sessions/book" className="inline-flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
+                    Book a session →
+                  </Link>
+                ) : (
+                  <BuySessionButton userEmail={userEmail ?? ''} />
+                )}
                 <Link href="/sessions" className="inline-flex items-center gap-2 border border-gray-300 text-gray-700 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors">
                   View my sessions
                 </Link>

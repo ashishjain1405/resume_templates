@@ -98,7 +98,7 @@ export default async function SessionsPage() {
       )}
 
       {/* Used all credits — show buy CTA */}
-      {(sessions ?? []).length > 0 && !hasRemainingCredits && upcoming.length === 0 && (
+      {(sessions ?? []).length > 0 && !hasRemainingCredits && (
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-center">
           <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
             <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
