@@ -28,6 +28,53 @@ export interface ResumeData {
   skills: string[]
 }
 
+const str = (v: unknown, max = 500) => String(v ?? '').slice(0, max)
+
+export function validateResumeData(raw: unknown): ResumeData {
+  const d = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>
+  const p = (d.personal && typeof d.personal === 'object' ? d.personal : {}) as Record<string, unknown>
+
+  const experience: ExperienceEntry[] = Array.isArray(d.experience)
+    ? d.experience.slice(0, 20).map((e: unknown) => {
+        const x = (e && typeof e === 'object' ? e : {}) as Record<string, unknown>
+        return {
+          id: str(x.id, 50),
+          company: str(x.company),
+          role: str(x.role),
+          startDate: str(x.startDate, 50),
+          endDate: str(x.endDate, 50),
+          bullets: Array.isArray(x.bullets) ? x.bullets.slice(0, 10).map((b: unknown) => str(b, 500)) : [],
+        }
+      })
+    : []
+
+  const education: EducationEntry[] = Array.isArray(d.education)
+    ? d.education.slice(0, 10).map((e: unknown) => {
+        const x = (e && typeof e === 'object' ? e : {}) as Record<string, unknown>
+        return {
+          id: str(x.id, 50),
+          institution: str(x.institution),
+          degree: str(x.degree),
+          year: str(x.year, 50),
+        }
+      })
+    : []
+
+  return {
+    personal: {
+      name: str(p.name),
+      title: str(p.title),
+      email: str(p.email),
+      phone: str(p.phone, 50),
+      location: str(p.location),
+      linkedin: str(p.linkedin),
+    },
+    experience,
+    education,
+    skills: Array.isArray(d.skills) ? d.skills.slice(0, 30).map((s: unknown) => str(s, 100)) : [],
+  }
+}
+
 export const SAMPLE_RESUME: ResumeData = {
   personal: {
     name: 'Priya Sharma',

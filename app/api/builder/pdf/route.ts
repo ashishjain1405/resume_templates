@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase-server'
 import type { ResumeData } from '@/lib/resume-data'
 import { buildResumeHtml } from '@/lib/build-resume-html'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { validateResumeData } from '@/lib/resume-data'
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
@@ -22,7 +23,7 @@ export async function POST(req: NextRequest) {
     accentColor: string
   }
 
-  const html = buildResumeHtml(data, accentColor, templateId)
+  const html = buildResumeHtml(validateResumeData(data), accentColor, templateId)
 
   if (!asPdf) {
     return new NextResponse(html, {

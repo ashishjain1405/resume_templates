@@ -3,6 +3,7 @@ import { createClient, createAdminClient } from '@/lib/supabase-server'
 import { isPro } from '@/lib/pro'
 import { uploadResumeToDrive } from '@/lib/google-drive'
 import { buildResumeHtml } from '@/lib/build-resume-html'
+import { validateResumeData } from '@/lib/resume-data'
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +18,7 @@ export async function POST(request: NextRequest) {
     const { templateId, data, accentColor } = await request.json()
     if (!templateId || !data) return Response.json({ error: 'Missing templateId or data' }, { status: 400 })
 
-    const html = buildResumeHtml(data, accentColor ?? '#2c3e50', templateId)
+    const html = buildResumeHtml(validateResumeData(data), accentColor ?? '#2c3e50', templateId)
     const buffer = Buffer.from(html, 'utf-8')
     const url = await uploadResumeToDrive(buffer, 'resume.html', 'text/html')
     return Response.json({ url })
