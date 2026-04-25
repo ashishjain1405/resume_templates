@@ -194,7 +194,7 @@ function ATSCheckInner() {
   }, [])
 
   useEffect(() => {
-    if (savedResumes.length > 0 && tab === 'upload' && !pendingRestoredRef.current) setTab('saved')
+    if (savedResumes.length > 0 && tab === 'upload' && !pendingRestoredRef.current && !selectedResumeIdRef.current) setTab('saved')
   }, [savedResumes])
 
   // Auto-trigger Google Docs edit when returning from payment with ?openDocs=1 or sessionStorage flag
@@ -248,9 +248,17 @@ function ATSCheckInner() {
         setError('')
         setLoading(true)
         setResult(null)
-        const form = new FormData()
-        form.append('file', f)
         try {
+          let resumeText = ''
+          try {
+            resumeText = await extractPdfText(f)
+          } catch {
+            setError('Could not parse this PDF. Please try pasting the text instead.')
+            return
+          }
+          if (!resumeText.trim()) { setError('Could not read text from this PDF. Please try pasting the text instead.'); return }
+          const form = new FormData()
+          form.append('resumeText', resumeText)
           const res = await fetch('/api/ats-check', { method: 'POST', body: form })
           const raw = await res.text()
           let parsed: { error?: string; _usage?: { used: number; limit: number } | null } & Partial<ATSResult> = {}
