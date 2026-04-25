@@ -317,10 +317,23 @@ function ATSCheckInner() {
         setResumeText(pending.resumeText)
       } else if (pending.tab === 'upload' && pending.fileData) {
         setTab('upload')
+        setLoading(true)
         fetch(pending.fileData)
           .then(r => r.blob())
-          .then(blob => setFile(new File([blob], pending.fileName ?? 'resume.pdf', { type: pending.fileType ?? 'application/pdf' })))
-          .catch(() => setInfo('Resume could not be restored — please re-upload.'))
+          .then(async blob => {
+            const file = new File([blob], pending.fileName ?? 'resume.pdf', { type: pending.fileType ?? 'application/pdf' })
+            const uploadForm = new FormData()
+            uploadForm.append('file', file)
+            const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: uploadForm })
+            const uploadData = await uploadRes.json()
+            if (uploadData.resume?.id) {
+              window.location.href = `/ats-check?resumeId=${uploadData.resume.id}`
+            } else {
+              setFile(file)
+              setLoading(false)
+            }
+          })
+          .catch(() => { setInfo('Resume could not be restored — please re-upload.'); setLoading(false) })
       } else if (pending.tab === 'saved' && pending.selectedResumeId) {
         setResumeId(pending.selectedResumeId)
         setLoading(true)
