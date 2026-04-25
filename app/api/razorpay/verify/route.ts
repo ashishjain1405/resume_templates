@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { createHmac } from 'crypto'
+import { createHmac, timingSafeEqual } from 'crypto'
 import { createClient } from '@/lib/supabase-server'
 import { createAdminClient } from '@/lib/supabase-server'
 import { TEMPLATES } from '@/lib/templates'
@@ -19,12 +19,11 @@ export async function POST(request: NextRequest) {
     .update(`${razorpay_order_id}|${razorpay_payment_id}`)
     .digest('hex')
 
-  if (expectedSignature !== razorpay_signature) {
-    console.error('Signature mismatch', {
-      expected: expectedSignature,
-      received: razorpay_signature,
-      hasSecret: !!process.env.RAZORPAY_KEY_SECRET,
-    })
+  const signaturesMatch = timingSafeEqual(
+    Buffer.from(expectedSignature, 'hex'),
+    Buffer.from(typeof razorpay_signature === 'string' ? razorpay_signature : '', 'hex'),
+  )
+  if (!signaturesMatch) {
     return Response.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
