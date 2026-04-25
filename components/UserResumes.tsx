@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
 import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
 import { TEMPLATES } from '@/lib/templates'
 
