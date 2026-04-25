@@ -223,7 +223,7 @@ function ATSCheckInner() {
       .finally(() => setEditLoading(false))
   }, [isPro])
 
-  // Load resume from dashboard "Check ATS" link (?resumeId=) — pre-select file, user clicks Analyse
+  // Load resume from dashboard "Check ATS" link (?resumeId=) and auto-analyse
   useEffect(() => {
     const resumeId = searchParams.get('resumeId')
     if (!resumeId) return
@@ -245,7 +245,30 @@ function ATSCheckInner() {
         setTab('upload')
         setResumeId(resumeId)
         if (data.template_id) setBuilderTemplateId(data.template_id)
-        setSaveCount(1)
+        setError('')
+        setLoading(true)
+        setResult(null)
+        const form = new FormData()
+        form.append('file', f)
+        try {
+          const res = await fetch('/api/ats-check', { method: 'POST', body: form })
+          const raw = await res.text()
+          let parsed: { error?: string; _usage?: { used: number; limit: number } | null } & Partial<ATSResult> = {}
+          try { parsed = JSON.parse(raw) } catch { /* ignore */ }
+          if (!res.ok) {
+            if (res.status === 403) setModal('pro_required')
+            else if (res.status === 401) setModal('login_required')
+            else setError(parsed.error ?? `Error ${res.status}`)
+          } else {
+            setResult(parsed as ATSResult)
+            if (parsed._usage) setUsage(parsed._usage)
+            setSaveCount(1)
+          }
+        } catch (e) {
+          setError(e instanceof Error ? e.message : 'Something went wrong.')
+        } finally {
+          setLoading(false)
+        }
       })
       .catch(() => {})
   }, [searchParams])
