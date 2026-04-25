@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, Suspense } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import ProBadge from '@/components/ProBadge'
 import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
 import { useProUpgrade } from '@/lib/use-pro-upgrade'
@@ -118,6 +118,7 @@ const FREE_LIMIT = 5
 
 function ATSCheckInner() {
   const searchParams = useSearchParams()
+  const router = useRouter()
   const [tab, setTab] = useState<'upload' | 'paste' | 'saved'>('upload')
   const [file, setFile] = useState<File | null>(null)
   const [resumeText, setResumeText] = useState('')
@@ -227,7 +228,7 @@ function ATSCheckInner() {
     if (!resumeId) return
     if (resumeIdProcessedRef.current) return
     resumeIdProcessedRef.current = true
-    window.history.replaceState({}, '', window.location.pathname)
+    router.replace('/ats-check')
     fetch(`/api/resume/${resumeId}`)
       .then(r => r.json())
       .then(async data => {
