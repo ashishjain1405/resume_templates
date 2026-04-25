@@ -15,7 +15,9 @@ function getOAuth2Client() {
   return client
 }
 
-// Returns available 30-min slots over the next `days` working days (Mon–Fri, 10am–6pm IST)
+// Returns available 30-min slots:
+// - Mon–Fri: 11am–5pm IST
+// - Sat–Sun: 12pm–5pm IST
 export async function getAvailableSlots(days = 14): Promise<Slot[]> {
   const auth = getOAuth2Client()
   const calendar = google.calendar({ version: 'v3', auth })
@@ -49,15 +51,28 @@ export async function getAvailableSlots(days = 14): Promise<Slot[]> {
 
   while (cursor < endDate) {
     const day = cursor.getDay()
-    if (day === 0 || day === 6) { cursor.setDate(cursor.getDate() + 1); cursor.setHours(5, 30, 0, 0); continue } // skip weekends; next day 11am IST = 5:30am UTC
+    const isWeekend = day === 0 || day === 6
 
     // Get IST hour
     const istMs = cursor.getTime() + IST_OFFSET
     const istDate = new Date(istMs)
     const istHour = istDate.getUTCHours()
 
-    if (istHour < 11) { cursor.setTime(cursor.getTime() + (11 - istHour) * 60 * 60 * 1000); cursor.setMinutes(0, 0, 0); continue }
-    if (istHour >= 17) { cursor.setDate(cursor.getDate() + 1); cursor.setHours(5, 30, 0, 0); continue } // next day 11am IST = 5:30am UTC
+    const startHour = isWeekend ? 12 : 11 // weekends start at 12pm IST, weekdays at 11am IST
+    const istMinute = istDate.getUTCMinutes()
+
+    if (istHour < startHour) {
+      // jump to startHour:00 IST = startHour:00 IST expressed in UTC
+      // current IST elapsed minutes into the day: istHour*60 + istMinute
+      // target IST elapsed minutes: startHour*60
+      // startHour IST in UTC = startHour*60 - 330 minutes from UTC midnight of current IST day
+      // easier: advance by the remaining minutes to reach startHour:00 IST
+      const istElapsed = istHour * 60 + istMinute
+      const targetElapsed = startHour * 60
+      cursor.setTime(cursor.getTime() + (targetElapsed - istElapsed) * 60 * 1000)
+      continue
+    }
+    if (istHour >= 17) { cursor.setDate(cursor.getDate() + 1); cursor.setHours(5, 30, 0, 0); continue } // next day 11am IST
 
     const slotEnd = new Date(cursor.getTime() + 30 * 60 * 1000)
     const overlaps = busy.some((b) => {
