@@ -227,6 +227,7 @@ function ATSCheckInner() {
     if (!resumeId) return
     if (resumeIdProcessedRef.current) return
     resumeIdProcessedRef.current = true
+    window.history.replaceState({}, '', window.location.pathname)
     fetch(`/api/resume/${resumeId}`)
       .then(r => r.json())
       .then(async data => {
