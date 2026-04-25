@@ -261,6 +261,11 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       }
       // else: proResolved=false — wait for next re-run when isPro/proResolved update
     }
+    const savePending = localStorage.getItem(`save_pending_${templateId}`)
+    if (savePending) {
+      localStorage.removeItem(`save_pending_${templateId}`)
+      setTimeout(() => handleSaveVersion(), 0)
+    }
     const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
     if (docsPending) {
       if (isPro) {
@@ -342,7 +347,14 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   }
 
   async function handleSaveVersion() {
-    if (!user) { setShowAuthModal(true); return }
+    if (!user) {
+      const sessionSnapshot = JSON.stringify({ data, accentColor })
+      sessionStorage.setItem(`builder_session_${templateId}`, sessionSnapshot)
+      localStorage.setItem(`builder_session_restore_${templateId}`, sessionSnapshot)
+      localStorage.setItem(`save_pending_${templateId}`, '1')
+      setShowAuthModal(true)
+      return
+    }
     setSavingVersion(true)
     try {
       const res = await fetch('/api/builder/pdf?pdf=1', {
