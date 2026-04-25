@@ -223,7 +223,7 @@ function ATSCheckInner() {
       .finally(() => setEditLoading(false))
   }, [isPro])
 
-  // Load resume from dashboard "Check ATS" link (?resumeId=) and auto-analyse
+  // Load resume from dashboard "Check ATS" link (?resumeId=) — pre-select file, user clicks Analyse
   useEffect(() => {
     const resumeId = searchParams.get('resumeId')
     if (!resumeId) return
@@ -245,32 +245,7 @@ function ATSCheckInner() {
         setTab('upload')
         setResumeId(resumeId)
         if (data.template_id) setBuilderTemplateId(data.template_id)
-        // Auto-trigger analysis
-        setError('')
-        setLoading(true)
-        setResult(null)
-        const form = new FormData()
-        form.append('file', f)
-        try {
-          const res = await fetch('/api/ats-check', { method: 'POST', body: form })
-          const raw = await res.text()
-          let parsed: { error?: string; _usage?: { used: number; limit: number } | null } & Partial<ATSResult> = {}
-          try { parsed = JSON.parse(raw) } catch { /* ignore */ }
-          if (!res.ok) {
-            if (res.status === 403) setModal('pro_required')
-            else if (res.status === 401) setModal('login_required')
-            else setError(parsed.error ?? `Error ${res.status}`)
-          } else {
-            setResult(parsed as ATSResult)
-            if (parsed._usage) setUsage(parsed._usage)
-            // resumeId already exists in dashboard — treat as already saved, auto-PATCH score
-            setSaveCount(1)
-          }
-        } catch (e) {
-          setError(e instanceof Error ? e.message : 'Something went wrong.')
-        } finally {
-          setLoading(false)
-        }
+        setSaveCount(1)
       })
       .catch(() => {})
   }, [searchParams])
@@ -286,97 +261,34 @@ function ATSCheckInner() {
       const pending = JSON.parse(raw)
       const jd = pending.jobDescription ?? ''
       setJobDescription(jd)
-      const autoAnalyse = (form: FormData, attempt = 0) => {
-        setLoading(true)
-        fetch('/api/ats-check', { method: 'POST', body: form })
-          .then(r => r.text())
-          .then(txt => {
-            try {
-              const data = JSON.parse(txt)
-              if (data.overall_score !== undefined) {
-                setResult(data)
-                if (data._usage) setUsage(data._usage)
-                setLoading(false)
-              } else if (data.error === 'limit_reached' && attempt < 4) {
-                // Pro DB write may not have replicated yet — retry with backoff
-                setTimeout(() => autoAnalyse(form, attempt + 1), 800)
-              } else {
-                setError(data.error ?? 'Analysis failed. Please try again.')
-                setLoading(false)
-              }
-            } catch { setError('Analysis failed. Please try again.'); setLoading(false) }
-          })
-          .catch(() => { setError('Something went wrong. Please try again.'); setLoading(false) })
-      }
 
       if (pending.fromBuilder && pending.data && pending.templateId) {
-        const d = pending.data
-        const p = d.personal ?? {}
         setBuilderTemplateId(pending.templateId)
         setLoading(true)
         fetch('/api/builder/pdf?pdf=1', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ templateId: pending.templateId, data: d, accentColor: pending.accentColor }),
+          body: JSON.stringify({ templateId: pending.templateId, data: pending.data, accentColor: pending.accentColor }),
         })
           .then(r => r.ok ? r.blob() : null)
-          .then(async blob => {
-            if (!blob) { setLoading(false); setError('Could not generate PDF. Please try again.'); return }
-            const name = `${p.name?.replace(/\s+/g, '_') || 'resume'}_${pending.templateId}.pdf`
-            const file = new File([blob], name, { type: 'application/pdf' })
-            setFile(file)
+          .then(blob => {
+            if (!blob) { setError('Could not generate PDF. Please try again.'); return }
+            const name = `${pending.data.personal?.name?.replace(/\s+/g, '_') || 'resume'}_${pending.templateId}.pdf`
+            setFile(new File([blob], name, { type: 'application/pdf' }))
             setTab('upload')
-            const form = new FormData()
-            form.append('file', file)
-            form.append('template_id', pending.templateId)
-            const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
-            const uploadData = await uploadRes.json()
-            if (uploadData.resume?.id) {
-              window.location.href = `/ats-check?resumeId=${uploadData.resume.id}`
-            } else {
-              const fallbackForm = new FormData()
-              fallbackForm.append('file', file)
-              autoAnalyse(fallbackForm)
-            }
           })
-          .catch(() => { setLoading(false); setError('Something went wrong. Please try again.') })
+          .catch(() => setError('Something went wrong. Please try again.'))
+          .finally(() => setLoading(false))
       } else if (pending.tab === 'paste' && pending.resumeText) {
         setTab('paste')
         setResumeText(pending.resumeText)
-        const form = new FormData()
-        form.append('resumeText', pending.resumeText)
-        form.append('jobDescription', jd)
-        autoAnalyse(form)
       } else if (pending.tab === 'upload' && pending.fileData) {
         setTab('upload')
-        setLoading(true)
-        // Reconstruct file, upload to storage, then analyse via resumeId (avoids pdfjs on raw bytes)
         fetch(pending.fileData)
           .then(r => r.blob())
-          .then(async blob => {
-            const restoredFile = new File([blob], pending.fileName ?? 'resume.pdf', { type: pending.fileType ?? 'application/pdf' })
-            setFile(restoredFile)
-            const uploadForm = new FormData()
-            uploadForm.append('file', restoredFile)
-            const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: uploadForm })
-            const uploadData = await uploadRes.json()
-            if (uploadData.resume?.id) {
-              // Fetch signed URL and analyse via blob — same path as dashboard "Check ATS"
-              const urlRes = await fetch(`/api/resume/${uploadData.resume.id}`)
-              const urlData = await urlRes.json()
-              if (!urlData.url) throw new Error('no url')
-              const pdfBlob = await fetch(urlData.url).then(r => r.blob())
-              const form = new FormData()
-              form.append('file', new File([pdfBlob], restoredFile.name, { type: restoredFile.type }))
-              form.append('jobDescription', jd)
-              autoAnalyse(form)
-            } else {
-              throw new Error('upload failed')
-            }
-          })
-          .catch(() => { setInfo('Resume could not be restored — please re-upload.'); setLoading(false) })
+          .then(blob => setFile(new File([blob], pending.fileName ?? 'resume.pdf', { type: pending.fileType ?? 'application/pdf' })))
+          .catch(() => setInfo('Resume could not be restored — please re-upload.'))
       } else if (pending.tab === 'saved' && pending.selectedResumeId) {
-        // File was uploaded to storage before payment — fetch blob, show on upload tab, analyse
         setResumeId(pending.selectedResumeId)
         setLoading(true)
         fetch(`/api/resume/${pending.selectedResumeId}`)
@@ -384,14 +296,11 @@ function ATSCheckInner() {
           .then(async ({ url, filename }) => {
             if (!url) throw new Error('no url')
             const blob = await fetch(url).then(r => r.blob())
-            const f = new File([blob], filename ?? 'resume.pdf', { type: blob.type || 'application/pdf' })
-            setFile(f)
+            setFile(new File([blob], filename ?? 'resume.pdf', { type: blob.type || 'application/pdf' }))
             setTab('upload')
-            const form = new FormData()
-            form.append('file', f)
-            autoAnalyse(form)
           })
-          .catch(() => { setInfo('Resume could not be restored — please re-upload.'); setLoading(false) })
+          .catch(() => setInfo('Resume could not be restored — please re-upload.'))
+          .finally(() => setLoading(false))
       } else if (pending.tab === 'upload') {
         setTab('upload')
         setInfo('You\'re signed in — re-upload your PDF and click Analyse.')
