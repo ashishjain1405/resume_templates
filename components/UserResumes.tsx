@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
+import { TEMPLATES } from '@/lib/templates'
 
 interface UploadedResume {
   id: string
@@ -21,13 +23,22 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-export default function UserResumes({ isPro = false }: { isPro?: boolean }) {
+export default function UserResumes({
+  isPro = false,
+  purchasedTemplateIds = new Set<string>(),
+  userEmail = '',
+}: {
+  isPro?: boolean
+  purchasedTemplateIds?: Set<string>
+  userEmail?: string
+}) {
   const [resumes, setResumes] = useState<UploadedResume[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
+  const [upgradeModalTemplateId, setUpgradeModalTemplateId] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => { fetchResumes() }, [])
@@ -87,6 +98,14 @@ export default function UserResumes({ isPro = false }: { isPro?: boolean }) {
       setDeletingId(null)
     }
   }
+
+  function canDownload(r: UploadedResume) {
+    return !r.template_id || isPro || purchasedTemplateIds.has(r.template_id)
+  }
+
+  const upgradeTemplate = upgradeModalTemplateId
+    ? TEMPLATES.find(t => t.id === upgradeModalTemplateId)
+    : null
 
   return (
     <div>
@@ -162,7 +181,7 @@ export default function UserResumes({ isPro = false }: { isPro?: boolean }) {
                 >
                   Check Resume score
                 </Link>
-                {isPro ? (
+                {canDownload(r) ? (
                   <button
                     onClick={() => handleDownload(r)}
                     disabled={downloadingId === r.id}
@@ -178,11 +197,16 @@ export default function UserResumes({ isPro = false }: { isPro?: boolean }) {
                     )}
                   </button>
                 ) : (
-                  <span className="text-gray-300 cursor-default" aria-label="Pro required to download" title="Upgrade to Pro to download">
+                  <button
+                    onClick={() => setUpgradeModalTemplateId(r.template_id)}
+                    className="text-gray-300 hover:text-amber-500 transition-colors"
+                    aria-label="Unlock to download"
+                    title="Purchase or upgrade to download"
+                  >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                     </svg>
-                  </span>
+                  </button>
                 )}
                 <button
                   onClick={(e) => { e.stopPropagation(); handleDelete(r.id) }}
@@ -201,6 +225,33 @@ export default function UserResumes({ isPro = false }: { isPro?: boolean }) {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Upgrade / purchase modal for locked builder resumes */}
+      {upgradeModalTemplateId && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setUpgradeModalTemplateId(null)}>
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl relative" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setUpgradeModalTemplateId(null)} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+            <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 3v13.5m-4.5-4.5L12 16.5l4.5-4.5" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Download your resume</h3>
+            <p className="text-sm text-gray-500 text-center mb-5">Choose what works for you — buy just this template or unlock everything with Pro.</p>
+            <div className="flex flex-col gap-2">
+              {upgradeTemplate && (
+                <Link
+                  href={`/builder/${upgradeModalTemplateId}`}
+                  className="w-full py-3 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors text-center"
+                >
+                  Buy {upgradeTemplate.name} template — ₹{(upgradeTemplate.price_inr / 100).toLocaleString('en-IN')}
+                </Link>
+              )}
+              <ProUpgradeCTAs layout="stack" userEmail={userEmail} source="download" returnPath="/dashboard" />
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -461,7 +461,11 @@ export default function DashboardTabs({
               <p className="text-sm text-gray-500">Upload your existing resume to run an ATS check or edit it in Google Docs. Files are stored securely and only accessible by you.</p>
             </div>
           </div>
-          <UserResumes isPro={isPro} />
+          <UserResumes
+          isPro={isPro}
+          purchasedTemplateIds={new Set(effectiveAccessible.map(t => t.id))}
+          userEmail={userEmail ?? ''}
+        />
         </div>
       )}
     </div>
