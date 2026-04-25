@@ -242,7 +242,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         }
       }
     }
-    load()
+    load().then(() => setIsDirty(true))
   }, [user, templateId])
 
   // Auto-open Pro upgrade modal once user is resolved — runs after load() has restored data
