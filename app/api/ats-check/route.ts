@@ -135,7 +135,43 @@ export async function POST(request: NextRequest) {
 
     const raw = completion.choices[0].message.content ?? ''
     try {
-      const result = JSON.parse(raw)
+      const r = JSON.parse(raw)
+
+      const clamp = (v: unknown) => Math.min(100, Math.max(0, Number.isFinite(Number(v)) ? Number(v) : 0))
+      const strArr = (v: unknown) => (Array.isArray(v) ? v.filter((x) => typeof x === 'string') : [])
+
+      const result = {
+        overall_score: clamp(r.overall_score),
+        ats_score: clamp(r.ats_score),
+        recruiter_score: clamp(r.recruiter_score),
+        section_scores: {
+          keywords: clamp(r.section_scores?.keywords),
+          formatting: clamp(r.section_scores?.formatting),
+          contact: clamp(r.section_scores?.contact),
+          achievements: clamp(r.section_scores?.achievements),
+          relevance_to_job: clamp(r.section_scores?.relevance_to_job),
+        },
+        top_issues: strArr(r.top_issues),
+        missing_keywords: strArr(r.missing_keywords),
+        bullet_improvements: Array.isArray(r.bullet_improvements)
+          ? r.bullet_improvements
+              .filter((b: unknown) => b && typeof b === 'object')
+              .map((b: { original?: unknown; improved?: unknown }) => ({
+                original: typeof b.original === 'string' ? b.original : '',
+                improved: typeof b.improved === 'string' ? b.improved : '',
+              }))
+          : [],
+        suggestions: Array.isArray(r.suggestions)
+          ? r.suggestions
+              .filter((s: unknown) => s && typeof s === 'object')
+              .map((s: { priority?: unknown; action?: unknown; example?: unknown }) => ({
+                priority: ['high', 'medium', 'low'].includes(s.priority as string) ? s.priority : 'medium',
+                action: typeof s.action === 'string' ? s.action : '',
+                example: typeof s.example === 'string' ? s.example : '',
+              }))
+          : [],
+      }
+
       // Track usage for free users
       let usageAfter: number | null = null
       if (!pro) {
