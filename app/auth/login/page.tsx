@@ -41,19 +41,7 @@ function LoginForm() {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
       if (error.message.toLowerCase().includes('invalid login credentials')) {
-        // Check whether email exists — if not, redirect to sign-up
-        const res = await fetch('/api/auth/check-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email }),
-        })
-        const { exists } = await res.json()
-        if (!exists) {
-          const signupUrl = `/auth/signup?redirect=${encodeURIComponent(redirect)}&email=${encodeURIComponent(email)}&info=${encodeURIComponent('No account found for that email — let\'s create one.')}`
-          window.location.href = signupUrl
-          return
-        }
-        setError('Incorrect password. ')
+        setError('Incorrect email or password. ')
         setErrorLink({ text: 'Forgot your password? →', href: `/auth/forgot-password?email=${encodeURIComponent(email)}` })
       } else {
         setError(error.message)
