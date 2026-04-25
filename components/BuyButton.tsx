@@ -128,12 +128,20 @@ export default function BuyButton({ template, purchased, selectedColor }: Props)
     const color = selectedColor ?? template.colors[0]
     const downloadHref = `/api/download/${template.id}?color=${encodeURIComponent(color)}`
     return (
-      <a
-        href={downloadHref}
-        className="w-full block text-center bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
-      >
-        Download PDF
-      </a>
+      <div className="flex flex-col gap-2">
+        <a
+          href={`/builder/${template.id}`}
+          className="w-full block text-center bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+        >
+          Create resume with this template
+        </a>
+        <a
+          href={downloadHref}
+          className="w-full block text-center border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors"
+        >
+          Download PDF
+        </a>
+      </div>
     )
   }
 

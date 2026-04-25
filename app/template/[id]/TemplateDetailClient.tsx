@@ -85,14 +85,16 @@ export default function TemplateDetailClient({ template, purchased }: Props) {
           </p>
         )}
 
-        <div className="mt-4 pt-4 border-t border-gray-100">
-          <Link
-            href={`/builder/${template.id}`}
-            className="w-full block text-center border border-blue-600 text-blue-600 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-50 transition-colors"
-          >
-            Build resume with this template →
-          </Link>
-        </div>
+        {!purchased && (
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <Link
+              href={`/builder/${template.id}`}
+              className="w-full block text-center border border-blue-600 text-blue-600 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-50 transition-colors"
+            >
+              Build resume with this template →
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   )
