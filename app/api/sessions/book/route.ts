@@ -55,13 +55,16 @@ export async function POST(request: NextRequest) {
     try {
       const resend = new Resend(process.env.RESEND_API_KEY)
       const scheduledDate = new Date(start).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'full', timeStyle: 'short' })
+      const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+      const safeName = esc(userName || 'Not provided')
+      const safeEmail = esc(user.email ?? '')
       const { data: emailData, error: emailError } = await resend.emails.send({
         from: 'onboarding@resend.dev',
         to: process.env.EXPERT_EMAIL!,
         subject: `New session booked — ${userName || user.email}`,
         html: `<p>A new resume session has been booked.</p>
-               <p><strong>Name:</strong> ${userName || 'Not provided'}<br>
-               <strong>Email:</strong> ${user.email}<br>
+               <p><strong>Name:</strong> ${safeName}<br>
+               <strong>Email:</strong> ${safeEmail}<br>
                <strong>Time:</strong> ${scheduledDate} IST<br>
                <strong>Meet link:</strong> <a href="${meetLink}">${meetLink}</a></p>`,
       })
