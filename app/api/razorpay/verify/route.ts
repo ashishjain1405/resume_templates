@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
   if (payment.status !== 'captured') {
     return Response.json({ error: 'Payment not captured' }, { status: 400 })
   }
-  if (Number(payment.amount) !== template.price_inr * 100) {
+  if (Number(payment.amount) !== template.price_inr) {
     return Response.json({ error: 'Amount mismatch' }, { status: 400 })
   }
 
