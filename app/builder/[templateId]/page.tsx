@@ -352,6 +352,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       sessionStorage.setItem(`builder_session_${templateId}`, sessionSnapshot)
       localStorage.setItem(`builder_session_restore_${templateId}`, sessionSnapshot)
       localStorage.setItem(`save_pending_${templateId}`, '1')
+      setShowChangeTemplateModal(false)
       setShowAuthModal(true)
       return false
     }
