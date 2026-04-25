@@ -116,6 +116,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [savingVersion, setSavingVersion] = useState(false)
   const [savedVersion, setSavedVersion] = useState(false)
   const [saveCount, setSaveCount] = useState(0)
+  const [isDirty, setIsDirty] = useState(false)
   const [mobileView, setMobileView] = useState<'edit' | 'preview'>('edit')
   const [isPro, setIsPro] = useState(false)
   const [proResolved, setProResolved] = useState(false)
@@ -304,11 +305,13 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   }, [user, templateId])
 
   function updateData(next: ResumeData) {
+    setIsDirty(true)
     setData(next)
     autoSave(next, accentColor)
   }
 
   function updateColor(color: string) {
+    setIsDirty(true)
     setAccentColor(color)
     autoSave(data, color)
   }
@@ -377,6 +380,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       if (!uploadRes.ok) { alert('Could not save to Dashboard. Please try again.'); return false }
       setSaveCount(c => c + 1)
       setSavedVersion(true)
+      setIsDirty(false)
       setTimeout(() => setSavedVersion(false), 3000)
       return true
     } finally {
@@ -734,7 +738,14 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
               {!isPro && <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clipRule="evenodd" /></svg>}
             </button>
             <button
-              onClick={() => setShowChangeTemplateModal(true)}
+              onClick={() => {
+                if (isDirty) {
+                  setShowChangeTemplateModal(true)
+                } else {
+                  localStorage.removeItem(storageKey(templateId))
+                  router.push('/builder')
+                }
+              }}
               className="flex items-center gap-1.5 text-xs border border-blue-200 text-blue-600 bg-blue-50 hover:bg-blue-100 px-2.5 py-1 rounded-lg font-medium transition-colors"
             >
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
