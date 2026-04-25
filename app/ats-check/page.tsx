@@ -255,7 +255,8 @@ function ATSCheckInner() {
           } else {
             setResult(parsed as ATSResult)
             if (parsed._usage) setUsage(parsed._usage)
-            setSaveCount(0)
+            // resumeId already exists in dashboard — treat as already saved, auto-PATCH score
+            setSaveCount(1)
           }
         } catch (e) {
           setError(e instanceof Error ? e.message : 'Something went wrong.')
@@ -380,6 +381,16 @@ function ATSCheckInner() {
       }
     } catch { /* ignore */ }
   }, [])
+
+  // Auto-PATCH score for existing resumes (saved tab or ?resumeId=) — no user action needed
+  useEffect(() => {
+    if (!result || !selectedResumeId || result.overall_score == null) return
+    fetch(`/api/resume/${selectedResumeId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ats_score: result.overall_score }),
+    }).catch(() => { /* best-effort */ })
+  }, [result, selectedResumeId])
 
   // Warn before tab close / hard navigation when result is unsaved
   useEffect(() => {
@@ -597,7 +608,8 @@ function ATSCheckInner() {
       }
       const atsResult = data as ATSResult
       setResult(atsResult)
-      setSaveCount(0)
+      // If analysing an existing saved resume, treat it as already saved — score will auto-PATCH
+      setSaveCount(selectedResumeIdRef.current ? 1 : 0)
       if (atsResult._usage) setUsage(atsResult._usage)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.')
@@ -999,24 +1011,26 @@ function ATSCheckInner() {
                     {!isPro && <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clipRule="evenodd" /></svg>}
                   </button>
                 )}
-                <button
-                  onClick={handleSaveToDashboard}
-                  disabled={savingToDashboard}
-                  className="flex items-center gap-1.5 border border-gray-200 text-gray-700 px-3.5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
-                >
-                  {savingToDashboard ? (
-                    <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-500 rounded-full animate-spin" />
-                  ) : savedToDashboard ? (
-                    <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  ) : (
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
-                    </svg>
-                  )}
-                  {savedToDashboard ? 'Saved to Dashboard' : 'Save to Dashboard'}
-                </button>
+                {!selectedResumeId && (
+                  <button
+                    onClick={handleSaveToDashboard}
+                    disabled={savingToDashboard}
+                    className="flex items-center gap-1.5 border border-gray-200 text-gray-700 px-3.5 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  >
+                    {savingToDashboard ? (
+                      <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-500 rounded-full animate-spin" />
+                    ) : savedToDashboard ? (
+                      <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                      </svg>
+                    )}
+                    {savedToDashboard ? 'Saved to Dashboard' : 'Save to Dashboard'}
+                  </button>
+                )}
               </div>
 
               <div className="flex items-center gap-6">
