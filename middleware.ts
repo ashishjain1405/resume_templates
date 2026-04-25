@@ -4,7 +4,7 @@ import { createServerClient } from '@supabase/ssr'
 const protectedRoutes = ['/dashboard']
 
 // API routes that don't require authentication
-const PUBLIC_API_PREFIXES = ['/api/auth/']
+const PUBLIC_API_PREFIXES = ['/api/auth/', '/api/ats-check']
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request })
