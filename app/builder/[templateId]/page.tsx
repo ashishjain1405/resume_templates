@@ -119,6 +119,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [isPro, setIsPro] = useState(false)
   const [proResolved, setProResolved] = useState(false)
   const [purchased, setPurchased] = useState(false)
+  const [purchasedResolved, setPurchasedResolved] = useState(false)
   const [buyingTemplate, setBuyingTemplate] = useState(false)
   const [showProDownloadModal, setShowProDownloadModal] = useState(false)
   const [showProDocsModal, setShowProDocsModal] = useState(false)
@@ -141,7 +142,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       setUser(data.user)
       if (data.user) {
         supabase.from('purchases').select('id').eq('user_id', data.user.id).eq('template_id', templateId).maybeSingle()
-          .then(({ data: row }) => setPurchased(!!row))
+          .then(({ data: row }) => { setPurchased(!!row); setPurchasedResolved(true) })
         if (initialProFlag) {
           setIsPro(true)
           setProResolved(true)
@@ -250,7 +251,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       if (isPro || purchased) {
         localStorage.removeItem(`download_pending_${templateId}`)
         setTimeout(() => handleDownload(), 0)
-      } else if (proResolved) {
+      } else if (proResolved && purchasedResolved) {
         const proFlag = localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked')
         if (!proFlag) {
           localStorage.removeItem(`download_pending_${templateId}`)
@@ -272,7 +273,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         }
       }
     }
-  }, [user, isPro, proResolved, purchased, templateId])
+  }, [user, isPro, proResolved, purchased, purchasedResolved, templateId])
 
   // Auto-save with debounce
   const autoSave = useCallback((next: ResumeData, color: string) => {
