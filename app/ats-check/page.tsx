@@ -820,10 +820,10 @@ function ATSCheckInner() {
               onClick={() => fileRef.current?.click()}
               onDragOver={e => { e.preventDefault(); setDragging(true) }}
               onDragLeave={() => setDragging(false)}
-              onDrop={e => { e.preventDefault(); setDragging(false); const f = e.dataTransfer.files[0]; if (f?.type === 'application/pdf') { setFile(f); setResumeId(null) } }}
+              onDrop={e => { e.preventDefault(); setDragging(false); const f = e.dataTransfer.files[0]; if (f?.type === 'application/pdf') { setFile(f); setResumeId(null); setBuilderTemplateId(null) } }}
               className={`border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors ${dragging ? 'border-blue-400 bg-blue-50' : file ? 'border-green-400 bg-green-50' : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'}`}
             >
-              <input ref={fileRef} type="file" accept=".pdf" className="hidden" onChange={e => { setFile(e.target.files?.[0] ?? null); setResumeId(null) }} />
+              <input ref={fileRef} type="file" accept=".pdf" className="hidden" onChange={e => { setFile(e.target.files?.[0] ?? null); setResumeId(null); setBuilderTemplateId(null) }} />
               {file ? (
                 <>
                   <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
