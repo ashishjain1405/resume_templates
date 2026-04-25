@@ -386,16 +386,11 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     }
     try {
       setDocsLoading(true)
-      const pdfRes = await fetch('/api/builder/pdf?pdf=1', {
+      const res = await fetch('/api/resume/edit-html', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ templateId, data, accentColor }),
       })
-      if (!pdfRes.ok) { setDocsLoading(false); return }
-      const blob = await pdfRes.blob()
-      const form = new FormData()
-      form.append('file', new File([blob], 'resume.pdf', { type: 'application/pdf' }))
-      const res = await fetch('/api/resume/edit', { method: 'POST', body: form })
       const json = await res.json()
       if (json.url) window.open(json.url, '_blank')
     } catch {
