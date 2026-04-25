@@ -141,6 +141,7 @@ function ATSCheckInner() {
   const [showSaveModal, setShowSaveModal] = useState(false)
   const [resultRestored, setResultRestored] = useState(false)
   const [pendingNavUrl, setPendingNavUrl] = useState<string | null>(null)
+  const [builderTemplateId, setBuilderTemplateId] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const beforeUnloadRef = useRef<((e: BeforeUnloadEvent) => void) | null>(null)
   const selectedResumeIdRef = useRef<string | null>(null)
@@ -292,6 +293,7 @@ function ATSCheckInner() {
       if (pending.fromBuilder && pending.data && pending.templateId) {
         const d = pending.data
         const p = d.personal ?? {}
+        setBuilderTemplateId(pending.templateId)
         setLoading(true)
         fetch('/api/builder/pdf?pdf=1', {
           method: 'POST',
@@ -307,6 +309,7 @@ function ATSCheckInner() {
             setTab('upload')
             const form = new FormData()
             form.append('file', file)
+            form.append('template_id', pending.templateId)
             const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
             const uploadData = await uploadRes.json()
             if (uploadData.resume?.id) {
@@ -402,6 +405,7 @@ function ATSCheckInner() {
         try {
           const form = new FormData()
           form.append('file', file)
+          if (builderTemplateId) form.append('template_id', builderTemplateId)
           const res = await fetch('/api/resume/upload', { method: 'POST', body: form })
           const d = await res.json()
           if (d.resume?.id) sid = d.resume.id
@@ -648,6 +652,7 @@ function ATSCheckInner() {
       const form = new FormData()
       form.append('file', fileToUpload)
       if (result?.overall_score != null) form.append('ats_score', String(result.overall_score))
+      if (builderTemplateId) form.append('template_id', builderTemplateId)
       await fetch('/api/resume/upload', { method: 'POST', body: form })
       setSaveCount(c => c + 1)
       setSavedToDashboard(true)
