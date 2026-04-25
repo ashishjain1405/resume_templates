@@ -346,14 +346,14 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     updateData({ ...data, skills: raw.split(',').map(s => s.trim()).filter(Boolean) })
   }
 
-  async function handleSaveVersion() {
+  async function handleSaveVersion(): Promise<boolean> {
     if (!user) {
       const sessionSnapshot = JSON.stringify({ data, accentColor })
       sessionStorage.setItem(`builder_session_${templateId}`, sessionSnapshot)
       localStorage.setItem(`builder_session_restore_${templateId}`, sessionSnapshot)
       localStorage.setItem(`save_pending_${templateId}`, '1')
       setShowAuthModal(true)
-      return
+      return false
     }
     setSavingVersion(true)
     try {
@@ -362,7 +362,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ templateId, data, accentColor }),
       })
-      if (!res.ok) { const err = await res.text(); alert(`Could not generate resume: ${err}`); return }
+      if (!res.ok) { const err = await res.text(); alert(`Could not generate resume: ${err}`); return false }
       const blob = await res.blob()
       const base = `${data.personal.name?.replace(/\s+/g, '_') || 'resume'}_${templateId}`
       const version = saveCount + 1
@@ -373,10 +373,11 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       form.append('file', file)
       form.append('template_id', templateId)
       const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
-      if (!uploadRes.ok) { alert('Could not save to Dashboard. Please try again.'); return }
+      if (!uploadRes.ok) { alert('Could not save to Dashboard. Please try again.'); return false }
       setSaveCount(c => c + 1)
       setSavedVersion(true)
       setTimeout(() => setSavedVersion(false), 3000)
+      return true
     } finally {
       setSavingVersion(false)
     }
@@ -795,8 +796,8 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
             <div className="flex flex-col gap-2">
               <button
                 onClick={async () => {
-                  await handleSaveVersion()
-                  router.push('/builder')
+                  const saved = await handleSaveVersion()
+                  if (saved) router.push('/builder')
                 }}
                 disabled={savingVersion}
                 className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
