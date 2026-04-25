@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase-server'
+import BuySessionButton from './BuySessionButton'
 
 interface Session {
   id: string
@@ -22,15 +23,17 @@ export default async function SessionsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/signup?redirect=/sessions')
 
-  const { data: sessions } = await supabase
-    .from('sessions')
-    .select('id, scheduled_at, meet_link, status, user_name')
-    .eq('user_id', user.id)
-    .order('scheduled_at', { ascending: false })
+  const [{ data: sessions }, { count: extraPurchases }] = await Promise.all([
+    supabase.from('sessions').select('id, scheduled_at, meet_link, status, user_name').eq('user_id', user.id).order('scheduled_at', { ascending: false }),
+    supabase.from('session_purchases').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+  ])
 
   const now = new Date()
   const upcoming = (sessions ?? []).filter((s: Session) => new Date(s.scheduled_at) > now && s.status === 'confirmed')
   const past = (sessions ?? []).filter((s: Session) => new Date(s.scheduled_at) <= now || s.status !== 'confirmed')
+
+  const totalCredits = 1 + (extraPurchases ?? 0)
+  const hasRemainingCredits = (sessions ?? []).length < totalCredits
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
@@ -39,7 +42,7 @@ export default async function SessionsPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-1">My Sessions</h1>
           <p className="text-gray-500 text-sm">Your expert resume review sessions.</p>
         </div>
-        {(sessions ?? []).length > 0 && (
+        {(sessions ?? []).length > 0 && hasRemainingCredits && (
           <Link href="/sessions/book" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
             Book a session
           </Link>
@@ -76,7 +79,7 @@ export default async function SessionsPage() {
       )}
 
       {past.length > 0 && (
-        <div>
+        <div className="mb-8">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Past</h2>
           <div className="space-y-3">
             {past.map((s: Session) => (
@@ -91,6 +94,20 @@ export default async function SessionsPage() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Used all credits — show buy CTA */}
+      {(sessions ?? []).length > 0 && !hasRemainingCredits && upcoming.length === 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-center">
+          <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
+            </svg>
+          </div>
+          <p className="text-sm font-semibold text-gray-900 mb-1">You&apos;ve used your included expert session</p>
+          <p className="text-xs text-gray-500 mb-4">Book another 30-minute 1:1 review at ₹299.</p>
+          <BuySessionButton userEmail={user.email ?? ''} />
         </div>
       )}
 

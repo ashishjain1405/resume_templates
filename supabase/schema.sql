@@ -74,6 +74,22 @@ CREATE POLICY "Users view own sessions"
   ON sessions FOR SELECT
   USING (auth.uid() = user_id);
 
+-- Additional session purchases (beyond the 1 included with Pro)
+CREATE TABLE IF NOT EXISTS session_purchases (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  razorpay_order_id TEXT,
+  razorpay_payment_id TEXT,
+  amount_inr INTEGER NOT NULL,
+  purchased_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE session_purchases ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users view own session purchases"
+  ON session_purchases FOR SELECT
+  USING (auth.uid() = user_id);
+
 -- Uploaded resumes: user-uploaded PDF/DOCX files stored in Supabase Storage
 CREATE TABLE IF NOT EXISTS uploaded_resumes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

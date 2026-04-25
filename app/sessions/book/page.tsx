@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
+import BuySessionButton from '../BuySessionButton'
 
 interface Slot {
   start: string
@@ -31,6 +32,7 @@ export default function BookSessionPage() {
   const [slots, setSlots] = useState<Slot[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [creditsExhausted, setCreditsExhausted] = useState(false)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null)
   const [step, setStep] = useState<'pick' | 'confirm' | 'done'>('pick')
@@ -40,18 +42,27 @@ export default function BookSessionPage() {
   const [scheduledAt, setScheduledAt] = useState('')
 
   useEffect(() => {
-    fetch('/api/sessions/availability')
-      .then(async (res) => {
-        const data = await res.json()
-        if (!res.ok) {
-          if (res.status === 403) setError('pro_required')
-          else setError(data.error ?? 'Could not load availability.')
+    Promise.all([
+      fetch('/api/sessions/availability'),
+      fetch('/api/sessions/credits'),
+    ]).then(async ([availRes, creditsRes]) => {
+      if (creditsRes.ok) {
+        const creditsData = await creditsRes.json()
+        if (!creditsData.hasRemainingCredits) {
+          setCreditsExhausted(true)
+          setLoading(false)
           return
         }
+      }
+      const data = await availRes.json()
+      if (!availRes.ok) {
+        if (availRes.status === 403) setError('pro_required')
+        else setError(data.error ?? 'Could not load availability.')
+      } else {
         setSlots(data.slots ?? [])
-      })
-      .catch(() => setError('Could not load availability. Please try again.'))
-      .finally(() => setLoading(false))
+      }
+      setLoading(false)
+    }).catch(() => { setError('Could not load availability. Please try again.'); setLoading(false) })
   }, [])
 
   async function handleBook() {
@@ -107,6 +118,24 @@ export default function BookSessionPage() {
         <h1 className="text-2xl font-bold text-gray-900 mb-2">Pro Access Required</h1>
         <p className="text-gray-500 mb-6 text-sm">Expert sessions are available to Pro members. Upgrade once for lifetime access.</p>
         <ProUpgradeCTAs layout="stack" source="sessions" />
+      </div>
+    )
+  }
+
+  if (creditsExhausted) {
+    return (
+      <div className="max-w-lg mx-auto px-4 py-16 text-center">
+        <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-5">
+          <svg className="w-8 h-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
+          </svg>
+        </div>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">You&apos;ve used your included session</h1>
+        <p className="text-gray-500 mb-6 text-sm">Buy another 30-minute 1:1 expert review session for ₹299.</p>
+        <BuySessionButton userEmail="" />
+        <div className="mt-4">
+          <Link href="/sessions" className="text-sm text-gray-400 hover:text-gray-600">← Back to sessions</Link>
+        </div>
       </div>
     )
   }

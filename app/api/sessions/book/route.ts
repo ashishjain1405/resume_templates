@@ -17,12 +17,13 @@ export async function POST(request: NextRequest) {
     const { start, end, userName } = await request.json()
     if (!start || !end) return Response.json({ error: 'Invalid slot' }, { status: 400 })
 
-    // Enforce 1-session limit per pro user
-    const { count: existingCount } = await adminClient
-      .from('sessions')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-    if ((existingCount ?? 0) >= 1) {
+    // Enforce credits-based session limit (1 included with Pro + 1 per additional purchase)
+    const [{ count: sessionsBooked }, { count: extraPurchases }] = await Promise.all([
+      adminClient.from('sessions').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+      adminClient.from('session_purchases').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+    ])
+    const totalCredits = 1 + (extraPurchases ?? 0)
+    if ((sessionsBooked ?? 0) >= totalCredits) {
       return Response.json({ error: 'session_limit_reached' }, { status: 403 })
     }
 
