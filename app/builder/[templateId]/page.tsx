@@ -242,7 +242,8 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         }
       }
     }
-    load().then(() => setIsDirty(true))
+    const wasPaymentReload = !!localStorage.getItem(`download_pending_${templateId}`)
+    load().then(() => { if (wasPaymentReload) setIsDirty(true) })
   }, [user, templateId])
 
   // Auto-open Pro upgrade modal once user is resolved — runs after load() has restored data
