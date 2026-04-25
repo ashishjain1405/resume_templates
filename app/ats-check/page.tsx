@@ -680,8 +680,8 @@ function ATSCheckInner() {
       const form = new FormData()
       if (tab === 'upload' && file) {
         form.append('file', file)
-      } else if (tab === 'upload' && selectedResumeId) {
-        // file was lost on reload — re-fetch from dashboard
+      } else if (selectedResumeId) {
+        // saved tab, or upload tab where file was lost on reload — re-fetch from dashboard
         const { url, filename } = await fetch(`/api/resume/${selectedResumeId}`).then(r => r.json())
         if (!url) { setError('Could not retrieve your resume. Please re-upload.'); setEditLoading(false); return }
         const blob = await fetch(url).then(r => r.blob())
