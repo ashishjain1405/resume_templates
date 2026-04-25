@@ -325,17 +325,9 @@ export default function DashboardTabs({
           {effectiveAccessible.length > 0 && (
             <div>
               <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Build with a template</div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 {effectiveAccessible.map(t => (
-                  <Link key={t.id} href={`/builder/${t.id}`} className="group block border border-gray-200 rounded-xl overflow-hidden hover:border-blue-400 hover:shadow-sm transition-all bg-white">
-                    <div className="bg-gray-50 h-24 flex items-center justify-center">
-                      <svg className="w-8 h-8 text-gray-300 group-hover:text-blue-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                    </div>
-                    <div className="px-3 py-2">
-                      <div className="text-xs font-semibold text-gray-700 truncate">{t.name}</div>
-                      <div className="text-[11px] text-blue-500 mt-0.5 group-hover:underline">Build with this</div>
-                    </div>
-                  </Link>
+                  <TemplateCard key={t.id} template={t} purchased />
                 ))}
               </div>
             </div>
