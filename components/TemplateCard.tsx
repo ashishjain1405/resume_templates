@@ -81,12 +81,12 @@ export default function TemplateCard({ template, purchased }: Props) {
             Preview
           </Link>
           {isOwned ? (
-            <a
-              href={`/api/download/${template.id}?color=${encodeURIComponent(activeColor)}`}
+            <Link
+              href={`/builder/${template.id}`}
               className="flex-1 text-center text-xs bg-green-600 text-white py-1.5 rounded-lg hover:bg-green-700 transition-colors font-medium"
             >
-              Download
-            </a>
+              Create Resume
+            </Link>
           ) : (
             <Link
               href={`/template/${template.id}`}
