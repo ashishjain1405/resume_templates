@@ -34,10 +34,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
+  const score = Number(body.ats_score)
+  if (!Number.isInteger(score) || score < 0 || score > 100) return Response.json({ error: 'Invalid ats_score' }, { status: 400 })
   const adminClient = await createAdminClient()
   const { error } = await adminClient
     .from('uploaded_resumes')
-    .update({ ats_score: body.ats_score })
+    .update({ ats_score: score })
     .eq('id', id)
     .eq('user_id', user.id)
 

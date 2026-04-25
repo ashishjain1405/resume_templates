@@ -33,7 +33,13 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: uploadError.message }, { status: 500 })
     }
 
-    const atsScore = form.get('ats_score')
+    const atsScoreRaw = form.get('ats_score')
+    let atsScoreValue: number | undefined
+    if (atsScoreRaw !== null) {
+      const score = Number(atsScoreRaw)
+      if (!Number.isInteger(score) || score < 0 || score > 100) return Response.json({ error: 'Invalid ats_score' }, { status: 400 })
+      atsScoreValue = score
+    }
     const { data: row, error: dbError } = await adminClient
       .from('uploaded_resumes')
       .insert({
@@ -42,7 +48,7 @@ export async function POST(request: NextRequest) {
         storage_path: storagePath,
         mime_type: mimeType,
         size_bytes: file.size,
-        ...(atsScore !== null ? { ats_score: Number(atsScore) } : {}),
+        ...(atsScoreValue !== undefined ? { ats_score: atsScoreValue } : {}),
       })
       .select('id, filename, mime_type, size_bytes, ats_score, created_at')
       .single()
