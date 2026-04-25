@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { TEMPLATES } from '@/lib/templates'
 
-const BASE_URL = 'https://www.resumenow.in'
+const BASE_URL = 'https://www.resume-expert.com'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const templateUrls = TEMPLATES.map((t) => ({

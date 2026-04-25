@@ -8,7 +8,7 @@ import { isPro } from '@/lib/pro'
 export const metadata: Metadata = {
   title: 'Resume Templates',
   description: 'Browse ATS-friendly resume templates — Classic, Modern, Multicolumn, and more. One-time purchase, instant PDF download.',
-  alternates: { canonical: 'https://www.resumenow.in/templates' },
+  alternates: { canonical: 'https://www.resume-expert.com/templates' },
 }
 
 export default async function TemplatesPage() {

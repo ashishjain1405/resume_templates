@@ -11,18 +11,18 @@ import { TEMPLATES } from '@/lib/templates'
 export const metadata: Metadata = {
   title: "Resume Review & Analysis Tool | Get Hire-Ready Faster",
   description: 'Browse 35+ professionally designed, ATS-optimised resume templates for Indian job seekers. One-time purchase, lifetime access. Download in PDF.',
-  alternates: { canonical: 'https://www.resumenow.in' },
+  alternates: { canonical: 'https://www.resume-expert.com' },
 }
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: 'Resume Expert',
-  url: 'https://www.resumenow.in',
+  url: 'https://www.resume-expert.com',
   description: "India's best ATS-friendly resume templates for job seekers.",
   potentialAction: {
     '@type': 'SearchAction',
-    target: 'https://www.resumenow.in/templates',
+    target: 'https://www.resume-expert.com/templates',
     'query-input': 'required name=search_term_string',
   },
 }

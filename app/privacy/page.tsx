@@ -12,7 +12,7 @@ export default function PrivacyPage() {
         <h2 className="text-base font-semibold text-gray-900">Third parties</h2>
         <p>We use Supabase for authentication and data storage, and Razorpay for payment processing. Both services have their own privacy policies.</p>
         <h2 className="text-base font-semibold text-gray-900">Contact</h2>
-        <p>For privacy-related questions, contact us at support@resumenow.in.</p>
+        <p>For privacy-related questions, contact us at support@resume-expert.com.</p>
       </div>
     </div>
   )

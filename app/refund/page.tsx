@@ -10,7 +10,7 @@ export default function RefundPage() {
         <h2 className="text-base font-semibold text-gray-900">Exceptions</h2>
         <p>We will issue a full refund if: the template file is corrupted or cannot be opened, the template is significantly different from the preview shown, or a duplicate charge occurred due to a technical error.</p>
         <h2 className="text-base font-semibold text-gray-900">How to request a refund</h2>
-        <p>Contact us at support@resumenow.in within 7 days of purchase with your order details. We will review your request and respond within 2 business days.</p>
+        <p>Contact us at support@resume-expert.com within 7 days of purchase with your order details. We will review your request and respond within 2 business days.</p>
       </div>
     </div>
   )

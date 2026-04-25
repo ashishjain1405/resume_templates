@@ -30,7 +30,8 @@ export async function createClient() {
   )
 }
 
-// Uses bare supabase-js client with service role key — bypasses RLS entirely
+// Uses bare supabase-js client with service role key — bypasses RLS entirely.
+// IMPORTANT: All queries must include a user_id filter to prevent cross-user data access.
 export async function createAdminClient() {
   return createSupabaseClient(
     requireEnv('NEXT_PUBLIC_SUPABASE_URL'),

@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { createHmac, timingSafeEqual } from 'crypto'
 import { createClient, createAdminClient } from '@/lib/supabase-server'
 import { PRO_PRICE_INR } from '@/lib/pro'
+import { getRazorpay } from '@/lib/razorpay'
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
@@ -20,6 +21,14 @@ export async function POST(request: NextRequest) {
   )
   if (!signaturesMatch) {
     return Response.json({ error: 'Invalid signature' }, { status: 400 })
+  }
+
+  const payment = await getRazorpay().payments.fetch(razorpay_payment_id)
+  if (payment.status !== 'captured') {
+    return Response.json({ error: 'Payment not captured' }, { status: 400 })
+  }
+  if (Number(payment.amount) !== PRO_PRICE_INR) {
+    return Response.json({ error: 'Amount mismatch' }, { status: 400 })
   }
 
   const adminClient = await createAdminClient()

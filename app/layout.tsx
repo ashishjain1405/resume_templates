@@ -6,7 +6,7 @@ import Footer from '@/components/Footer'
 
 const inter = Inter({ subsets: ['latin'] })
 
-const BASE_URL = 'https://www.resumenow.in'
+const BASE_URL = 'https://www.resume-expert.com'
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),

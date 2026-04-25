@@ -21,11 +21,11 @@ export async function generateMetadata({
   return {
     title: `${template.name} Resume Template`,
     description: `${template.description} ATS-friendly, one-time purchase. Download instantly as PDF.`,
-    alternates: { canonical: `https://www.resumenow.in/template/${id}` },
+    alternates: { canonical: `https://www.resume-expert.com/template/${id}` },
     openGraph: {
       title: `${template.name} Resume Template | Resume Expert`,
       description: template.description,
-      url: `https://www.resumenow.in/template/${id}`,
+      url: `https://www.resume-expert.com/template/${id}`,
     },
   }
 }

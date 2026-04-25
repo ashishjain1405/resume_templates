@@ -12,7 +12,7 @@ export default function TermsPage() {
         <h2 className="text-base font-semibold text-gray-900">Account</h2>
         <p>You are responsible for maintaining the security of your account credentials. Resume Expert is not liable for any loss resulting from unauthorized access to your account.</p>
         <h2 className="text-base font-semibold text-gray-900">Contact</h2>
-        <p>For any questions about these terms, contact us at support@resumenow.in.</p>
+        <p>For any questions about these terms, contact us at support@resume-expert.com.</p>
       </div>
     </div>
   )

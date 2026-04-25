@@ -23,7 +23,7 @@ interface Props {
   hasRemainingCredits: boolean
 }
 
-const TABS = [
+const ALL_TABS = [
   { id: 'overview', label: 'Overview' },
   { id: 'ats', label: 'Resume Score' },
   { id: 'builder', label: 'Resume Creator' },
@@ -76,6 +76,7 @@ export default function DashboardTabs({
   }, [])
 
   const isPro = pro || clientPro
+  const TABS = ALL_TABS.filter(tab => !(isPro && tab.id === 'templates'))
   const effectiveAccessible = isPro ? [...accessibleTemplates, ...lockedTemplates] : accessibleTemplates
   const effectiveLocked = isPro ? [] : lockedTemplates
 

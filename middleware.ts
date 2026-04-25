@@ -3,6 +3,9 @@ import { createServerClient } from '@supabase/ssr'
 
 const protectedRoutes = ['/dashboard']
 
+// API routes that don't require authentication
+const PUBLIC_API_PREFIXES = ['/api/auth/']
+
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request })
 
@@ -26,14 +29,22 @@ export async function middleware(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
+  const { pathname } = request.nextUrl
 
-  const isProtected = protectedRoutes.some((route) =>
-    request.nextUrl.pathname.startsWith(route)
-  )
+  // API route safety net: block unauthenticated requests to non-public API routes
+  if (pathname.startsWith('/api/')) {
+    const isPublic = PUBLIC_API_PREFIXES.some((p) => pathname.startsWith(p))
+    if (!isPublic && !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    return response
+  }
+
+  const isProtected = protectedRoutes.some((route) => pathname.startsWith(route))
 
   if (isProtected && !user) {
     const loginUrl = new URL('/auth/login', request.url)
-    loginUrl.searchParams.set('redirect', request.nextUrl.pathname)
+    loginUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(loginUrl)
   }
 
@@ -41,5 +52,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|api/|public/).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|public/).*)'],
 }
