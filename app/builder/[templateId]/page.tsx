@@ -13,6 +13,16 @@ import ExecutivePreview from '@/components/resume-previews/Executive'
 import type { User } from '@supabase/supabase-js'
 import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
 
+declare global {
+  interface Window {
+    Razorpay: new (options: {
+      key: string; amount: number; currency: string; name: string; description: string
+      order_id: string; handler: (r: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) => void
+      prefill: { email: string }; theme: { color: string }; modal?: { ondismiss?: () => void }
+    }) => { open(): void }
+  }
+}
+
 function CheckATSButton({ user, data, accentColor, templateId }: {
   user: User | null
   data: ResumeData
@@ -109,6 +119,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [isPro, setIsPro] = useState(false)
   const [proResolved, setProResolved] = useState(false)
   const [purchased, setPurchased] = useState(false)
+  const [buyingTemplate, setBuyingTemplate] = useState(false)
   const [showProDownloadModal, setShowProDownloadModal] = useState(false)
   const [showProDocsModal, setShowProDocsModal] = useState(false)
   const [showChangeTemplateModal, setShowChangeTemplateModal] = useState(false)
@@ -390,6 +401,59 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       alert('Failed to open in Google Docs. Please try again.')
     } finally {
       setDocsLoading(false)
+    }
+  }
+
+  async function handleBuyTemplate() {
+    if (!template) return
+    setBuyingTemplate(true)
+    try {
+      const res = await fetch('/api/razorpay/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ templateId }),
+      })
+      if (!res.ok) throw new Error('Failed to create order')
+      const { orderId, amount, currency } = await res.json()
+      const script = document.createElement('script')
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+      document.head.appendChild(script)
+      script.onload = () => {
+        const rzp = new window.Razorpay({
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
+          amount,
+          currency,
+          name: 'Resume Expert',
+          description: `${template.name} Resume Template`,
+          order_id: orderId,
+          handler: async (response) => {
+            const verifyRes = await fetch('/api/razorpay/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+                templateId,
+              }),
+            })
+            const verifyData = await verifyRes.json()
+            if (verifyRes.ok) {
+              localStorage.setItem(`download_pending_${templateId}`, '1')
+              window.location.href = `/builder/${templateId}`
+            } else {
+              alert(`Payment verification failed: ${verifyData.error ?? verifyRes.status}`)
+              setBuyingTemplate(false)
+            }
+          },
+          prefill: { email: user?.email ?? '' },
+          theme: { color: '#2563eb' },
+          modal: { ondismiss: () => setBuyingTemplate(false) },
+        })
+        rzp.open()
+      }
+    } catch {
+      setBuyingTemplate(false)
     }
   }
 
@@ -681,19 +745,8 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
             {(authForDownload || authForDocs) ? (
               <>
-                <h2 className="text-lg font-bold text-gray-900 mb-1">Almost there — 2 quick steps</h2>
-                <div className="flex flex-col gap-2 mb-5 mt-3">
-                  <div className="flex items-center gap-3 bg-blue-50 rounded-xl px-3 py-2.5">
-                    <span className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
-                    <span className="text-sm text-gray-700 font-medium">Create a free account</span>
-                  </div>
-                  <div className="flex items-center gap-3 bg-gray-50 rounded-xl px-3 py-2.5">
-                    <span className="w-6 h-6 bg-gray-300 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
-                    <span className="text-sm text-gray-500">
-                      {authForDocs ? 'Unlock Google Docs editing with Pro — ₹999 one-time' : 'Unlock PDF downloads with Pro — ₹999 one-time'}
-                    </span>
-                  </div>
-                </div>
+                <h2 className="text-lg font-bold text-gray-900 mb-2">Create a free account to continue</h2>
+                <p className="text-sm text-gray-500 mb-5">Sign up to save your resume and unlock download options.</p>
               </>
             ) : (
               <>
@@ -773,14 +826,23 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowProDownloadModal(false)}>
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl relative" onClick={e => e.stopPropagation()}>
             <button onClick={() => setShowProDownloadModal(false)} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
-            <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 3v13.5m-4.5-4.5L12 16.5l4.5-4.5" />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">PDF download is a Pro feature</h3>
-            <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for lifetime access — unlimited downloads, unlimited Resume checks, and an expert session. ₹999, one-time.</p>
-            <ProUpgradeCTAs layout="stack" source="download" returnPath={`/builder/${templateId}`} />
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Download your resume</h3>
+            <p className="text-sm text-gray-500 text-center mb-5">Choose what works for you — buy just this template or unlock everything with Pro.</p>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={handleBuyTemplate}
+                disabled={buyingTemplate}
+                className="w-full py-3 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-60"
+              >
+                {buyingTemplate ? 'Processing…' : `Buy ${template?.name} template — ₹${(template?.price_inr ?? 0) / 100}`}
+              </button>
+              <ProUpgradeCTAs layout="stack" source="download" returnPath={`/builder/${templateId}`} />
+            </div>
           </div>
         </div>
       )}
