@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS rate_limits (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS rate_limits_lookup ON rate_limits (user_id, key, created_at);
+ALTER TABLE rate_limits ENABLE ROW LEVEL SECURITY;
 
 CREATE TABLE IF NOT EXISTS purchases (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
