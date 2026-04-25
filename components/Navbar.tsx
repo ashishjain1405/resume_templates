@@ -245,7 +245,7 @@ export default function Navbar() {
                   <Link href="/auth/login" onClick={() => setMobileOpen(false)} className="block text-sm text-gray-700 py-2.5 px-2 rounded-lg hover:bg-gray-50">Log in</Link>
                   <Link href="/auth/signup" onClick={() => setMobileOpen(false)} className="block text-sm text-gray-700 py-2.5 px-2 rounded-lg hover:bg-gray-50">Sign up</Link>
                   <div className="pt-2">
-                    <GoProLink className="block text-center w-full" />
+                    <GoProLink className="block text-center w-full" onClick={() => setMobileOpen(false)} />
                   </div>
                 </>
               )}
