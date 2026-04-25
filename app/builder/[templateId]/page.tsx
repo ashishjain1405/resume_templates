@@ -51,6 +51,7 @@ function CheckATSButton({ user, data, accentColor, templateId }: {
       const file = new File([blob], name, { type: 'application/pdf' })
       const form = new FormData()
       form.append('file', file)
+      form.append('template_id', templateId)
       const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
       const uploadData = await uploadRes.json()
       if (uploadData.resume?.id) {
