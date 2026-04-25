@@ -226,6 +226,8 @@ function ATSCheckInner() {
   useEffect(() => {
     const resumeId = searchParams.get('resumeId')
     if (!resumeId) return
+    if (sessionStorage.getItem('ats_resumeId_processed') === resumeId) return
+    sessionStorage.setItem('ats_resumeId_processed', resumeId)
     if (resumeIdProcessedRef.current) return
     resumeIdProcessedRef.current = true
     router.replace('/ats-check')
