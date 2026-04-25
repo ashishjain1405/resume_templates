@@ -249,16 +249,8 @@ function ATSCheckInner() {
         setLoading(true)
         setResult(null)
         try {
-          let resumeText = ''
-          try {
-            resumeText = await extractPdfText(f)
-          } catch {
-            setError('Could not parse this PDF. Please try pasting the text instead.')
-            return
-          }
-          if (!resumeText.trim()) { setError('Could not read text from this PDF. Please try pasting the text instead.'); return }
           const form = new FormData()
-          form.append('resumeText', resumeText)
+          form.append('file', f)
           const res = await fetch('/api/ats-check', { method: 'POST', body: form })
           const raw = await res.text()
           let parsed: { error?: string; _usage?: { used: number; limit: number } | null } & Partial<ATSResult> = {}
