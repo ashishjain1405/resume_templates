@@ -93,7 +93,45 @@ function ModalProRequired({ onClose, userEmail }: { onClose: () => void; userEma
   )
 }
 
-function Modal({ type, onClose, userEmail }: { type: 'login_required'; onClose: () => void; userEmail?: string }) {
+function InlineAuthModal({ onClose, onSignedIn }: { onClose: () => void; onSignedIn: () => void }) {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [authLoading, setAuthLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
+  const [authError, setAuthError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const supabase = createClient()
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        onSignedIn()
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault()
+    setAuthLoading(true)
+    setAuthError('')
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) {
+      setAuthError('Incorrect email or password.')
+      setAuthLoading(false)
+    }
+    // onAuthStateChange fires SIGNED_IN → onSignedIn() is called automatically
+  }
+
+  async function handleGoogle() {
+    setGoogleLoading(true)
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/auth/confirm?redirect=/ats-check` },
+    })
+    setGoogleLoading(false)
+  }
+
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4" onClick={onClose}>
       <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl relative" onClick={e => e.stopPropagation()}>
@@ -103,11 +141,68 @@ function Modal({ type, onClose, userEmail }: { type: 'login_required'; onClose: 
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
           </svg>
         </div>
-        <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Want to save your results?</h3>
-        <p className="text-sm text-gray-500 text-center mb-5">Sign in to save your score and review it anytime from your dashboard.</p>
-        <Link href="/auth/signup?redirect=/ats-check" className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
-          Sign in or create account
-        </Link>
+        <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Sign in to analyse</h3>
+        <p className="text-sm text-gray-500 text-center mb-5">Create a free account to check your resume score.</p>
+
+        {authError && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-3 py-2 text-sm mb-4">{authError}</div>}
+
+        <form onSubmit={handleLogin} className="space-y-3 mb-4">
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+            placeholder="you@example.com"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+              placeholder="Password"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              {showPassword
+                ? <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                : <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>}
+            </button>
+          </div>
+          <button
+            type="submit"
+            disabled={authLoading}
+            className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors disabled:opacity-60"
+          >
+            {authLoading ? 'Signing in…' : 'Sign in'}
+          </button>
+        </form>
+
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex-1 h-px bg-gray-200" />
+          <span className="text-xs text-gray-400">or</span>
+          <div className="flex-1 h-px bg-gray-200" />
+        </div>
+
+        <button
+          onClick={handleGoogle}
+          disabled={googleLoading || authLoading}
+          className="w-full flex items-center justify-center gap-2.5 border border-gray-300 rounded-lg py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-60"
+        >
+          <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+            <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+            <path d="M3.964 10.707A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.039l3.007-2.332z" fill="#FBBC05"/>
+            <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z" fill="#EA4335"/>
+          </svg>
+          {googleLoading ? 'Redirecting…' : 'Continue with Google'}
+        </button>
+
+        <p className="text-center text-xs text-gray-400 mt-4">
+          No account?{' '}
+          <Link href="/auth/signup?redirect=/ats-check" className="text-blue-600 hover:underline">Sign up free</Link>
+        </p>
       </div>
     </div>
   )
@@ -124,7 +219,8 @@ function ATSCheckInner() {
   const [resumeText, setResumeText] = useState('')
   const [jobDescription, setJobDescription] = useState('')
   const [loading, setLoading] = useState(false)
-  const [modal, setModal] = useState<'login_required' | 'pro_required' | null>(null)
+  const [modal, setModal] = useState<'pro_required' | null>(null)
+  const [showAuthModal, setShowAuthModal] = useState(false)
   const [showProDocsModal, setShowProDocsModal] = useState(false)
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
@@ -257,7 +353,7 @@ function ATSCheckInner() {
           try { parsed = JSON.parse(raw) } catch { /* ignore */ }
           if (!res.ok) {
             if (res.status === 403) setModal('pro_required')
-            else if (res.status === 401) setModal('login_required')
+            else if (res.status === 401) setShowAuthModal(true)
             else setError(parsed.error ?? `Error ${res.status}`)
           } else {
             setResult(parsed as ATSResult)
@@ -553,28 +649,7 @@ function ATSCheckInner() {
       try { data = JSON.parse(raw) } catch { /* non-JSON */ }
       if (!res.ok) {
         if (res.status === 401) {
-          if (tab === 'paste' && resumeText.trim()) {
-            const payload = JSON.stringify({ tab: 'paste', resumeText, jobDescription })
-            sessionStorage.setItem(STORAGE_KEY, payload)
-            localStorage.setItem(STORAGE_KEY, payload)
-          } else if (tab === 'upload' && file) {
-            const reader = new FileReader()
-            reader.onload = () => {
-              const payload = JSON.stringify({
-                tab: 'upload',
-                jobDescription,
-                fileData: reader.result as string,
-                fileName: file.name,
-                fileType: file.type,
-              })
-              sessionStorage.setItem(STORAGE_KEY, payload)
-              localStorage.setItem(STORAGE_KEY, payload)
-              setModal('login_required')
-            }
-            reader.readAsDataURL(file)
-            return
-          }
-          setModal('login_required')
+          setShowAuthModal(true)
         } else if (res.status === 403) {
           // Save pending state so analysis auto-re-runs after payment reload.
           // For upload tab: upload file to storage now so resumeId survives reload
@@ -745,7 +820,7 @@ function ATSCheckInner() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
       {modal === 'pro_required' && <ModalProRequired onClose={() => setModal(null)} userEmail={userEmail} />}
-      {modal === 'login_required' && <Modal type="login_required" onClose={() => setModal(null)} userEmail={userEmail} />}
+      {showAuthModal && <InlineAuthModal onClose={() => setShowAuthModal(false)} onSignedIn={() => { setShowAuthModal(false); handleAnalyse() }} />}
 
       {showProDocsModal && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowProDocsModal(false)}>
