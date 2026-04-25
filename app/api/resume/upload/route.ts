@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase-server'
+import { fileTypeFromBuffer } from 'file-type'
 
 const MAX_SIZE = 5 * 1024 * 1024 // 5 MB
 const ALLOWED_TYPES = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
@@ -13,18 +14,19 @@ export async function POST(request: NextRequest) {
     const form = await request.formData()
     const file = form.get('file') as File | null
     if (!file || file.size === 0) return Response.json({ error: 'No file provided' }, { status: 400 })
-    if (!ALLOWED_TYPES.includes(file.type)) return Response.json({ error: 'Only PDF and DOCX files are allowed' }, { status: 400 })
     if (file.size > MAX_SIZE) return Response.json({ error: 'File must be under 5 MB' }, { status: 400 })
-
-    const ext = file.type === 'application/pdf' ? 'pdf' : 'docx'
-    const storagePath = `${user.id}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
 
     const adminClient = await createAdminClient()
     const buffer = Buffer.from(await file.arrayBuffer())
+    const detected = await fileTypeFromBuffer(buffer)
+    const mimeType = detected?.mime ?? ''
+    if (!ALLOWED_TYPES.includes(mimeType)) return Response.json({ error: 'Only PDF and DOCX files are allowed' }, { status: 400 })
+
+    const storagePath = `${user.id}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
 
     const { error: uploadError } = await adminClient.storage
       .from('user-resumes')
-      .upload(storagePath, buffer, { contentType: file.type, upsert: false })
+      .upload(storagePath, buffer, { contentType: mimeType, upsert: false })
 
     if (uploadError) {
       console.error('Storage upload error:', uploadError)
@@ -38,7 +40,7 @@ export async function POST(request: NextRequest) {
         user_id: user.id,
         filename: file.name,
         storage_path: storagePath,
-        mime_type: file.type,
+        mime_type: mimeType,
         size_bytes: file.size,
         ...(atsScore !== null ? { ats_score: Number(atsScore) } : {}),
       })
