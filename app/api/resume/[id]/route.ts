@@ -65,7 +65,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 
   const adminClient = await createAdminClient()
   await adminClient.storage.from('user-resumes').remove([row.storage_path])
-  await adminClient.from('uploaded_resumes').delete().eq('id', id)
+  await adminClient.from('uploaded_resumes').delete().eq('id', id).eq('user_id', user.id)
 
   return Response.json({ ok: true })
 }
