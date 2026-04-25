@@ -19,7 +19,8 @@ function LoginForm() {
   const supabase = createClient()
 
   function getRedirect() {
-    return searchParams.get('redirect') ?? '/dashboard'
+    const r = searchParams.get('redirect') ?? ''
+    return r.startsWith('/') && !r.startsWith('//') ? r : '/dashboard'
   }
 
   async function handleLogin(e: React.FormEvent) {
