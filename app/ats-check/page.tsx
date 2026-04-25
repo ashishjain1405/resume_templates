@@ -284,19 +284,28 @@ function ATSCheckInner() {
       const pending = JSON.parse(raw)
       const jd = pending.jobDescription ?? ''
       setJobDescription(jd)
-      const autoAnalyse = (form: FormData) => {
+      const autoAnalyse = (form: FormData, attempt = 0) => {
         setLoading(true)
         fetch('/api/ats-check', { method: 'POST', body: form })
           .then(r => r.text())
           .then(txt => {
             try {
               const data = JSON.parse(txt)
-              if (data.overall_score !== undefined) setResult(data)
-              else if (data.error) setError(data.error)
-            } catch { setError('Analysis failed. Please try again.') }
+              if (data.overall_score !== undefined) {
+                setResult(data)
+                setIsPro(true)
+                if (data._usage) setUsage(data._usage)
+                setLoading(false)
+              } else if (data.error === 'limit_reached' && attempt < 4) {
+                // Pro DB write may not have replicated yet — retry with backoff
+                setTimeout(() => autoAnalyse(form, attempt + 1), 800)
+              } else {
+                setError(data.error ?? 'Analysis failed. Please try again.')
+                setLoading(false)
+              }
+            } catch { setError('Analysis failed. Please try again.'); setLoading(false) }
           })
-          .catch(() => setError('Something went wrong. Please try again.'))
-          .finally(() => setLoading(false))
+          .catch(() => { setError('Something went wrong. Please try again.'); setLoading(false) })
       }
 
       if (pending.fromBuilder && pending.data && pending.templateId) {
