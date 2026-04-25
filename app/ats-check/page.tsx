@@ -26,6 +26,7 @@ interface UploadedResume {
   mime_type: string
   size_bytes: number
   created_at: string
+  template_id: string | null
 }
 
 function ScoreRing({ score, instant = false }: { score: number; instant?: boolean }) {
@@ -160,11 +161,12 @@ function ATSCheckInner() {
       sessionStorage.removeItem(STORAGE_KEY)
       localStorage.removeItem(STORAGE_KEY)
       try {
-        const { result: r, resumeText: rt, selectedResumeId: sid, tab: t } = JSON.parse(persisted)
+        const { result: r, resumeText: rt, selectedResumeId: sid, tab: t, builderTemplateId: btid } = JSON.parse(persisted)
         if (r) { setResult(r); setResultRestored(true) }
         if (rt) setResumeText(rt)
         if (sid) setResumeId(sid)
         if (t) setTab(t)
+        if (btid) setBuilderTemplateId(btid)
         // Re-hydrate file from dashboard so upload tab shows the file and Edit in Docs works
         if (sid) {
           fetch(`/api/resume/${sid}`)
@@ -395,7 +397,7 @@ function ATSCheckInner() {
           if (d.resume?.id) sid = d.resume.id
         } catch { /* best-effort */ }
       }
-      sessionStorage.setItem('ats_result_persist', JSON.stringify({ result, resumeText, selectedResumeId: sid, tab }))
+      sessionStorage.setItem('ats_result_persist', JSON.stringify({ result, resumeText, selectedResumeId: sid, tab, builderTemplateId }))
     }
     return () => {
       window.removeEventListener('beforeunload', handler)
@@ -868,7 +870,7 @@ function ATSCheckInner() {
               {savedResumes.map(r => (
                 <button
                   key={r.id}
-                  onClick={() => setResumeId(r.id)}
+                  onClick={() => { setResumeId(r.id); setBuilderTemplateId(r.template_id ?? null) }}
                   className={`w-full flex items-center gap-3 p-3.5 rounded-xl border text-left transition-colors ${selectedResumeId === r.id ? 'border-blue-400 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}
                 >
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${r.mime_type === 'application/pdf' ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'}`}>
