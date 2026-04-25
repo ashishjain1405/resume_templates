@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
 
   if (error) {
     if (error.code === '23505') return Response.json({ success: true }) // duplicate payment_id — already recorded
-    console.error('Purchase insert error:', JSON.stringify(error))
-    return Response.json({ error: `Failed to record purchase: ${error.message} (${error.code})` }, { status: 500 })
+    console.error('Purchase insert error:', error.code)
+    return Response.json({ error: 'Failed to record purchase. Contact support.' }, { status: 500 })
   }
 
   return Response.json({ success: true })
