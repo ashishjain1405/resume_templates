@@ -189,6 +189,10 @@ function ATSCheckInner() {
     })
   }, [])
 
+  useEffect(() => {
+    if (savedResumes.length > 0 && tab === 'upload') setTab('saved')
+  }, [savedResumes])
+
   // Auto-trigger Google Docs edit when returning from payment with ?openDocs=1 or sessionStorage flag
   useEffect(() => {
     const pendingAts = sessionStorage.getItem('docs_pending_ats')
@@ -706,9 +710,9 @@ function ATSCheckInner() {
   }
 
   const tabs = [
+    ...(savedResumes.length > 0 ? [{ id: 'saved' as const, label: 'My Resumes' }] : []),
     { id: 'upload' as const, label: 'Upload PDF' },
     { id: 'paste' as const, label: 'Paste Text' },
-    ...(savedResumes.length > 0 ? [{ id: 'saved' as const, label: 'My Resumes' }] : []),
   ]
 
   return (
