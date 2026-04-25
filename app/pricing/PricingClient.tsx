@@ -11,14 +11,14 @@ interface Props {
   isLoggedIn: boolean
 }
 
-const COMPARISON = [
-  { feature: 'Resume Builder (use)', free: true, pro: true },
-  { feature: 'Browse all templates', free: true, pro: true },
+const COMPARISON: { feature: string; free: boolean | string; pro: boolean | string }[] = [
+  { feature: 'Resume Checks', free: '5', pro: 'Unlimited' },
+  { feature: 'Create Resume', free: 'Create & Preview', pro: 'Create, Preview & Download' },
+  { feature: 'Access to all 5 templates', free: true, pro: true },
+  { feature: 'Buy individual templates', free: true, pro: true },
   { feature: 'Save & sync resumes', free: true, pro: true },
-  { feature: 'Resume Checker (1 free check)', free: true, pro: true },
-  { feature: 'Unlimited Resume Checks', free: false, pro: true },
-  { feature: 'Resume Builder download', free: false, pro: true },
-  { feature: '1:1 Expert Session', free: false, pro: true },
+  { feature: 'Edit resume in Google Docs', free: false, pro: true },
+  { feature: '1:1 Expert Review Session', free: false, pro: true },
   { feature: 'Priority support', free: false, pro: true },
 ]
 
@@ -298,8 +298,8 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
             {COMPARISON.map((row, i) => (
               <div key={row.feature} className={`grid grid-cols-3 items-center py-3 px-5 ${i !== COMPARISON.length - 1 ? 'border-b border-gray-50' : ''}`}>
                 <div className="text-sm text-gray-700">{row.feature}</div>
-                <div className="flex justify-center">{row.free ? <Check color="green" /> : <Cross />}</div>
-                <div className="flex justify-center">{row.pro ? <Check /> : <Cross />}</div>
+                <div className="flex justify-center">{typeof row.free === 'string' ? <span className="text-xs text-gray-600 font-medium">{row.free}</span> : row.free ? <Check color="green" /> : <Cross />}</div>
+                <div className="flex justify-center">{typeof row.pro === 'string' ? <span className="text-xs text-blue-600 font-medium">{row.pro}</span> : row.pro ? <Check /> : <Cross />}</div>
               </div>
             ))}
           </div>
