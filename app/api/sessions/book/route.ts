@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase-server'
 import { isPro } from '@/lib/pro'
 import { getAvailableSlots, createBookingEvent, deleteBookingEvent } from '@/lib/google-calendar'
+import { checkRateLimit } from '@/lib/rate-limit'
 import { Resend } from 'resend'
 
 export async function POST(request: NextRequest) {
@@ -16,6 +17,10 @@ export async function POST(request: NextRequest) {
 
     const { start, end, userName } = await request.json()
     if (!start || !end) return Response.json({ error: 'Invalid slot' }, { status: 400 })
+
+    if (!(await checkRateLimit(user.id, 'sessions-book', 5))) {
+      return Response.json({ error: 'Too many requests. Please wait a few minutes.' }, { status: 429 })
+    }
 
     // Enforce credits-based session limit (1 included with Pro + 1 per additional purchase)
     const [{ count: sessionsBooked }, { count: extraPurchases }] = await Promise.all([

@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase-server'
 import { getRazorpay } from '@/lib/razorpay'
 import { TEMPLATES } from '@/lib/templates'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
@@ -9,6 +10,10 @@ export async function POST(request: NextRequest) {
 
   if (!user) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (!(await checkRateLimit(user.id, 'razorpay-create-order', 10))) {
+    return Response.json({ error: 'Too many requests. Please wait a few minutes.' }, { status: 429 })
   }
 
   const { templateId } = await request.json()

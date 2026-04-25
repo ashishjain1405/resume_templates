@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase-server'
 import { fileTypeFromBuffer } from 'file-type'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 const MAX_SIZE = 5 * 1024 * 1024 // 5 MB
 const ALLOWED_TYPES = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
@@ -13,6 +14,10 @@ export async function POST(request: NextRequest) {
 
     const form = await request.formData()
     const file = form.get('file') as File | null
+    if (!(await checkRateLimit(user.id, 'resume-upload', 20))) {
+      return Response.json({ error: 'Too many requests. Please wait a few minutes.' }, { status: 429 })
+    }
+
     if (!file || file.size === 0) return Response.json({ error: 'No file provided' }, { status: 400 })
     if (file.size > MAX_SIZE) return Response.json({ error: 'File must be under 5 MB' }, { status: 400 })
 

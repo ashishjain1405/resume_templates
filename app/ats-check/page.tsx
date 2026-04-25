@@ -583,6 +583,8 @@ function ATSCheckInner() {
           } else {
             setModal('pro_required')
           }
+        } else if (res.status === 429) {
+          setError("You've made a lot of checks recently — please wait a few minutes before trying again.")
         } else {
           setError(data.error ?? `Server error (${res.status}). Please try again.`)
         }

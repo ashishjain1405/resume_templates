@@ -1,5 +1,13 @@
 -- Run this in your Supabase SQL editor
 
+CREATE TABLE IF NOT EXISTS rate_limits (
+  id BIGSERIAL PRIMARY KEY,
+  user_id UUID NOT NULL,
+  key TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS rate_limits_lookup ON rate_limits (user_id, key, created_at);
+
 CREATE TABLE IF NOT EXISTS purchases (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,

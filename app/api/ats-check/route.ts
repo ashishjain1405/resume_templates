@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase-server'
 import { isPro } from '@/lib/pro'
+import { checkRateLimit } from '@/lib/rate-limit'
 import OpenAI from 'openai'
 
 export const maxDuration = 60
@@ -72,6 +73,10 @@ export async function POST(request: NextRequest) {
 
     const adminClient = await createAdminClient()
     const pro = await isPro(user.id, adminClient)
+
+    if (!(await checkRateLimit(user.id, 'ats-check', 20))) {
+      return Response.json({ error: 'rate_limited' }, { status: 429 })
+    }
 
     const FREE_LIMIT = 5
     if (!pro) {
