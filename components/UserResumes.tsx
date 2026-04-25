@@ -1,9 +1,18 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import Link from 'next/link'
 import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
 import { TEMPLATES } from '@/lib/templates'
+
+declare global {
+  interface Window {
+    Razorpay: new (options: {
+      key: string; amount: number; currency: string; name: string; description: string
+      order_id: string; handler: (r: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) => void
+      prefill: { email: string }; theme: { color: string }; modal?: { ondismiss?: () => void }
+    }) => { open(): void }
+  }
+}
 
 interface UploadedResume {
   id: string
@@ -39,6 +48,7 @@ export default function UserResumes({
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
   const [upgradeModalTemplateId, setUpgradeModalTemplateId] = useState<string | null>(null)
+  const [buyingTemplate, setBuyingTemplate] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => { fetchResumes() }, [])
@@ -101,6 +111,52 @@ export default function UserResumes({
 
   function canDownload(r: UploadedResume) {
     return !r.template_id || isPro || purchasedTemplateIds.has(r.template_id)
+  }
+
+  async function handleBuyTemplate(templateId: string | null) {
+    if (!templateId) return
+    const tpl = TEMPLATES.find(t => t.id === templateId)
+    if (!tpl) return
+    setBuyingTemplate(true)
+    try {
+      const res = await fetch('/api/razorpay/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ templateId }),
+      })
+      if (!res.ok) { const d = await res.json(); alert(d.error ?? 'Failed to create order'); setBuyingTemplate(false); return }
+      const { orderId, amount, currency } = await res.json()
+      const script = document.createElement('script')
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+      document.head.appendChild(script)
+      script.onload = () => {
+        const rzp = new window.Razorpay({
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
+          amount, currency,
+          name: 'ResumeNow',
+          description: `${tpl.name} Resume Template`,
+          order_id: orderId,
+          handler: async (response) => {
+            const verifyRes = await fetch('/api/razorpay/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ ...response, templateId }),
+            })
+            if (verifyRes.ok) {
+              window.location.href = '/dashboard?tab=resumes'
+            } else {
+              const d = await verifyRes.json()
+              alert(`Payment verification failed: ${d.error ?? 'Unknown error'}`)
+              setBuyingTemplate(false)
+            }
+          },
+          prefill: { email: userEmail },
+          theme: { color: '#2563eb' },
+          modal: { ondismiss: () => setBuyingTemplate(false) },
+        })
+        rzp.open()
+      }
+    } catch { setBuyingTemplate(false) }
   }
 
   const upgradeTemplate = upgradeModalTemplateId
@@ -199,12 +255,12 @@ export default function UserResumes({
                 ) : (
                   <button
                     onClick={() => setUpgradeModalTemplateId(r.template_id)}
-                    className="text-gray-300 hover:text-amber-500 transition-colors"
+                    className="text-amber-400 hover:text-amber-600 transition-colors"
                     aria-label="Unlock to download"
                     title="Purchase or upgrade to download"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M12 3v13.5m-4.5-4.5L12 16.5l4.5-4.5" />
                     </svg>
                   </button>
                 )}
@@ -242,14 +298,15 @@ export default function UserResumes({
             <p className="text-sm text-gray-500 text-center mb-5">Choose what works for you — buy just this template or unlock everything with Pro.</p>
             <div className="flex flex-col gap-2">
               {upgradeTemplate && (
-                <Link
-                  href={`/builder/${upgradeModalTemplateId}`}
-                  className="w-full py-3 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors text-center"
+                <button
+                  onClick={() => handleBuyTemplate(upgradeModalTemplateId)}
+                  disabled={buyingTemplate}
+                  className="w-full py-3 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-60"
                 >
-                  Buy {upgradeTemplate.name} template — ₹{(upgradeTemplate.price_inr / 100).toLocaleString('en-IN')}
-                </Link>
+                  {buyingTemplate ? 'Processing…' : `Buy ${upgradeTemplate.name} template — ₹${(upgradeTemplate.price_inr / 100).toLocaleString('en-IN')}`}
+                </button>
               )}
-              <ProUpgradeCTAs layout="stack" userEmail={userEmail} source="download" returnPath="/dashboard" />
+              <ProUpgradeCTAs layout="stack" userEmail={userEmail} source="download" returnPath="/dashboard?tab=resumes" />
             </div>
           </div>
         </div>

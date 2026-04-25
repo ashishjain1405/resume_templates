@@ -61,13 +61,15 @@ export default function DashboardTabs({
     if (flag) setClientPro(true)
 
     const params = new URLSearchParams(window.location.search)
+    const tab = params.get('tab')
+    if (tab) setActive(tab)
     if (params.get('welcome') === '1') {
       setFlashMsg({ text: 'Welcome back! You already have an account — we\'ve signed you in.', type: 'green' })
     } else if (params.get('info') === 'password_updated') {
       setFlashMsg({ text: 'Password updated successfully.', type: 'green' })
     }
     // Clean URL without reload
-    if (params.has('welcome') || params.has('info')) {
+    if (params.has('welcome') || params.has('info') || params.has('tab')) {
       const clean = window.location.pathname
       window.history.replaceState({}, '', clean)
     }
