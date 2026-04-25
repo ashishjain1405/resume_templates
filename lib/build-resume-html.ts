@@ -1,5 +1,14 @@
 import type { ResumeData } from './resume-data'
 
+function esc(s: string | undefined | null): string {
+  return (s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+}
+
+const COLOR_RE = /^(#[0-9a-fA-F]{3,8}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)|rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*[\d.]+\s*\)|hsl\(\s*\d+\s*,\s*[\d.]+%\s*,\s*[\d.]+%\s*\)|[a-zA-Z]{2,30})$/
+function safeColor(color: string, fallback = '#2563eb'): string {
+  return COLOR_RE.test(color.trim()) ? color.trim() : fallback
+}
+
 function sectionLabel(text: string, color: string) {
   return `<div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${color};border-bottom:1px solid ${color};padding-bottom:4px;margin-bottom:10px;margin-top:20px;">${text}</div>`
 }
@@ -8,11 +17,11 @@ function expHtml(experience: ResumeData['experience'], bulletLimit = 3) {
   return experience.map(exp => `
     <div style="margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:baseline;">
-        <span style="font-size:11px;font-weight:600;color:#1a1a1a;">${exp.role}</span>
-        <span style="font-size:9px;color:#888;">${exp.startDate}${exp.endDate ? ' – ' + exp.endDate : exp.startDate ? ' – Present' : ''}</span>
+        <span style="font-size:11px;font-weight:600;color:#1a1a1a;">${esc(exp.role)}</span>
+        <span style="font-size:9px;color:#888;">${esc(exp.startDate)}${exp.endDate ? ' – ' + esc(exp.endDate) : exp.startDate ? ' – Present' : ''}</span>
       </div>
-      <div style="font-size:10px;color:#555;margin-bottom:4px;">${exp.company}</div>
-      ${exp.bullets.slice(0, bulletLimit).map(b => `<div style="font-size:10px;color:#444;margin-left:10px;margin-top:2px;">· ${b}</div>`).join('')}
+      <div style="font-size:10px;color:#555;margin-bottom:4px;">${esc(exp.company)}</div>
+      ${exp.bullets.slice(0, bulletLimit).map(b => `<div style="font-size:10px;color:#444;margin-left:10px;margin-top:2px;">· ${esc(b)}</div>`).join('')}
     </div>
   `).join('')
 }
@@ -21,10 +30,10 @@ function eduHtml(education: ResumeData['education']) {
   return education.map(edu => `
     <div style="margin-bottom:10px;">
       <div style="display:flex;justify-content:space-between;">
-        <span style="font-size:11px;font-weight:600;color:#1a1a1a;">${edu.degree}</span>
-        <span style="font-size:9px;color:#888;">${edu.year}</span>
+        <span style="font-size:11px;font-weight:600;color:#1a1a1a;">${esc(edu.degree)}</span>
+        <span style="font-size:9px;color:#888;">${esc(edu.year)}</span>
       </div>
-      <div style="font-size:10px;color:#555;">${edu.institution}</div>
+      <div style="font-size:10px;color:#555;">${esc(edu.institution)}</div>
     </div>
   `).join('')
 }
@@ -35,21 +44,22 @@ const BASE_STYLE = `* { margin:0; padding:0; box-sizing:border-box; } body { fon
 
 function buildClassicHtml(data: ResumeData, accentColor: string): string {
   const { personal, experience, education, skills } = data
-  const name = personal.name || 'Your Name'
-  const contact = [personal.email, personal.phone, personal.location, personal.linkedin].filter(Boolean).join(' · ')
+  const color = safeColor(accentColor)
+  const name = esc(personal.name) || 'Your Name'
+  const contact = [personal.email, personal.phone, personal.location, personal.linkedin].filter(Boolean).map(esc).join(' · ')
 
   return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>
     ${BASE_STYLE}
     .page { max-width: 750px; margin: 0 auto; padding: 48px; }
   </style></head><body><div class="page">
-    <div style="text-align:center;border-bottom:2px solid ${accentColor};padding-bottom:20px;margin-bottom:4px;">
+    <div style="text-align:center;border-bottom:2px solid ${color};padding-bottom:20px;margin-bottom:4px;">
       <div style="font-size:24px;font-weight:700;letter-spacing:2px;color:#111;">${name.toUpperCase()}</div>
-      ${personal.title ? `<div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:${accentColor};margin-top:6px;">${personal.title}</div>` : ''}
+      ${personal.title ? `<div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:${color};margin-top:6px;">${esc(personal.title)}</div>` : ''}
       ${contact ? `<div style="font-size:10px;color:#888;margin-top:8px;">${contact}</div>` : ''}
     </div>
-    ${experience.length ? sectionLabel('Experience', accentColor) + expHtml(experience) : ''}
-    ${education.length ? sectionLabel('Education', accentColor) + eduHtml(education) : ''}
-    ${skills.length ? sectionLabel('Skills', accentColor) + `<div style="font-size:10px;color:#555;">${skills.join(' · ')}</div>` : ''}
+    ${experience.length ? sectionLabel('Experience', color) + expHtml(experience) : ''}
+    ${education.length ? sectionLabel('Education', color) + eduHtml(education) : ''}
+    ${skills.length ? sectionLabel('Skills', color) + `<div style="font-size:10px;color:#555;">${skills.map(esc).join(' · ')}</div>` : ''}
   </div></body></html>`
 }
 
@@ -57,35 +67,36 @@ function buildClassicHtml(data: ResumeData, accentColor: string): string {
 
 function buildModernHtml(data: ResumeData, accentColor: string): string {
   const { personal, experience, education, skills } = data
-  const name = personal.name || 'Your Name'
-  const initials = name.split(' ').map((w: string) => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || '??'
-  const contact = [personal.email, personal.phone, personal.location].filter(Boolean).join(' · ')
+  const color = safeColor(accentColor)
+  const name = esc(personal.name) || 'Your Name'
+  const initials = (personal.name || '').split(' ').map((w: string) => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || '??'
+  const contact = [personal.email, personal.phone, personal.location].filter(Boolean).map(esc).join(' · ')
 
-  const skillBadges = skills.map(s => `<span style="background:${accentColor};color:white;padding:3px 8px;border-radius:4px;font-size:9px;margin:2px;display:inline-block;">${s}</span>`).join('')
+  const skillBadges = skills.map(s => `<span style="background:${color};color:white;padding:3px 8px;border-radius:4px;font-size:9px;margin:2px;display:inline-block;">${esc(s)}</span>`).join('')
 
   return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>
     ${BASE_STYLE}
     .page { max-width: 750px; margin: 0 auto; display: flex; min-height: 100vh; }
-    .bar { width: 8px; flex-shrink: 0; background: ${accentColor}; }
+    .bar { width: 8px; flex-shrink: 0; background: ${color}; }
     .main { flex: 1; display: flex; flex-direction: column; }
-    .header { background: ${accentColor}; padding: 28px 32px; display: flex; align-items: center; gap: 20px; }
+    .header { background: ${color}; padding: 28px 32px; display: flex; align-items: center; gap: 20px; }
     .avatar { width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .content { padding: 28px 32px; }
   </style></head><body><div class="page">
     <div class="bar"></div>
     <div class="main">
       <div class="header">
-        <div class="avatar"><span style="color:white;font-weight:700;font-size:20px;">${initials}</span></div>
+        <div class="avatar"><span style="color:white;font-weight:700;font-size:20px;">${esc(initials)}</span></div>
         <div>
           <div style="font-size:22px;font-weight:700;color:white;letter-spacing:1px;">${name.toUpperCase()}</div>
-          ${personal.title ? `<div style="font-size:10px;color:rgba(255,255,255,0.8);letter-spacing:2px;text-transform:uppercase;margin-top:4px;">${personal.title}</div>` : ''}
+          ${personal.title ? `<div style="font-size:10px;color:rgba(255,255,255,0.8);letter-spacing:2px;text-transform:uppercase;margin-top:4px;">${esc(personal.title)}</div>` : ''}
         </div>
       </div>
       <div class="content">
         ${contact ? `<div style="font-size:10px;color:#888;border-bottom:1px solid #eee;padding-bottom:12px;margin-bottom:4px;">${contact}</div>` : ''}
-        ${experience.length ? sectionLabel('Experience', accentColor) + expHtml(experience) : ''}
-        ${education.length ? sectionLabel('Education', accentColor) + eduHtml(education) : ''}
-        ${skills.length ? sectionLabel('Skills', accentColor) + `<div style="margin-top:4px;">${skillBadges}</div>` : ''}
+        ${experience.length ? sectionLabel('Experience', color) + expHtml(experience) : ''}
+        ${education.length ? sectionLabel('Education', color) + eduHtml(education) : ''}
+        ${skills.length ? sectionLabel('Skills', color) + `<div style="margin-top:4px;">${skillBadges}</div>` : ''}
       </div>
     </div>
   </div></body></html>`
@@ -95,7 +106,8 @@ function buildModernHtml(data: ResumeData, accentColor: string): string {
 
 function buildMulticolumnHtml(data: ResumeData, accentColor: string): string {
   const { personal, experience, education, skills } = data
-  const name = personal.name || 'Your Name'
+  const color = safeColor(accentColor)
+  const name = esc(personal.name) || 'Your Name'
 
   const sidebarSectionLabel = (text: string) =>
     `<div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);border-bottom:1px solid rgba(255,255,255,0.2);padding-bottom:4px;margin-bottom:8px;margin-top:16px;">${text}</div>`
@@ -106,7 +118,7 @@ function buildMulticolumnHtml(data: ResumeData, accentColor: string): string {
         <div style="flex:1;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;">
           <div style="width:75%;height:4px;background:rgba(255,255,255,0.7);border-radius:2px;"></div>
         </div>
-        <span style="font-size:9px;color:rgba(255,255,255,0.7);min-width:60px;">${s}</span>
+        <span style="font-size:9px;color:rgba(255,255,255,0.7);min-width:60px;">${esc(s)}</span>
       </div>
     </div>
   `).join('')
@@ -114,7 +126,7 @@ function buildMulticolumnHtml(data: ResumeData, accentColor: string): string {
   return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>
     ${BASE_STYLE}
     .page { max-width: 750px; margin: 0 auto; display: flex; min-height: 100vh; }
-    .sidebar { width: 260px; flex-shrink: 0; background: ${accentColor}; padding: 36px 24px; color: white; }
+    .sidebar { width: 260px; flex-shrink: 0; background: ${color}; padding: 36px 24px; color: white; }
     .main { flex: 1; padding: 36px 32px; }
   </style></head><body><div class="page">
     <div class="sidebar">
@@ -123,20 +135,20 @@ function buildMulticolumnHtml(data: ResumeData, accentColor: string): string {
       </div>
       <div style="text-align:center;">
         <div style="font-size:15px;font-weight:700;color:white;">${name.toUpperCase()}</div>
-        ${personal.title ? `<div style="font-size:9px;color:rgba(255,255,255,0.7);margin-top:4px;">${personal.title}</div>` : ''}
+        ${personal.title ? `<div style="font-size:9px;color:rgba(255,255,255,0.7);margin-top:4px;">${esc(personal.title)}</div>` : ''}
       </div>
       ${sidebarSectionLabel('Contact')}
       <div style="font-size:9px;color:rgba(255,255,255,0.7);line-height:1.8;">
-        ${personal.email ? `<div>${personal.email}</div>` : ''}
-        ${personal.phone ? `<div>${personal.phone}</div>` : ''}
-        ${personal.location ? `<div>${personal.location}</div>` : ''}
-        ${personal.linkedin ? `<div>${personal.linkedin}</div>` : ''}
+        ${personal.email ? `<div>${esc(personal.email)}</div>` : ''}
+        ${personal.phone ? `<div>${esc(personal.phone)}</div>` : ''}
+        ${personal.location ? `<div>${esc(personal.location)}</div>` : ''}
+        ${personal.linkedin ? `<div>${esc(personal.linkedin)}</div>` : ''}
       </div>
       ${skills.length ? sidebarSectionLabel('Skills') + skillBars : ''}
     </div>
     <div class="main">
-      ${experience.length ? sectionLabel('Experience', accentColor) + expHtml(experience) : ''}
-      ${education.length ? sectionLabel('Education', accentColor) + eduHtml(education) : ''}
+      ${experience.length ? sectionLabel('Experience', color) + expHtml(experience) : ''}
+      ${education.length ? sectionLabel('Education', color) + eduHtml(education) : ''}
     </div>
   </div></body></html>`
 }
@@ -145,40 +157,41 @@ function buildMulticolumnHtml(data: ResumeData, accentColor: string): string {
 
 function buildQuotationHtml(data: ResumeData, accentColor: string): string {
   const { personal, experience, education } = data
-  const name = personal.name || 'Your Name'
-  const contact = [personal.email, personal.location].filter(Boolean).join(' · ')
+  const color = safeColor(accentColor)
+  const name = esc(personal.name) || 'Your Name'
+  const contact = [personal.email, personal.location].filter(Boolean).map(esc).join(' · ')
 
   return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>
     ${BASE_STYLE}
     .page { max-width: 750px; margin: 0 auto; padding: 48px; background: #fdfaf5; min-height: 100vh; position: relative; }
-    .quote-mark { position: absolute; top: 24px; right: 32px; font-size: 120px; line-height: 1; font-family: Georgia, serif; opacity: 0.08; color: ${accentColor}; }
+    .quote-mark { position: absolute; top: 24px; right: 32px; font-size: 120px; line-height: 1; font-family: Georgia, serif; opacity: 0.08; color: ${color}; }
   </style></head><body><div class="page">
     <div class="quote-mark">&ldquo;</div>
     <div style="margin-bottom:20px;">
       <div style="font-size:28px;font-weight:700;color:#111;">${name}</div>
-      ${personal.title ? `<div style="font-size:11px;color:${accentColor};margin-top:4px;">${personal.title}</div>` : ''}
-      <div style="width:40px;height:3px;background:${accentColor};border-radius:2px;margin-top:10px;"></div>
+      ${personal.title ? `<div style="font-size:11px;color:${color};margin-top:4px;">${esc(personal.title)}</div>` : ''}
+      <div style="width:40px;height:3px;background:${color};border-radius:2px;margin-top:10px;"></div>
     </div>
     <div style="font-size:10px;color:#888;margin-bottom:20px;line-height:1.7;">
       ${contact ? `<div>${contact}</div>` : ''}
-      ${personal.linkedin ? `<div>${personal.linkedin}</div>` : ''}
+      ${personal.linkedin ? `<div>${esc(personal.linkedin)}</div>` : ''}
     </div>
     ${experience.length ? `
-      <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${accentColor};margin-bottom:10px;">Experience</div>
+      <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${color};margin-bottom:10px;">Experience</div>
       ${experience.map(exp => `
         <div style="margin-bottom:14px;">
-          <div style="font-size:11px;font-weight:600;color:#1a1a1a;">${exp.role}${exp.company ? ` — ${exp.company}` : ''}</div>
-          <div style="font-size:9px;color:#888;margin-bottom:3px;">${exp.startDate}${exp.endDate ? ' – ' + exp.endDate : exp.startDate ? ' – Present' : ''}</div>
-          ${exp.bullets.map(b => `<div style="font-size:10px;color:#555;margin-left:10px;">· ${b}</div>`).join('')}
+          <div style="font-size:11px;font-weight:600;color:#1a1a1a;">${esc(exp.role)}${exp.company ? ` — ${esc(exp.company)}` : ''}</div>
+          <div style="font-size:9px;color:#888;margin-bottom:3px;">${esc(exp.startDate)}${exp.endDate ? ' – ' + esc(exp.endDate) : exp.startDate ? ' – Present' : ''}</div>
+          ${exp.bullets.map(b => `<div style="font-size:10px;color:#555;margin-left:10px;">· ${esc(b)}</div>`).join('')}
         </div>
       `).join('')}
     ` : ''}
     ${education.length ? `
-      <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${accentColor};margin-bottom:10px;margin-top:20px;">Education</div>
+      <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${color};margin-bottom:10px;margin-top:20px;">Education</div>
       ${education.map(edu => `
         <div style="margin-bottom:10px;">
-          <div style="font-size:11px;font-weight:600;color:#1a1a1a;">${edu.degree}</div>
-          <div style="font-size:9px;color:#888;">${[edu.institution, edu.year].filter(Boolean).join(' · ')}</div>
+          <div style="font-size:11px;font-weight:600;color:#1a1a1a;">${esc(edu.degree)}</div>
+          <div style="font-size:9px;color:#888;">${[edu.institution, edu.year].filter(Boolean).map(esc).join(' · ')}</div>
         </div>
       `).join('')}
     ` : ''}
@@ -189,32 +202,33 @@ function buildQuotationHtml(data: ResumeData, accentColor: string): string {
 
 function buildExecutiveHtml(data: ResumeData, accentColor: string): string {
   const { personal, experience, education } = data
-  const name = personal.name || 'Your Name'
-  const initials = name.split(' ').map((w: string) => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || '??'
-  const contact = [personal.email, personal.phone, personal.location].filter(Boolean).join('  ·  ')
+  const color = safeColor(accentColor)
+  const name = esc(personal.name) || 'Your Name'
+  const initials = (personal.name || '').split(' ').map((w: string) => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || '??'
+  const contact = [personal.email, personal.phone, personal.location].filter(Boolean).map(esc).join('  ·  ')
 
   return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>
     ${BASE_STYLE}
     .page { max-width: 750px; margin: 0 auto; }
-    .header { background: ${accentColor}; padding: 28px 36px; display: flex; align-items: center; justify-content: space-between; }
+    .header { background: ${color}; padding: 28px 36px; display: flex; align-items: center; justify-content: space-between; }
     .content { padding: 32px 36px; }
   </style></head><body><div class="page">
     <div class="header">
       <div>
         <div style="font-size:24px;font-weight:700;color:white;letter-spacing:2px;">${name.toUpperCase()}</div>
-        ${personal.title ? `<div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#c9b99a;margin-top:6px;">${personal.title}</div>` : ''}
+        ${personal.title ? `<div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#c9b99a;margin-top:6px;">${esc(personal.title)}</div>` : ''}
         ${contact ? `<div style="font-size:9px;color:rgba(255,255,255,0.55);margin-top:10px;letter-spacing:0.5px;">${contact}</div>` : ''}
       </div>
       <div style="width:56px;height:56px;border:1px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:24px;">
-        <span style="color:white;font-size:18px;font-weight:700;">${initials}</span>
+        <span style="color:white;font-size:18px;font-weight:700;">${esc(initials)}</span>
       </div>
     </div>
     <div class="content">
       ${experience.length ? `
-        <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${accentColor};border-bottom:1px solid ${accentColor};padding-bottom:4px;margin-bottom:14px;">Career History</div>
+        <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${color};border-bottom:1px solid ${color};padding-bottom:4px;margin-bottom:14px;">Career History</div>
         ${expHtml(experience)}
       ` : ''}
-      ${education.length ? sectionLabel('Education', accentColor) + eduHtml(education) : ''}
+      ${education.length ? sectionLabel('Education', color) + eduHtml(education) : ''}
     </div>
   </div></body></html>`
 }
