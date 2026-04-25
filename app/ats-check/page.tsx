@@ -147,6 +147,7 @@ function ATSCheckInner() {
   const beforeUnloadRef = useRef<((e: BeforeUnloadEvent) => void) | null>(null)
   const selectedResumeIdRef = useRef<string | null>(null)
   const resumeIdProcessedRef = useRef(false)
+  const pendingRestoredRef = useRef(false)
   function setResumeId(id: string | null) { selectedResumeIdRef.current = id; setSelectedResumeId(id) }
 
   // On mount: check pro status, fetch usage, load saved resumes, restore persisted ATS result
@@ -193,7 +194,7 @@ function ATSCheckInner() {
   }, [])
 
   useEffect(() => {
-    if (savedResumes.length > 0 && tab === 'upload') setTab('saved')
+    if (savedResumes.length > 0 && tab === 'upload' && !pendingRestoredRef.current) setTab('saved')
   }, [savedResumes])
 
   // Auto-trigger Google Docs edit when returning from payment with ?openDocs=1 or sessionStorage flag
@@ -278,6 +279,7 @@ function ATSCheckInner() {
   useEffect(() => {
     const raw = sessionStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(STORAGE_KEY)
     if (!raw) return
+    pendingRestoredRef.current = true
     sessionStorage.removeItem(STORAGE_KEY)
     localStorage.removeItem(STORAGE_KEY)
     try {
@@ -293,7 +295,6 @@ function ATSCheckInner() {
               const data = JSON.parse(txt)
               if (data.overall_score !== undefined) {
                 setResult(data)
-                setIsPro(true)
                 if (data._usage) setUsage(data._usage)
                 setLoading(false)
               } else if (data.error === 'limit_reached' && attempt < 4) {
