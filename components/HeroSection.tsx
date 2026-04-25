@@ -249,7 +249,7 @@ export default function HeroSection() {
               <span className="text-blue-600">Hire-ready.</span>
             </h1>
             <p className="text-gray-500 text-base mb-5 leading-relaxed">
-              Get a free resume score - ATS + recruiter ready. Fix gaps. Get more interviews.
+              Get your free resume score, built for ATS and recruiters. See what to improve and land more interviews.
             </p>
             <div className="flex flex-col gap-3">
               <Link href="/ats-check" className="w-full text-center bg-blue-600 text-white py-3.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm">
