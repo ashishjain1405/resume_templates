@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS purchases (
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   template_id TEXT NOT NULL,
   razorpay_order_id TEXT,
-  razorpay_payment_id TEXT,
+  razorpay_payment_id TEXT UNIQUE,
   amount_inr INTEGER NOT NULL,
   purchased_at TIMESTAMPTZ DEFAULT now(),
   UNIQUE(user_id, template_id)
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS pro_access (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
   razorpay_order_id TEXT,
-  razorpay_payment_id TEXT,
+  razorpay_payment_id TEXT UNIQUE,
   amount_inr INTEGER NOT NULL,
   purchased_at TIMESTAMPTZ DEFAULT now()
 );
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS session_purchases (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   razorpay_order_id TEXT,
-  razorpay_payment_id TEXT,
+  razorpay_payment_id TEXT UNIQUE,
   amount_inr INTEGER NOT NULL,
   purchased_at TIMESTAMPTZ DEFAULT now()
 );
