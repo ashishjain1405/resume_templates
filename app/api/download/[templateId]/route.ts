@@ -38,6 +38,9 @@ export async function GET(
 
   const color = request.nextUrl.searchParams.get('color')
   const colorKey = color ? color.replace('#', '') : template.colors[0].replace('#', '')
+  if (!/^[0-9a-fA-F]{3,6}$/.test(colorKey)) {
+    return Response.json({ error: 'Invalid color' }, { status: 400 })
+  }
   const storagePath = `templates/${templateId}-${colorKey}.pdf`
 
   const { data, error } = await adminClient.storage
