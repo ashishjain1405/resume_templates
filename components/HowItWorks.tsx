@@ -2,12 +2,12 @@ const STEPS: { n: string; title: string; desc: string; pro?: boolean }[] = [
   {
     n: '1',
     title: 'Build or upload',
-    desc: "No resume? Build one from scratch in minutes. Already have one? Upload it directly.",
+    desc: "No resume? Build one in minutes. Already have one? Just upload it.",
   },
   {
     n: '2',
-    title: 'Check your Resume score',
-    desc: 'Get an instant score with specific gaps and improvements highlighted.',
+    title: 'See how your resume stacks up',
+    desc: 'Get an instant score - see exactly what\'s holding you back and how to fix it.',
   },
   {
     n: '3',
@@ -19,7 +19,7 @@ const STEPS: { n: string; title: string; desc: string; pro?: boolean }[] = [
     n: '4',
     title: 'Book an expert review',
     pro: true,
-    desc: 'Want a second opinion? Book a 30-minute 1:1 session with a resume expert and get personalised feedback before you apply.',
+    desc: 'Want an expert opinion? Book a 30-minute 1:1 with a resume expert and get personalised feedback before you hit send.',
   },
 ]
 

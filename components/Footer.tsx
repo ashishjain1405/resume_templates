@@ -14,7 +14,7 @@ export default function Footer() {
               </div>
               <span className="text-white font-bold">Resume Expert</span>
             </div>
-            <p className="text-sm leading-relaxed">All in one solution to stand out to recruiters.</p>
+            <p className="text-sm leading-relaxed">Everything you need to get noticed — and hired.</p>
           </div>
 
           <div>

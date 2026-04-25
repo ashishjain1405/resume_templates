@@ -78,7 +78,7 @@ export default function BookSessionPage() {
       const data = await res.json()
       if (!res.ok) {
         if (data.error === 'session_limit_reached') {
-          setError('You have already used your included expert session. Each Pro plan includes 1 session.')
+          setError('You\'ve used your included session. Pro includes 1 session — book more at ₹299 each.')
         } else {
           setError(data.error ?? 'Booking failed.')
         }
@@ -115,8 +115,8 @@ export default function BookSessionPage() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
           </svg>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Pro Access Required</h1>
-        <p className="text-gray-500 mb-6 text-sm">Expert sessions are available to Pro members. Upgrade once for lifetime access.</p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Sessions are a Pro feature</h1>
+        <p className="text-gray-500 mb-6 text-sm">Expert sessions are included with Pro — upgrade once and keep access forever.</p>
         <ProUpgradeCTAs layout="stack" source="sessions" />
       </div>
     )
@@ -148,8 +148,8 @@ export default function BookSessionPage() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Session Booked!</h1>
-        <p className="text-gray-500 text-sm mb-1">Your 30-minute expert session is confirmed.</p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">You&apos;re booked!</h1>
+        <p className="text-gray-500 text-sm mb-1">Your 30-minute session is confirmed — you&apos;ll get a calendar invite shortly.</p>
         <p className="text-sm font-medium text-gray-700 mb-6">{formatDate(scheduledAt)} · {formatTime(scheduledAt)}</p>
         {meetLink && (
           <a

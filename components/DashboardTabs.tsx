@@ -64,7 +64,7 @@ export default function DashboardTabs({
     const tab = params.get('tab')
     if (tab) setActive(tab)
     if (params.get('welcome') === '1') {
-      setFlashMsg({ text: 'Welcome back! You already have an account — we\'ve signed you in.', type: 'green' })
+      setFlashMsg({ text: 'You\'re already signed in — welcome back!', type: 'green' })
     } else if (params.get('info') === 'password_updated') {
       setFlashMsg({ text: 'Password updated successfully.', type: 'green' })
     }
@@ -148,8 +148,8 @@ export default function DashboardTabs({
                   <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </div>
                 <div>
-                  <div className="text-sm font-bold text-gray-900 mb-0.5">Check your Resume score</div>
-                  <div className="text-xs text-gray-400">See how your resume performs against job tracking systems</div>
+                  <div className="text-sm font-bold text-gray-900 mb-0.5">See how your resume stacks up</div>
+                  <div className="text-xs text-gray-400">Find out how recruiters and ATS systems see your resume</div>
                 </div>
                 <Link href="/ats-check" className="mt-auto inline-flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors self-start">
                   Check resume score →
@@ -161,7 +161,7 @@ export default function DashboardTabs({
                 </div>
                 <div>
                   <div className="text-sm font-bold text-gray-900 mb-0.5">No resume yet?</div>
-                  <div className="text-xs text-gray-400">Build from scratch with our Resume Creator</div>
+                  <div className="text-xs text-gray-400">Build one from scratch — it only takes a few minutes.</div>
                 </div>
                 <BuilderLink className="mt-auto inline-flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors self-start">
                   Create Resume →
@@ -192,7 +192,7 @@ export default function DashboardTabs({
                 </div>
                 <div>
                   <div className="text-sm font-bold text-gray-900 mb-0.5">Book 1:1 Expert Session</div>
-                  <div className="text-xs text-gray-400">30-min personalised resume feedback call</div>
+                  <div className="text-xs text-gray-400">30-min 1:1 resume review with an expert</div>
                 </div>
                 <Link href="/sessions/book" className="mt-auto inline-flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors self-start">
                   Book Session →
@@ -359,7 +359,7 @@ export default function DashboardTabs({
             </div>
             <div>
               <h2 className="text-base font-bold text-gray-900 mb-0.5">Resume Templates</h2>
-              <p className="text-sm text-gray-500">Each template is a one-time purchase — download as PDF, use forever. Pro gives you instant access to all 5.</p>
+              <p className="text-sm text-gray-500">Every template is a one-time purchase — download as PDF, yours forever. Pro unlocks all 5 instantly.</p>
             </div>
           </div>
 
@@ -386,7 +386,7 @@ export default function DashboardTabs({
 
           {effectiveAccessible.length === 0 && (
             <div className="text-center py-14 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-              <p className="text-sm text-gray-500 mb-4">You don&apos;t own any templates yet.</p>
+              <p className="text-sm text-gray-500 mb-4">You haven&apos;t picked a template yet.</p>
               <div className="flex gap-3 justify-center flex-wrap">
                 <Link href="/templates" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">Browse templates</Link>
                 <Link href="/pricing" className="bg-amber-50 text-amber-700 border border-amber-200 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-amber-100 transition-colors">Upgrade to Pro ✦</Link>

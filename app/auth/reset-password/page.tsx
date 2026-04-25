@@ -17,13 +17,13 @@ export default function ResetPasswordPage() {
     // Supabase sets the session from the token in the URL hash automatically
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) setReady(true)
-      else setError('This reset link is invalid or has expired. Please request a new one.')
+      else setError('This link has expired. Request a fresh one and try again.')
     })
   }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (password !== confirm) { setError('Passwords do not match.'); return }
+    if (password !== confirm) { setError('Those passwords don\'t match — give it another try.'); return }
     setLoading(true)
     setError('')
 
@@ -40,8 +40,8 @@ export default function ResetPasswordPage() {
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 bg-gray-50">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Set a new password</h1>
-          <p className="text-gray-500 text-sm mb-6">Choose a strong password for your account.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Create a new password</h1>
+          <p className="text-gray-500 text-sm mb-6">Pick something strong — you&apos;re almost in.</p>
 
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm mb-4">

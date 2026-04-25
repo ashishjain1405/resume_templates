@@ -76,8 +76,8 @@ function ModalProRequired({ onClose, userEmail }: { onClose: () => void; userEma
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
           </svg>
         </div>
-        <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Free limit reached</h3>
-        <p className="text-sm text-gray-500 text-center mb-5">You've used all 5 free checks. Upgrade once for unlimited Resume checks — ₹999, lifetime.</p>
+        <h3 className="text-lg font-bold text-gray-900 text-center mb-1">You&apos;ve hit your free limit</h3>
+        <p className="text-sm text-gray-500 text-center mb-5">You&apos;ve used all 5 free checks — nice work! Upgrade for unlimited checks, lifetime access, and more. One-time payment of ₹999.</p>
         <div className="flex flex-col gap-2">
           <button
             onClick={() => { onClose(); startUpgrade(userEmail, 'ats') }}
@@ -103,8 +103,8 @@ function Modal({ type, onClose, userEmail }: { type: 'login_required'; onClose: 
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
           </svg>
         </div>
-        <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Save your results</h3>
-        <p className="text-sm text-gray-500 text-center mb-5">Sign in to keep your Resume score and access it anytime from your dashboard.</p>
+        <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Want to save your results?</h3>
+        <p className="text-sm text-gray-500 text-center mb-5">Sign in to save your score and review it anytime from your dashboard.</p>
         <Link href="/auth/signup?redirect=/ats-check" className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
           Sign in or create account
         </Link>
@@ -589,7 +589,7 @@ function ATSCheckInner() {
             setModal('pro_required')
           }
         } else if (res.status === 429) {
-          setError("You've made a lot of checks recently — please wait a few minutes before trying again.")
+          setError("You've been busy! Please wait a few minutes before running another check.")
         } else {
           setError(data.error ?? `Server error (${res.status}). Please try again.`)
         }
@@ -768,8 +768,8 @@ function ATSCheckInner() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Save your Resume score results?</h3>
-            <p className="text-sm text-gray-500 text-center mb-5">Your score and suggestions will be gone once you leave this page.</p>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Save before you go?</h3>
+            <p className="text-sm text-gray-500 text-center mb-5">Your score and suggestions will disappear if you leave now.</p>
             <div className="flex flex-col gap-2">
               <button
                 onClick={async () => {
@@ -787,7 +787,7 @@ function ATSCheckInner() {
                 onClick={() => { setShowSaveModal(false); if (beforeUnloadRef.current) { window.removeEventListener('beforeunload', beforeUnloadRef.current); beforeUnloadRef.current = null } if (pendingNavUrl) window.location.href = pendingNavUrl }}
                 className="w-full border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors"
               >
-                Leave anyway
+                Leave without saving
               </button>
             </div>
           </div>
@@ -802,7 +802,7 @@ function ATSCheckInner() {
         {limitReached && (
           <div className="flex items-center gap-2">
             <ProBadge />
-            <span className="text-xs text-gray-500">Free limit reached</span>
+            <span className="text-xs text-gray-500">You&apos;ve hit your free limit</span>
           </div>
         )}
         {!isPro && usage && !limitReached && (() => {
@@ -857,7 +857,7 @@ function ATSCheckInner() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                     </svg>
                   </div>
-                  <div className="text-sm font-medium text-gray-700">Drop your PDF here or click to browse</div>
+                  <div className="text-sm font-medium text-gray-700">Drop your PDF here, or click to browse</div>
                   <div className="text-xs text-gray-400 mt-1">PDF only · max 5MB</div>
                 </>
               )}
@@ -908,7 +908,7 @@ function ATSCheckInner() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Job Description <span className="text-gray-400 font-normal">(optional — improves keyword matching)</span>
+              Job Description <span className="text-gray-400 font-normal">(optional — helps us match keywords)</span>
             </label>
             <textarea
               className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100 resize-none"
@@ -955,8 +955,8 @@ function ATSCheckInner() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <p className="text-sm font-medium">Your results will appear here</p>
-                <p className="text-xs mt-1">Upload your resume and click Analyse</p>
+                <p className="text-sm font-medium">Your results will show up here.</p>
+                <p className="text-xs mt-1">Upload your resume above and hit Analyse.</p>
               </div>
             </div>
           )}

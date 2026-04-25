@@ -66,12 +66,12 @@ function SignupForm() {
         return
       }
       // Wrong password
-      setError('You already have an account. Check your password or ')
+      setError('Looks like you already have an account. Try logging in or ')
       setErrorLink({ text: 'reset it →', href: `/auth/forgot-password?email=${encodeURIComponent(email)}` })
     } else if (error) {
       setError(error.message)
     } else {
-      setMessage('Check your inbox — we\'ve sent you a link to continue.')
+      setMessage('Check your inbox! We\'ve sent you a link to get started.')
     }
     setLoading(false)
   }
@@ -92,7 +92,7 @@ function SignupForm() {
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 bg-gray-50">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Create your account</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Let&apos;s get you set up</h1>
           <p className="text-gray-500 text-sm mb-6">Stand out to recruiters with a polished resume</p>
 
           {infoMsg && (

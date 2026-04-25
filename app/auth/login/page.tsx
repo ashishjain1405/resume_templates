@@ -42,8 +42,8 @@ function LoginForm() {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
       if (error.message.toLowerCase().includes('invalid login credentials')) {
-        setError('Incorrect email or password. ')
-        setErrorLink({ text: 'Forgot your password? →', href: `/auth/forgot-password?email=${encodeURIComponent(email)}` })
+        setError('Hmm, that didn\'t work. Double-check your email and password. ')
+        setErrorLink({ text: 'Reset your password →', href: `/auth/forgot-password?email=${encodeURIComponent(email)}` })
       } else {
         setError(error.message)
       }
@@ -70,7 +70,7 @@ function LoginForm() {
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 bg-gray-50">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Welcome back</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Welcome back!</h1>
           <p className="text-gray-500 text-sm mb-6">Stand out to recruiters with a polished resume</p>
 
           {error && (

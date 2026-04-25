@@ -100,7 +100,7 @@ function PaymentSuccessContent() {
         </h1>
         <p className="text-gray-500 text-sm mb-6">
           {waiting
-            ? 'This usually takes just a moment. Please don\'t close this page.'
+            ? 'Hang tight — this usually takes just a second. Please keep this tab open.'
             : (isProPayment ? primary.description : 'Your purchase is confirmed. Head to your dashboard to access your template.')}
         </p>
 

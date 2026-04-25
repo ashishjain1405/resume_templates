@@ -40,7 +40,7 @@ export default async function SessionsPage() {
       <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 mb-1">My Sessions</h1>
-          <p className="text-gray-500 text-sm">Your expert resume review sessions.</p>
+          <p className="text-gray-500 text-sm">Your 1:1 resume review sessions.</p>
         </div>
         {(sessions ?? []).length > 0 && hasRemainingCredits && (
           <Link href="/sessions/book" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
@@ -105,8 +105,8 @@ export default async function SessionsPage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
             </svg>
           </div>
-          <p className="text-sm font-semibold text-gray-900 mb-1">You&apos;ve used your included expert session</p>
-          <p className="text-xs text-gray-500 mb-4">Book another 30-minute 1:1 review at ₹299.</p>
+          <p className="text-sm font-semibold text-gray-900 mb-1">You&apos;ve used your included session</p>
+          <p className="text-xs text-gray-500 mb-4">Book another session — 30 minutes, 1:1, ₹299.</p>
           <BuySessionButton userEmail={user.email ?? ''} />
         </div>
       )}
@@ -118,8 +118,8 @@ export default async function SessionsPage() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
             </svg>
           </div>
-          <p className="text-sm font-medium text-gray-700 mb-1">No sessions yet</p>
-          <p className="text-xs text-gray-400 mb-5">Book a 30-minute expert review session.</p>
+          <p className="text-sm font-medium text-gray-700 mb-1">No sessions booked yet</p>
+          <p className="text-xs text-gray-400 mb-5">Get personalised feedback from a resume expert in 30 minutes.</p>
           <Link href="/sessions/book" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors">
             Book your first session
           </Link>

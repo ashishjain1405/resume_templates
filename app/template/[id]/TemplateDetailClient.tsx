@@ -81,7 +81,7 @@ export default function TemplateDetailClient({ template, purchased }: Props) {
 
         {!purchased && (
           <p className="text-xs text-gray-400 text-center mt-3">
-            One-time payment. No subscription. No expiry.
+            One-time payment. No subscription. No expiry. Ever.
           </p>
         )}
 
@@ -91,7 +91,7 @@ export default function TemplateDetailClient({ template, purchased }: Props) {
               href={`/builder/${template.id}`}
               className="w-full block text-center border border-blue-600 text-blue-600 py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-50 transition-colors"
             >
-              Build resume with this template →
+              Start building with this template →
             </Link>
           </div>
         )}
