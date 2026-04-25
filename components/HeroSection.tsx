@@ -24,9 +24,13 @@ const REWRITES = [
     original: 'Worked on improving application performance',
     improved: 'Optimised API response time by 35% (800ms → 520ms) via query indexing',
   },
+  {
+    original: 'Collaborated with cross-functional teams on product launches',
+    improved: 'Partnered with design, PM, and engineering to ship 4 launches, reaching 200k users',
+  },
 ]
 
-const CARD_STYLE = 'absolute inset-0 w-full bg-blue-50/40 rounded-[28px] p-3 lg:p-4'
+const CARD_STYLE = 'absolute inset-0 w-full bg-transparent p-3 lg:p-4'
 
 function ATSAnimation() {
   const [cycle, setCycle] = useState(0)
