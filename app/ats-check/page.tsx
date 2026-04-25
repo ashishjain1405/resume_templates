@@ -294,14 +294,24 @@ function ATSCheckInner() {
           body: JSON.stringify({ templateId: pending.templateId, data: pending.data, accentColor: pending.accentColor }),
         })
           .then(r => r.ok ? r.blob() : null)
-          .then(blob => {
-            if (!blob) { setError('Could not generate PDF. Please try again.'); return }
+          .then(async blob => {
+            if (!blob) { setError('Could not generate PDF. Please try again.'); setLoading(false); return }
             const name = `${pending.data.personal?.name?.replace(/\s+/g, '_') || 'resume'}_${pending.templateId}.pdf`
-            setFile(new File([blob], name, { type: 'application/pdf' }))
-            setTab('upload')
+            const file = new File([blob], name, { type: 'application/pdf' })
+            const uploadForm = new FormData()
+            uploadForm.append('file', file)
+            uploadForm.append('template_id', pending.templateId)
+            const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: uploadForm })
+            const uploadData = await uploadRes.json()
+            if (uploadData.resume?.id) {
+              window.location.href = `/ats-check?resumeId=${uploadData.resume.id}`
+            } else {
+              setFile(file)
+              setTab('upload')
+              setLoading(false)
+            }
           })
-          .catch(() => setError('Something went wrong. Please try again.'))
-          .finally(() => setLoading(false))
+          .catch(() => { setError('Something went wrong. Please try again.'); setLoading(false) })
       } else if (pending.tab === 'paste' && pending.resumeText) {
         setTab('paste')
         setResumeText(pending.resumeText)
