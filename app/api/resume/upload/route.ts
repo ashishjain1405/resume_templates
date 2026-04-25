@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: uploadError.message }, { status: 500 })
     }
 
+    const templateIdRaw = form.get('template_id') as string | null
     const atsScoreRaw = form.get('ats_score')
     let atsScoreValue: number | undefined
     if (atsScoreRaw !== null) {
@@ -54,6 +55,7 @@ export async function POST(request: NextRequest) {
         mime_type: mimeType,
         size_bytes: file.size,
         ...(atsScoreValue !== undefined ? { ats_score: atsScoreValue } : {}),
+        ...(templateIdRaw ? { template_id: templateIdRaw } : {}),
       })
       .select('id, filename, mime_type, size_bytes, ats_score, created_at')
       .single()

@@ -358,6 +358,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
       const file = new File([blob], name, { type: 'application/pdf' })
       const form = new FormData()
       form.append('file', file)
+      form.append('template_id', templateId)
       const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
       if (!uploadRes.ok) { alert('Could not save to Dashboard. Please try again.'); return }
       setSaveCount(c => c + 1)
