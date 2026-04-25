@@ -123,3 +123,9 @@ export async function createBookingEvent(
   const meetLink = event.data.conferenceData?.entryPoints?.find((e) => e.entryPointType === 'video')?.uri ?? ''
   return { eventId: event.data.id!, meetLink }
 }
+
+export async function deleteBookingEvent(eventId: string): Promise<void> {
+  const auth = getOAuth2Client()
+  const calendar = google.calendar({ version: 'v3', auth })
+  await calendar.events.delete({ calendarId: 'primary', eventId, sendUpdates: 'all' })
+}

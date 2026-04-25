@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS sessions (
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   user_email TEXT NOT NULL,
   user_name TEXT,
-  scheduled_at TIMESTAMPTZ NOT NULL,
+  scheduled_at TIMESTAMPTZ NOT NULL UNIQUE,
   duration_minutes INTEGER DEFAULT 30,
   google_event_id TEXT,
   meet_link TEXT,

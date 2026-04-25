@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase-server'
 import { isPro } from '@/lib/pro'
-import { getAvailableSlots, createBookingEvent } from '@/lib/google-calendar'
+import { getAvailableSlots, createBookingEvent, deleteBookingEvent } from '@/lib/google-calendar'
 import { Resend } from 'resend'
 
 export async function POST(request: NextRequest) {
@@ -47,6 +47,10 @@ export async function POST(request: NextRequest) {
     })
 
     if (dbError) {
+      if (dbError.code === '23505') {
+        await deleteBookingEvent(eventId).catch(() => {})
+        return Response.json({ error: 'This slot was just booked by someone else. Please choose another.' }, { status: 409 })
+      }
       console.error('Session insert error:', dbError)
       return Response.json({ error: 'Booking created but failed to save. Contact support.' }, { status: 500 })
     }
