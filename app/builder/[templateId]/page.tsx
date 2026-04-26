@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef, use } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, useCallback, useRef, use, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { TEMPLATES } from '@/lib/templates'
 import { EMPTY_RESUME, type ResumeData, type ExperienceEntry, type EducationEntry } from '@/lib/resume-data'
 import { createClient } from '@/lib/supabase'
@@ -94,9 +94,10 @@ function storageKey(templateId: string) {
   return `resume_builder_${templateId}`
 }
 
-export default function BuilderPage({ params }: { params: Promise<{ templateId: string }> }) {
+function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> }) {
   const { templateId } = use(params)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
 
   const template = TEMPLATES.find(t => t.id === templateId)
@@ -222,6 +223,10 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         if (row) {
           setData(row.data as ResumeData)
           if (row.accent_color) setAccentColor(row.accent_color)
+          if (searchParams.get('fromRewrite')) {
+            setIsDirty(true)
+            router.replace(`/builder/${templateId}`)
+          }
         } else {
           // No Supabase row yet — fall back to localStorage draft (e.g. guest typed data, then signed up via ATS flow)
           const stored = typeof window !== 'undefined' ? localStorage.getItem(storageKey(templateId)) : null
@@ -970,5 +975,13 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         </div>
       )}
     </div>
+  )
+}
+
+export default function BuilderPage({ params }: { params: Promise<{ templateId: string }> }) {
+  return (
+    <Suspense>
+      <BuilderPageInner params={params} />
+    </Suspense>
   )
 }

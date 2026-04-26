@@ -83,7 +83,7 @@ function ATSRewriteInner() {
         }, { onConflict: 'user_id,template_id' })
       if (upsertError) { setError('Failed to save. Please try again.'); return }
       sessionStorage.removeItem('rewrite_result')
-      router.push(`/builder/${data.templateId}`)
+      router.push(`/builder/${data.templateId}?fromRewrite=1`)
     } finally {
       setAccepting(false)
     }
