@@ -12,6 +12,12 @@ export interface EducationEntry {
   institution: string
   degree: string
   year: string
+  gpa?: string
+}
+
+export interface SkillCategory {
+  category: string
+  items: string[]
 }
 
 export interface ResumeData {
@@ -22,10 +28,13 @@ export interface ResumeData {
     phone: string
     location: string
     linkedin: string
+    summary?: string
   }
   experience: ExperienceEntry[]
   education: EducationEntry[]
   skills: string[]
+  skillCategories?: SkillCategory[]
+  awards?: string[]
 }
 
 const str = (v: unknown, max = 500) => String(v ?? '').slice(0, max)
@@ -51,14 +60,26 @@ export function validateResumeData(raw: unknown): ResumeData {
   const education: EducationEntry[] = Array.isArray(d.education)
     ? d.education.slice(0, 10).map((e: unknown) => {
         const x = (e && typeof e === 'object' ? e : {}) as Record<string, unknown>
-        return {
+        const entry: EducationEntry = {
           id: str(x.id, 50),
           institution: str(x.institution),
           degree: str(x.degree),
           year: str(x.year, 50),
         }
+        if (x.gpa !== undefined && x.gpa !== '') entry.gpa = str(x.gpa, 50)
+        return entry
       })
     : []
+
+  const skillCategories: SkillCategory[] | undefined = Array.isArray(d.skillCategories)
+    ? d.skillCategories.slice(0, 10).map((c: unknown) => {
+        const x = (c && typeof c === 'object' ? c : {}) as Record<string, unknown>
+        return {
+          category: str(x.category, 100),
+          items: Array.isArray(x.items) ? x.items.slice(0, 20).map((i: unknown) => str(i, 100)) : [],
+        }
+      })
+    : undefined
 
   return {
     personal: {
@@ -68,10 +89,13 @@ export function validateResumeData(raw: unknown): ResumeData {
       phone: str(p.phone, 50),
       location: str(p.location),
       linkedin: str(p.linkedin),
+      ...(p.summary !== undefined ? { summary: str(p.summary, 1000) } : {}),
     },
     experience,
     education,
     skills: Array.isArray(d.skills) ? d.skills.slice(0, 30).map((s: unknown) => str(s, 100)) : [],
+    ...(skillCategories !== undefined ? { skillCategories } : {}),
+    awards: Array.isArray(d.awards) ? d.awards.slice(0, 20).map((a: unknown) => str(a, 300)) : [],
   }
 }
 
@@ -83,6 +107,7 @@ export const SAMPLE_RESUME: ResumeData = {
     phone: '+91 98765 43210',
     location: 'Bangalore, India',
     linkedin: 'linkedin.com/in/priyasharma',
+    summary: 'Product leader with 8+ years driving growth and monetization across B2C platforms. Proven track record launching 0-to-1 products and scaling revenue through ML-powered experimentation and cross-functional leadership.',
   },
   experience: [
     {
@@ -115,6 +140,7 @@ export const SAMPLE_RESUME: ResumeData = {
       institution: 'IIM Bangalore',
       degree: 'MBA, Strategy & Technology',
       year: '2018',
+      gpa: '3.8/4.0',
     },
     {
       id: '2',
@@ -124,6 +150,15 @@ export const SAMPLE_RESUME: ResumeData = {
     },
   ],
   skills: ['Product Strategy', 'Roadmapping', 'SQL', 'A/B Testing', 'Figma', 'JIRA', 'Python', 'Go-to-Market'],
+  skillCategories: [
+    { category: 'Product Leadership', items: ['Product Strategy', 'Roadmapping', 'OKRs', 'GTM Strategy'] },
+    { category: 'Growth & Analytics', items: ['A/B Testing', 'Funnel Analysis', 'Cohort Analysis', 'Monetization'] },
+    { category: 'Tools', items: ['Figma', 'JIRA', 'Amplitude', 'SQL'] },
+  ],
+  awards: [
+    'Quarterly Award at Expedia Group for deep innovation and user centric thinking',
+    'CEO Hall of Fame Award from BrowserStack CEO for extraordinary result driven performance',
+  ],
 }
 
 export const EMPTY_RESUME: ResumeData = {
@@ -134,8 +169,11 @@ export const EMPTY_RESUME: ResumeData = {
     phone: '',
     location: '',
     linkedin: '',
+    summary: '',
   },
   experience: [],
   education: [],
   skills: [],
+  skillCategories: [],
+  awards: [],
 }

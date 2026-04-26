@@ -34,6 +34,14 @@ export default function ClassicPreview({ accentColor = '#1e3a5f', data }: Props)
         <div className="text-gray-400 mt-0.5 text-[5px]">{contact}</div>
       </div>
 
+      {/* Summary */}
+      {data?.personal.summary && (
+        <div className="mb-2">
+          <div className="font-bold uppercase tracking-widest text-[5px] mb-0.5" style={{ color: accentColor }}>Summary</div>
+          <div className="text-gray-500 text-[5px] leading-relaxed">{data.personal.summary}</div>
+        </div>
+      )}
+
       {/* Experience */}
       <div className="mb-2">
         <div className="font-bold uppercase tracking-widest text-[5px] mb-1" style={{ color: accentColor }}>Experience</div>
@@ -60,16 +68,26 @@ export default function ClassicPreview({ accentColor = '#1e3a5f', data }: Props)
               <span className="font-semibold text-gray-800 text-[5.5px]">{edu.degree}</span>
               <span className="text-gray-400 text-[5px]">{edu.year}</span>
             </div>
-            <div className="text-gray-500 text-[5px]">{edu.institution}</div>
+            <div className="text-gray-500 text-[5px]">{edu.institution}{edu.gpa ? ` · ${edu.gpa}` : ''}</div>
           </div>
         ))}
       </div>
 
       {/* Skills */}
       {skills.length > 0 && (
-        <div>
+        <div className="mb-2">
           <div className="font-bold uppercase tracking-widest text-[5px] mb-0.5" style={{ color: accentColor }}>Skills</div>
           <div className="text-gray-500 text-[5px]">{skills.join(' · ')}</div>
+        </div>
+      )}
+
+      {/* Awards */}
+      {(data?.awards?.length ?? 0) > 0 && (
+        <div>
+          <div className="font-bold uppercase tracking-widest text-[5px] mb-0.5" style={{ color: accentColor }}>Awards</div>
+          {data!.awards!.map((a, i) => (
+            <div key={i} className="text-gray-400 text-[5px]">· {a}</div>
+          ))}
         </div>
       )}
     </div>

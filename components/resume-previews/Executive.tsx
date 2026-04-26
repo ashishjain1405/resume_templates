@@ -44,6 +44,9 @@ export default function ExecutivePreview({ accentColor = '#1c1c1c', data }: Prop
       </div>
 
       <div className="p-2.5 space-y-1.5">
+        {data?.personal.summary && (
+          <div className="text-gray-500 text-[4.5px] leading-relaxed pb-1 border-b border-gray-100">{data.personal.summary}</div>
+        )}
         <div className="border-t border-gray-100 pt-1.5">
           <div className="font-bold text-[5px] uppercase tracking-widest mb-1" style={{ color: accentColor }}>Career History</div>
           {experience.map((exp) => (
@@ -65,12 +68,21 @@ export default function ExecutivePreview({ accentColor = '#1c1c1c', data }: Prop
           {education.map((edu) => (
             <div key={edu.id}>
               <div className="font-semibold text-gray-900 text-[5.5px]">{edu.degree}</div>
-              {(edu.institution || edu.year) && (
-                <div className="text-gray-400 text-[4.5px]">{[edu.institution, edu.year].filter(Boolean).join(' · ')}</div>
+              {(edu.institution || edu.year || edu.gpa) && (
+                <div className="text-gray-400 text-[4.5px]">{[edu.institution, edu.year, edu.gpa].filter(Boolean).join(' · ')}</div>
               )}
             </div>
           ))}
         </div>
+
+        {(data?.awards?.length ?? 0) > 0 && (
+          <div className="border-t border-gray-100 pt-1.5">
+            <div className="font-bold text-[5px] uppercase tracking-widest mb-0.5" style={{ color: accentColor }}>Awards</div>
+            {data!.awards!.slice(0, 2).map((a, i) => (
+              <div key={i} className="text-gray-400 text-[4.5px]">· {a}</div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

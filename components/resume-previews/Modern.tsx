@@ -45,6 +45,10 @@ export default function ModernPreview({ accentColor = '#e94560', data }: Props) 
             {location && <><span>·</span><span>{location}</span></>}
           </div>
 
+          {data?.personal.summary && (
+            <div className="text-gray-500 text-[4.5px] leading-relaxed">{data.personal.summary}</div>
+          )}
+
           <div>
             <div className="font-bold text-[5px] uppercase tracking-wider mb-0.5" style={{ color: accentColor }}>Experience</div>
             {experience.map((exp) => (
@@ -69,6 +73,15 @@ export default function ModernPreview({ accentColor = '#e94560', data }: Props) 
               ))}
             </div>
           </div>
+
+          {(data?.awards?.length ?? 0) > 0 && (
+            <div>
+              <div className="font-bold text-[5px] uppercase tracking-wider mb-0.5" style={{ color: accentColor }}>Awards</div>
+              {data!.awards!.slice(0, 2).map((a, i) => (
+                <div key={i} className="text-gray-400 text-[4.5px]">· {a}</div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -38,6 +38,10 @@ export default function QuotationPreview({ accentColor = '#d4a853', data }: Prop
         {linkedin && <div>{linkedin}</div>}
       </div>
 
+      {data?.personal.summary && (
+        <div className="mb-2 text-gray-500 text-[4.5px] leading-relaxed italic">{data.personal.summary}</div>
+      )}
+
       <div className="mb-1.5">
         <div className="font-bold text-[5px] uppercase tracking-widest mb-1" style={{ color: accentColor }}>Experience</div>
         {experience.map((exp) => (
@@ -56,10 +60,19 @@ export default function QuotationPreview({ accentColor = '#d4a853', data }: Prop
         {education.map((edu) => (
           <div key={edu.id}>
             <div className="font-semibold text-gray-800 text-[5.5px]">{edu.degree}</div>
-            <div className="text-gray-400 text-[4.5px]">{edu.institution}{edu.year ? ` · ${edu.year}` : ''}</div>
+            <div className="text-gray-400 text-[4.5px]">{[edu.institution, edu.year, edu.gpa].filter(Boolean).join(' · ')}</div>
           </div>
         ))}
       </div>
+
+      {(data?.awards?.length ?? 0) > 0 && (
+        <div className="mt-1.5">
+          <div className="font-bold text-[5px] uppercase tracking-widest mb-0.5" style={{ color: accentColor }}>Awards</div>
+          {data!.awards!.slice(0, 2).map((a, i) => (
+            <div key={i} className="text-gray-400 text-[4.5px]">· {a}</div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

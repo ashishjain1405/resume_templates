@@ -88,7 +88,7 @@ const PREVIEW_MAP: Record<string, React.ComponentType<{ accentColor?: string; da
   executive: ExecutivePreview,
 }
 
-type Tab = 'personal' | 'experience' | 'education' | 'skills'
+type Tab = 'personal' | 'experience' | 'education' | 'skills' | 'awards'
 
 function uid() {
   return Math.random().toString(36).slice(2)
@@ -344,10 +344,35 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     updateData({ ...data, education: data.education.map(e => e.id === id ? { ...e, [field]: value } : e) })
   }
 
-  // Skills: comma-separated string ↔ array
+  // Skills: comma-separated string ↔ array (legacy flat)
   const skillsStr = data.skills.join(', ')
   function setSkills(raw: string) {
     updateData({ ...data, skills: raw.split(',').map(s => s.trim()).filter(Boolean) })
+  }
+
+  // Skill categories
+  function addSkillCategory() {
+    const cats = [...(data.skillCategories ?? []), { category: '', items: [] }]
+    updateData({ ...data, skillCategories: cats, skills: cats.flatMap(c => c.items) })
+  }
+  function removeSkillCategory(idx: number) {
+    const cats = (data.skillCategories ?? []).filter((_, i) => i !== idx)
+    updateData({ ...data, skillCategories: cats, skills: cats.flatMap(c => c.items) })
+  }
+  function updateSkillCategory(idx: number, field: 'category' | 'items', value: string | string[]) {
+    const cats = (data.skillCategories ?? []).map((c, i) => i === idx ? { ...c, [field]: value } : c)
+    updateData({ ...data, skillCategories: cats, skills: cats.flatMap(c => c.items) })
+  }
+
+  // Awards
+  function addAward() {
+    updateData({ ...data, awards: [...(data.awards ?? []), ''] })
+  }
+  function removeAward(idx: number) {
+    updateData({ ...data, awards: (data.awards ?? []).filter((_, i) => i !== idx) })
+  }
+  function updateAward(idx: number, value: string) {
+    updateData({ ...data, awards: (data.awards ?? []).map((a, i) => i === idx ? value : a) })
   }
 
   async function handleSaveVersion(): Promise<boolean> {
@@ -511,6 +536,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
     { id: 'experience', label: 'Experience' },
     { id: 'education', label: 'Education' },
     { id: 'skills', label: 'Skills' },
+    { id: 'awards', label: 'Awards' },
   ]
 
   return (
@@ -561,9 +587,19 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
               ] as [keyof ResumeData['personal'], string, string][]).map(([field, lbl, placeholder]) => (
                 <div key={field}>
                   <label className={labelCls}>{lbl}</label>
-                  <input className={inputCls} placeholder={placeholder} value={data.personal[field]} onChange={e => setPersonal(field, e.target.value)} />
+                  <input className={inputCls} placeholder={placeholder} value={(data.personal[field] as string) ?? ''} onChange={e => setPersonal(field, e.target.value)} />
                 </div>
               ))}
+              <div>
+                <label className={labelCls}>Professional Summary</label>
+                <textarea
+                  className={`${inputCls} resize-none`}
+                  rows={3}
+                  placeholder="e.g. Product leader with 8+ years driving growth and monetization…"
+                  value={data.personal.summary ?? ''}
+                  onChange={e => setPersonal('summary', e.target.value)}
+                />
+              </div>
             </>
           )}
 
@@ -631,6 +667,10 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
                     <label className={labelCls}>Year</label>
                     <input className={inputCls} placeholder="2022" value={edu.year} onChange={e => updateEdu(edu.id, 'year', e.target.value)} />
                   </div>
+                  <div>
+                    <label className={labelCls}>GPA / Score (optional)</label>
+                    <input className={inputCls} placeholder="e.g. 3.8/4.0 or 7.4/9" value={edu.gpa ?? ''} onChange={e => updateEdu(edu.id, 'gpa', e.target.value)} />
+                  </div>
                 </div>
               ))}
               <button onClick={addEdu} className="w-full border-2 border-dashed border-gray-200 text-gray-400 hover:border-blue-300 hover:text-blue-500 py-2.5 rounded-xl text-sm font-medium transition-colors">
@@ -640,23 +680,71 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
           )}
 
           {tab === 'skills' && (
-            <div>
-              <label className={labelCls}>Skills (comma-separated)</label>
-              <textarea
-                className={`${inputCls} resize-none`}
-                rows={4}
-                placeholder="e.g. React, Node.js, Python, AWS, TypeScript"
-                value={skillsStr}
-                onChange={e => setSkills(e.target.value)}
-              />
-              {data.skills.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-3">
-                  {data.skills.map(s => (
-                    <span key={s} className="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded-full">{s}</span>
-                  ))}
+            <>
+              {(data.skillCategories ?? []).length === 0 ? (
+                <div>
+                  <label className={labelCls}>Skills (comma-separated)</label>
+                  <textarea
+                    className={`${inputCls} resize-none`}
+                    rows={4}
+                    placeholder="e.g. React, Node.js, Python, AWS, TypeScript"
+                    value={skillsStr}
+                    onChange={e => setSkills(e.target.value)}
+                  />
+                  {data.skills.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-3">
+                      {data.skills.map(s => (
+                        <span key={s} className="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded-full">{s}</span>
+                      ))}
+                    </div>
+                  )}
+                  <button onClick={addSkillCategory} className="mt-3 w-full border-2 border-dashed border-gray-200 text-gray-400 hover:border-blue-300 hover:text-blue-500 py-2 rounded-xl text-sm font-medium transition-colors">
+                    + Add Skill Categories
+                  </button>
                 </div>
+              ) : (
+                <>
+                  {(data.skillCategories ?? []).map((cat, idx) => (
+                    <div key={idx} className="border border-gray-100 rounded-xl p-3 space-y-2 relative">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-semibold text-gray-700">Category {idx + 1}</span>
+                        <button onClick={() => removeSkillCategory(idx)} className="text-gray-300 hover:text-red-400 text-lg leading-none">×</button>
+                      </div>
+                      <div>
+                        <label className={labelCls}>Category Name</label>
+                        <input className={inputCls} placeholder="e.g. Product Leadership" value={cat.category} onChange={e => updateSkillCategory(idx, 'category', e.target.value)} />
+                      </div>
+                      <div>
+                        <label className={labelCls}>Skills (comma-separated)</label>
+                        <input className={inputCls} placeholder="e.g. Strategy, Roadmapping, OKRs" value={cat.items.join(', ')} onChange={e => updateSkillCategory(idx, 'items', e.target.value.split(',').map(s => s.trim()).filter(Boolean))} />
+                      </div>
+                    </div>
+                  ))}
+                  <button onClick={addSkillCategory} className="w-full border-2 border-dashed border-gray-200 text-gray-400 hover:border-blue-300 hover:text-blue-500 py-2.5 rounded-xl text-sm font-medium transition-colors">
+                    + Add Category
+                  </button>
+                </>
               )}
-            </div>
+            </>
+          )}
+
+          {tab === 'awards' && (
+            <>
+              {(data.awards ?? []).map((award, idx) => (
+                <div key={idx} className="flex gap-2 items-start">
+                  <input
+                    className={`${inputCls} flex-1`}
+                    placeholder="e.g. CEO Award for outstanding performance"
+                    value={award}
+                    onChange={e => updateAward(idx, e.target.value)}
+                  />
+                  <button onClick={() => removeAward(idx)} className="text-gray-300 hover:text-red-400 text-lg leading-none mt-2">×</button>
+                </div>
+              ))}
+              <button onClick={addAward} className="w-full border-2 border-dashed border-gray-200 text-gray-400 hover:border-blue-300 hover:text-blue-500 py-2.5 rounded-xl text-sm font-medium transition-colors">
+                + Add Award
+              </button>
+            </>
           )}
         </div>
 

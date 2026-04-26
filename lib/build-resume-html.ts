@@ -33,7 +33,7 @@ function eduHtml(education: ResumeData['education']) {
         <span style="font-size:11px;font-weight:600;color:#1a1a1a;">${esc(edu.degree)}</span>
         <span style="font-size:9px;color:#888;">${esc(edu.year)}</span>
       </div>
-      <div style="font-size:10px;color:#555;">${esc(edu.institution)}</div>
+      <div style="font-size:10px;color:#555;">${esc(edu.institution)}${edu.gpa ? ` · ${esc(edu.gpa)}` : ''}</div>
     </div>
   `).join('')
 }
@@ -57,9 +57,11 @@ function buildClassicHtml(data: ResumeData, accentColor: string): string {
       ${personal.title ? `<div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:${color};margin-top:6px;">${esc(personal.title)}</div>` : ''}
       ${contact ? `<div style="font-size:10px;color:#888;margin-top:8px;">${contact}</div>` : ''}
     </div>
+    ${personal.summary ? sectionLabel('Summary', color) + `<div style="font-size:10px;color:#555;line-height:1.7;">${esc(personal.summary)}</div>` : ''}
     ${experience.length ? sectionLabel('Experience', color) + expHtml(experience) : ''}
     ${education.length ? sectionLabel('Education', color) + eduHtml(education) : ''}
     ${skills.length ? sectionLabel('Skills', color) + `<div style="font-size:10px;color:#555;">${skills.map(esc).join(' · ')}</div>` : ''}
+    ${data.awards?.length ? sectionLabel('Awards &amp; Achievements', color) + `<ul style="margin:0;padding-left:16px;">${data.awards.map(a => `<li style="font-size:10px;color:#444;margin-bottom:4px;">${esc(a)}</li>`).join('')}</ul>` : ''}
   </div></body></html>`
 }
 
@@ -94,9 +96,11 @@ function buildModernHtml(data: ResumeData, accentColor: string): string {
       </div>
       <div class="content">
         ${contact ? `<div style="font-size:10px;color:#888;border-bottom:1px solid #eee;padding-bottom:12px;margin-bottom:4px;">${contact}</div>` : ''}
+        ${personal.summary ? sectionLabel('Summary', color) + `<div style="font-size:10px;color:#555;line-height:1.7;">${esc(personal.summary)}</div>` : ''}
         ${experience.length ? sectionLabel('Experience', color) + expHtml(experience) : ''}
         ${education.length ? sectionLabel('Education', color) + eduHtml(education) : ''}
         ${skills.length ? sectionLabel('Skills', color) + `<div style="margin-top:4px;">${skillBadges}</div>` : ''}
+        ${data.awards?.length ? sectionLabel('Awards &amp; Achievements', color) + `<ul style="margin:0;padding-left:16px;">${data.awards.map(a => `<li style="font-size:10px;color:#444;margin-bottom:4px;">${esc(a)}</li>`).join('')}</ul>` : ''}
       </div>
     </div>
   </div></body></html>`
@@ -105,23 +109,34 @@ function buildModernHtml(data: ResumeData, accentColor: string): string {
 // ─── Multicolumn ───────────────────────────────────────────────────────────
 
 function buildMulticolumnHtml(data: ResumeData, accentColor: string): string {
-  const { personal, experience, education, skills } = data
+  const { personal, experience, education, skills, skillCategories } = data
   const color = safeColor(accentColor)
   const name = esc(personal.name) || 'Your Name'
 
   const sidebarSectionLabel = (text: string) =>
     `<div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);border-bottom:1px solid rgba(255,255,255,0.2);padding-bottom:4px;margin-bottom:8px;margin-top:16px;">${text}</div>`
 
-  const skillBars = skills.map(s => `
-    <div style="margin-bottom:6px;">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div style="flex:1;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;">
-          <div style="width:75%;height:4px;background:rgba(255,255,255,0.7);border-radius:2px;"></div>
+  const skillsHtml = skillCategories?.length
+    ? skillCategories.map(cat => `
+        <div style="margin-bottom:10px;">
+          <div style="font-size:8px;color:rgba(255,255,255,0.5);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">${esc(cat.category)}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            ${cat.items.map(item => `<span style="font-size:9px;color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.12);padding:2px 7px;border-radius:3px;">${esc(item)}</span>`).join('')}
+          </div>
         </div>
-        <span style="font-size:9px;color:rgba(255,255,255,0.7);min-width:60px;">${esc(s)}</span>
-      </div>
-    </div>
-  `).join('')
+      `).join('')
+    : skills.map(s => `
+        <div style="margin-bottom:6px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="flex:1;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;">
+              <div style="width:75%;height:4px;background:rgba(255,255,255,0.7);border-radius:2px;"></div>
+            </div>
+            <span style="font-size:9px;color:rgba(255,255,255,0.7);min-width:60px;">${esc(s)}</span>
+          </div>
+        </div>
+      `).join('')
+
+  const hasSkills = (skillCategories?.length ?? 0) > 0 || skills.length > 0
 
   return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>
     ${BASE_STYLE}
@@ -144,11 +159,13 @@ function buildMulticolumnHtml(data: ResumeData, accentColor: string): string {
         ${personal.location ? `<div>${esc(personal.location)}</div>` : ''}
         ${personal.linkedin ? `<div>${esc(personal.linkedin)}</div>` : ''}
       </div>
-      ${skills.length ? sidebarSectionLabel('Skills') + skillBars : ''}
+      ${hasSkills ? sidebarSectionLabel('Skills') + skillsHtml : ''}
     </div>
     <div class="main">
+      ${personal.summary ? `<div style="font-size:10px;color:#555;line-height:1.7;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #eee;">${esc(personal.summary)}</div>` : ''}
       ${experience.length ? sectionLabel('Experience', color) + expHtml(experience) : ''}
       ${education.length ? sectionLabel('Education', color) + eduHtml(education) : ''}
+      ${data.awards?.length ? sectionLabel('Awards &amp; Achievements', color) + `<ul style="margin:0;padding-left:16px;">${data.awards.map(a => `<li style="font-size:10px;color:#444;margin-bottom:4px;">${esc(a)}</li>`).join('')}</ul>` : ''}
     </div>
   </div></body></html>`
 }
@@ -176,6 +193,7 @@ function buildQuotationHtml(data: ResumeData, accentColor: string): string {
       ${contact ? `<div>${contact}</div>` : ''}
       ${personal.linkedin ? `<div>${esc(personal.linkedin)}</div>` : ''}
     </div>
+    ${personal.summary ? `<div style="font-size:10px;color:#555;line-height:1.7;margin-bottom:20px;font-style:italic;">${esc(personal.summary)}</div>` : ''}
     ${experience.length ? `
       <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${color};margin-bottom:10px;">Experience</div>
       ${experience.map(exp => `
@@ -191,9 +209,15 @@ function buildQuotationHtml(data: ResumeData, accentColor: string): string {
       ${education.map(edu => `
         <div style="margin-bottom:10px;">
           <div style="font-size:11px;font-weight:600;color:#1a1a1a;">${esc(edu.degree)}</div>
-          <div style="font-size:9px;color:#888;">${[edu.institution, edu.year].filter(Boolean).map(esc).join(' · ')}</div>
+          <div style="font-size:9px;color:#888;">${[edu.institution, edu.year, edu.gpa].filter(Boolean).map(esc).join(' · ')}</div>
         </div>
       `).join('')}
+    ` : ''}
+    ${data.awards?.length ? `
+      <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${color};margin-bottom:10px;margin-top:20px;">Awards &amp; Achievements</div>
+      <ul style="margin:0;padding-left:16px;">
+        ${data.awards.map(a => `<li style="font-size:10px;color:#555;margin-bottom:4px;">${esc(a)}</li>`).join('')}
+      </ul>
     ` : ''}
   </div></body></html>`
 }
@@ -224,11 +248,13 @@ function buildExecutiveHtml(data: ResumeData, accentColor: string): string {
       </div>
     </div>
     <div class="content">
+      ${personal.summary ? `<div style="font-size:10px;color:#555;line-height:1.7;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #eee;">${esc(personal.summary)}</div>` : ''}
       ${experience.length ? `
         <div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${color};border-bottom:1px solid ${color};padding-bottom:4px;margin-bottom:14px;">Career History</div>
         ${expHtml(experience)}
       ` : ''}
       ${education.length ? sectionLabel('Education', color) + eduHtml(education) : ''}
+      ${data.awards?.length ? sectionLabel('Awards &amp; Achievements', color) + `<ul style="margin:0;padding-left:16px;">${data.awards.map(a => `<li style="font-size:10px;color:#444;margin-bottom:4px;">${esc(a)}</li>`).join('')}</ul>` : ''}
     </div>
   </div></body></html>`
 }
