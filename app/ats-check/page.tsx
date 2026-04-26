@@ -609,6 +609,17 @@ function ATSCheckInner() {
       // If analysing an existing saved resume, treat it as already saved — score will auto-PATCH
       setSaveCount(selectedResumeIdRef.current ? 1 : 0)
       if (atsResult._usage) setUsage(atsResult._usage)
+      // Upload file to storage after analysis so resumeId is ready for AI Re-write iframe.
+      // Non-blocking — does not affect result display.
+      if (tab === 'upload' && file && !selectedResumeIdRef.current) {
+        const uploadForm = new FormData()
+        uploadForm.append('file', file)
+        if (atsResult.overall_score != null) uploadForm.append('ats_score', String(atsResult.overall_score))
+        fetch('/api/resume/upload', { method: 'POST', body: uploadForm })
+          .then(r => r.json())
+          .then(d => { if (d.resume?.id) { setResumeId(d.resume.id); setSaveCount(1) } })
+          .catch(() => { /* non-blocking */ })
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.')
     } finally {
