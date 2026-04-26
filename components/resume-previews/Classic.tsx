@@ -53,7 +53,7 @@ export default function ClassicPreview({ accentColor = '#1e3a5f', data }: Props)
               <span className="text-gray-400 text-[5px]">{exp.startDate}{exp.endDate ? ` – ${exp.endDate}` : exp.startDate ? ' – Present' : ''}</span>
             </div>
             <div className="text-gray-500 text-[5px]">{exp.company}</div>
-            {exp.bullets.slice(0, 2).map((b, i) => (
+            {exp.bullets.map((b, i) => (
               <div key={i} className="text-gray-400 text-[5px] mt-0.5">· {b}</div>
             ))}
           </div>

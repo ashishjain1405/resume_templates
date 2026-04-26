@@ -48,7 +48,7 @@ export default function QuotationPreview({ accentColor = '#d4a853', data }: Prop
           <div key={exp.id} className="mb-1">
             <div className="font-semibold text-gray-800 text-[5.5px]">{exp.role}{exp.company ? ` — ${exp.company}` : ''}</div>
             <div className="text-gray-400 text-[4.5px]">{exp.startDate}{exp.endDate ? ` – ${exp.endDate}` : exp.startDate ? ' – Present' : ''}</div>
-            {exp.bullets.slice(0, 1).map((b, i) => (
+            {exp.bullets.map((b, i) => (
               <div key={i} className="text-gray-400 text-[4.5px] mt-0.5">· {b}</div>
             ))}
           </div>
@@ -68,7 +68,7 @@ export default function QuotationPreview({ accentColor = '#d4a853', data }: Prop
       {(data?.awards?.length ?? 0) > 0 && (
         <div className="mt-1.5">
           <div className="font-bold text-[5px] uppercase tracking-widest mb-0.5" style={{ color: accentColor }}>Awards</div>
-          {data!.awards!.slice(0, 2).map((a, i) => (
+          {data!.awards!.map((a, i) => (
             <div key={i} className="text-gray-400 text-[4.5px]">· {a}</div>
           ))}
         </div>

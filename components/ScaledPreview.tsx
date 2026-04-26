@@ -17,9 +17,8 @@ const PREVIEW_MAP: Record<string, React.ComponentType<{ accentColor?: string; da
   executive: ExecutivePreview,
 }
 
-// Preview components are authored at this width (derived from their px font sizes
-// targeting ~10-12px body text at 2× scale on a standard A4 proportion container).
 const DESIGN_WIDTH = 210
+const DESIGN_HEIGHT = DESIGN_WIDTH * (297 / 210) // A4: 297
 
 interface Props {
   templateId: string
@@ -29,8 +28,12 @@ interface Props {
 
 export default function ScaledPreview({ templateId, accentColor, data }: Props) {
   const outerRef = useRef<HTMLDivElement>(null)
+  const innerRef = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(1)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
+  // Measure container width → scale
   useEffect(() => {
     const el = outerRef.current
     if (!el) return
@@ -42,14 +45,66 @@ export default function ScaledPreview({ templateId, accentColor, data }: Props) 
     return () => obs.disconnect()
   }, [])
 
+  // Reset to page 1 when content or template changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [data, templateId])
+
+  // Measure total pages after layout settles
+  useEffect(() => {
+    const id = requestAnimationFrame(() => {
+      const h = innerRef.current?.scrollHeight ?? 0
+      setTotalPages(Math.max(1, Math.ceil(h / DESIGN_HEIGHT)))
+    })
+    return () => cancelAnimationFrame(id)
+  }, [scale, data, templateId])
+
+  // Clamp current page if total pages shrinks (e.g. on resize)
+  useEffect(() => {
+    setCurrentPage(p => Math.min(p, totalPages))
+  }, [totalPages])
+
   const Preview = PREVIEW_MAP[templateId] ?? ClassicPreview
-  // A4 ratio: 210 × 297mm → height = DESIGN_WIDTH × (297/210)
-  const designHeight = DESIGN_WIDTH * (297 / 210)
+  const offset = (currentPage - 1) * DESIGN_HEIGHT
 
   return (
-    <div ref={outerRef} className="w-full overflow-hidden" style={{ height: designHeight * scale }}>
-      <div style={{ width: DESIGN_WIDTH, height: designHeight, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
-        <Preview accentColor={accentColor} data={data} />
+    <div>
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-3 py-1.5 bg-gray-50 border-b border-gray-200">
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            aria-label="Previous page"
+            className="p-1 rounded disabled:opacity-30 hover:bg-gray-200 transition-colors"
+          >
+            <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <span className="text-xs text-gray-500 tabular-nums font-medium">Page {currentPage} of {totalPages}</span>
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            aria-label="Next page"
+            className="p-1 rounded disabled:opacity-30 hover:bg-gray-200 transition-colors"
+          >
+            <svg className="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      )}
+      <div ref={outerRef} className="w-full overflow-hidden" style={{ height: DESIGN_HEIGHT * scale }}>
+        <div
+          ref={innerRef}
+          style={{
+            width: DESIGN_WIDTH,
+            transform: `scale(${scale}) translateY(-${offset}px)`,
+            transformOrigin: 'top left',
+          }}
+        >
+          <Preview accentColor={accentColor} data={data} />
+        </div>
       </div>
     </div>
   )
