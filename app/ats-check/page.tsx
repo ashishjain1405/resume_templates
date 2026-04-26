@@ -1084,7 +1084,17 @@ function ATSCheckInner() {
               <div className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => {
-                    if (!isPro) { setShowProRewriteModal(true); return }
+                    if (!isPro) {
+                      sessionStorage.setItem('ats_result_persist', JSON.stringify({
+                        result,
+                        resumeText: resumeTextRef.current || resumeText,
+                        selectedResumeId,
+                        tab,
+                        builderTemplateId,
+                      }))
+                      setShowProRewriteModal(true)
+                      return
+                    }
                     if (builderTemplateId) {
                       handleAIRewrite()
                     } else {
