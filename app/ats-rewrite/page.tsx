@@ -15,6 +15,7 @@ interface RewriteResult {
   keyChanges: string[]
   accentColor: string
   templateId: string
+  resumeId: string | null
 }
 
 function ScoreRing({ score }: { score: number }) {
@@ -72,6 +73,8 @@ function ATSRewriteInner() {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { setError('Not logged in'); return }
+
+      // 1. Upsert resumes (builder JSON)
       const { error: upsertError } = await supabase
         .from('resumes')
         .upsert({
@@ -82,8 +85,33 @@ function ATSRewriteInner() {
           updated_at: new Date().toISOString(),
         }, { onConflict: 'user_id,template_id' })
       if (upsertError) { setError('Failed to save. Please try again.'); return }
+
+      // 2. Generate PDF from rewritten data
+      const pdfRes = await fetch('/api/builder/pdf?pdf=1', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ templateId: data.templateId, data: data.rewrittenData, accentColor: data.accentColor }),
+      })
+      if (!pdfRes.ok) { setError('Failed to generate PDF. Please try again.'); return }
+      const blob = await pdfRes.blob()
+      const name = `${data.rewrittenData.personal?.name?.replace(/\s+/g, '_') || 'resume'}_${data.templateId}.pdf`
+      const file = new File([blob], name, { type: 'application/pdf' })
+
+      // 3. Upload new PDF with rewritten score
+      const form = new FormData()
+      form.append('file', file)
+      form.append('template_id', data.templateId)
+      form.append('ats_score', String(data.rewrittenScore.overall_score))
+      const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
+      if (!uploadRes.ok) { setError('Failed to save to Dashboard. Please try again.'); return }
+
+      // 4. Delete original file only after new upload succeeds
+      if (data.resumeId) {
+        await fetch(`/api/resume/${data.resumeId}`, { method: 'DELETE' })
+      }
+
       sessionStorage.removeItem('rewrite_result')
-      router.push(`/builder/${data.templateId}?fromRewrite=1`)
+      router.push('/dashboard?tab=resumes')
     } finally {
       setAccepting(false)
     }
@@ -103,7 +131,7 @@ function ATSRewriteInner() {
       <div className="max-w-5xl mx-auto space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">AI Resume Re-write</h1>
-          <p className="text-sm text-gray-500 mt-1">Review the changes before accepting. Your original is preserved until you accept.</p>
+          <p className="text-sm text-gray-500 mt-1">Review the changes before saving. The AI rewritten version will replace your existing resume.</p>
         </div>
 
         {error && (
@@ -196,14 +224,17 @@ function ATSRewriteInner() {
           >
             Discard
           </button>
-          <button
-            onClick={handleAccept}
-            disabled={accepting}
-            className="px-6 py-2.5 rounded-xl font-semibold text-sm bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-60 flex items-center gap-2"
-          >
-            {accepting && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-            {accepting ? 'Saving…' : 'Accept & Open in Builder'}
-          </button>
+          <div className="flex flex-col items-end gap-1">
+            <button
+              onClick={handleAccept}
+              disabled={accepting}
+              className="px-6 py-2.5 rounded-xl font-semibold text-sm bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-60 flex items-center gap-2"
+            >
+              {accepting && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+              {accepting ? 'Saving…' : 'Save to Dashboard'}
+            </button>
+            {!accepting && <p className="text-xs text-gray-400">Replaces your existing resume with the AI rewritten version</p>}
+          </div>
         </div>
       </div>
     </div>
