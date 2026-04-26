@@ -149,9 +149,11 @@ function ATSCheckInner() {
   const fileRef = useRef<HTMLInputElement>(null)
   const beforeUnloadRef = useRef<((e: BeforeUnloadEvent) => void) | null>(null)
   const selectedResumeIdRef = useRef<string | null>(null)
+  const resumeTextRef = useRef<string>('')
   const resumeIdProcessedRef = useRef(false)
   const pendingRestoredRef = useRef(false)
   function setResumeId(id: string | null) { selectedResumeIdRef.current = id; setSelectedResumeId(id) }
+  function setResumeTextSync(text: string) { resumeTextRef.current = text; setResumeText(text) }
 
   // On mount: check pro status, fetch usage, load saved resumes, restore persisted ATS result
   useEffect(() => {
@@ -256,7 +258,7 @@ function ATSCheckInner() {
           const form = new FormData()
           try {
             const extracted = await extractPdfText(f)
-            if (extracted.trim()) { setResumeText(extracted); form.append('resumeText', extracted) }
+            if (extracted.trim()) { setResumeTextSync(extracted); form.append('resumeText', extracted) }
             else form.append('file', f)
           } catch { form.append('file', f) }
           const res = await fetch('/api/ats-check', { method: 'POST', body: form })
@@ -458,7 +460,7 @@ function ATSCheckInner() {
     // Patch history.pushState so Next.js router.push calls are intercepted
     const origPushState = history.pushState.bind(history)
     history.pushState = function (state, title, url) {
-      if (url && typeof url === 'string' && !url.includes('/ats-check')) {
+      if (url && typeof url === 'string' && !url.includes('/ats-check') && !url.includes('/ats-rewrite')) {
         setPendingNavUrl(url as string)
         setShowSaveModal(true)
         return
@@ -499,7 +501,7 @@ function ATSCheckInner() {
         try {
           const text = await extractPdfText(file)
           if (!text.trim()) { setError('Could not read text from this PDF. Please try pasting the text instead.'); return }
-          setResumeText(text)
+          setResumeTextSync(text)
           form.append('resumeText', text)
         } catch {
           setError('Could not parse this PDF. Please try pasting the text instead.')
@@ -515,7 +517,7 @@ function ATSCheckInner() {
         try {
           const text = await extractPdfText(blob)
           if (!text.trim()) { setError('Could not read text from this PDF. Please try pasting the text instead.'); return }
-          setResumeText(text)
+          setResumeTextSync(text)
           form.append('resumeText', text)
         } catch {
           setError('Could not parse this PDF. Please try pasting the text instead.')
@@ -682,7 +684,7 @@ function ATSCheckInner() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           templateId: effectiveTemplateId,
-          resumeText,
+          resumeText: resumeTextRef.current || resumeText,
           jobDescription,
           atsContext: result ? {
             overall_score: result.overall_score,
