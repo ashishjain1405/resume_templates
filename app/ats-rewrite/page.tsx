@@ -4,20 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import type { ResumeData } from '@/lib/resume-data'
-import ClassicPreview from '@/components/resume-previews/Classic'
-import ModernPreview from '@/components/resume-previews/Modern'
-import MulticolumnPreview from '@/components/resume-previews/Multicolumn'
-import QuotationPreview from '@/components/resume-previews/Quotation'
-import ExecutivePreview from '@/components/resume-previews/Executive'
-import type React from 'react'
-
-const PREVIEW_MAP: Record<string, React.ComponentType<{ accentColor?: string; data?: ResumeData }>> = {
-  classic: ClassicPreview,
-  modern: ModernPreview,
-  multicolumn: MulticolumnPreview,
-  quotation: QuotationPreview,
-  executive: ExecutivePreview,
-}
+import ScaledPreview from '@/components/ScaledPreview'
 
 interface RewriteResult {
   originalData: ResumeData
@@ -75,7 +62,7 @@ function ATSRewriteInner() {
 
   if (!data) return null
 
-  const Preview = PREVIEW_MAP[templateId] ?? PREVIEW_MAP[data.templateId] ?? ClassicPreview
+  const resolvedTemplateId = templateId || data.templateId
 
   async function handleAccept() {
     if (!data) return
@@ -145,8 +132,8 @@ function ATSRewriteInner() {
               </div>
             </div>
             <div className="p-4">
-              <div className="w-full aspect-[3/4] rounded-lg overflow-hidden border border-gray-100 shadow-sm">
-                <Preview accentColor={data.accentColor} data={data.originalData} />
+              <div className="w-full rounded-lg overflow-hidden border border-gray-100 shadow-sm">
+                <ScaledPreview templateId={resolvedTemplateId} accentColor={data.accentColor} data={data.originalData} />
               </div>
             </div>
           </div>
@@ -178,8 +165,8 @@ function ATSRewriteInner() {
               </div>
             </div>
             <div className="p-4">
-              <div className="w-full aspect-[3/4] rounded-lg overflow-hidden border border-gray-100 shadow-sm">
-                <Preview accentColor={data.accentColor} data={data.rewrittenData} />
+              <div className="w-full rounded-lg overflow-hidden border border-gray-100 shadow-sm">
+                <ScaledPreview templateId={resolvedTemplateId} accentColor={data.accentColor} data={data.rewrittenData} />
               </div>
             </div>
           </div>

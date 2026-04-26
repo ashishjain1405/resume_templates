@@ -5,11 +5,7 @@ import { useRouter } from 'next/navigation'
 import { TEMPLATES } from '@/lib/templates'
 import { EMPTY_RESUME, type ResumeData, type ExperienceEntry, type EducationEntry } from '@/lib/resume-data'
 import { createClient } from '@/lib/supabase'
-import ClassicPreview from '@/components/resume-previews/Classic'
-import ModernPreview from '@/components/resume-previews/Modern'
-import MulticolumnPreview from '@/components/resume-previews/Multicolumn'
-import QuotationPreview from '@/components/resume-previews/Quotation'
-import ExecutivePreview from '@/components/resume-previews/Executive'
+import ScaledPreview from '@/components/ScaledPreview'
 import type { User } from '@supabase/supabase-js'
 import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
 
@@ -80,14 +76,6 @@ function CheckATSButton({ user, data, accentColor, templateId }: {
   )
 }
 
-const PREVIEW_MAP: Record<string, React.ComponentType<{ accentColor?: string; data?: ResumeData }>> = {
-  classic: ClassicPreview,
-  modern: ModernPreview,
-  multicolumn: MulticolumnPreview,
-  quotation: QuotationPreview,
-  executive: ExecutivePreview,
-}
-
 type Tab = 'personal' | 'experience' | 'education' | 'skills' | 'awards'
 
 function uid() {
@@ -131,8 +119,6 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
   const [docsLoading, setDocsLoading] = useState(false)
 
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  const Preview = PREVIEW_MAP[templateId] ?? ClassicPreview
 
   // Load user + pro status
   useEffect(() => {
@@ -845,8 +831,8 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
         </div>
 
         <div className="flex-1 overflow-auto flex items-start justify-center p-4 lg:p-8">
-          <div className="bg-white shadow-xl rounded-xl overflow-hidden w-full max-w-[420px]" style={{ aspectRatio: '420/594' }}>
-            <Preview accentColor={accentColor} data={data} />
+          <div className="bg-white shadow-xl rounded-xl overflow-hidden w-full max-w-[420px]">
+            <ScaledPreview templateId={templateId} accentColor={accentColor} data={data} />
           </div>
         </div>
       </div>
