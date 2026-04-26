@@ -679,12 +679,30 @@ function ATSCheckInner() {
     setRewriteLoading(true)
     setError('')
     try {
+      // If resumeText is empty but we have a resumeId (e.g. post-login restore),
+      // re-fetch and extract the PDF text before calling the rewrite API
+      let effectiveResumeText = resumeTextRef.current || resumeText
+      if (!effectiveResumeText.trim() && selectedResumeId) {
+        try {
+          const urlRes = await fetch(`/api/resume/${selectedResumeId}`)
+          const urlData = await urlRes.json()
+          if (urlData.url) {
+            const blob = await fetch(urlData.url).then(r => r.blob())
+            const extracted = await extractPdfText(blob)
+            if (extracted.trim()) {
+              setResumeTextSync(extracted)
+              effectiveResumeText = extracted
+            }
+          }
+        } catch { /* fall through with empty text, API will return 400 */ }
+      }
+
       const res = await fetch('/api/resume/rewrite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           templateId: effectiveTemplateId,
-          resumeText: resumeTextRef.current || resumeText,
+          resumeText: effectiveResumeText,
           jobDescription,
           atsContext: result ? {
             overall_score: result.overall_score,
@@ -710,6 +728,10 @@ function ATSCheckInner() {
         resumeId: selectedResumeId,
         isUploadedResume: !builderTemplateId,
       }))
+      if (beforeUnloadRef.current) {
+        window.removeEventListener('beforeunload', beforeUnloadRef.current)
+        beforeUnloadRef.current = null
+      }
       window.location.href = `/ats-rewrite?templateId=${effectiveTemplateId}`
     } finally {
       setRewriteLoading(false)
