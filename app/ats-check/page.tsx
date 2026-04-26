@@ -8,6 +8,8 @@ import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
 import { useProUpgrade } from '@/lib/use-pro-upgrade'
 import { createClient } from '@/lib/supabase'
 import { TEMPLATES } from '@/lib/templates'
+import ScaledPreview from '@/components/ScaledPreview'
+import { EMPTY_RESUME } from '@/lib/resume-data'
 
 interface ATSResult {
   overall_score: number
@@ -1228,7 +1230,9 @@ function ATSCheckInner() {
                   onClick={() => { setShowTemplatePicker(false); handleAIRewrite(t.id) }}
                   className="border border-gray-200 rounded-xl overflow-hidden hover:border-blue-400 hover:shadow-md transition-all text-left"
                 >
-                  <img src={t.preview_image} alt={t.name} className="w-full aspect-[3/4] object-cover object-top" />
+                  <div className="w-full aspect-[3/4] overflow-hidden pointer-events-none">
+                    <ScaledPreview templateId={t.id} accentColor={t.colors[0]} data={EMPTY_RESUME} />
+                  </div>
                   <div className="px-3 py-2">
                     <div className="text-sm font-semibold text-gray-800">{t.name}</div>
                     <div className="text-xs text-gray-400 mt-0.5">{t.tag}</div>
