@@ -687,7 +687,6 @@ function ATSCheckInner() {
         keyChanges: payload.keyChanges,
         accentColor: payload.accentColor,
         templateId: builderTemplateId,
-        selectedResumeId,
       }))
       router.push(`/ats-rewrite?templateId=${builderTemplateId}`)
     } finally {
