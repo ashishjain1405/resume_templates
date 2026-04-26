@@ -7,6 +7,7 @@ import ProBadge from '@/components/ProBadge'
 import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
 import { useProUpgrade } from '@/lib/use-pro-upgrade'
 import { createClient } from '@/lib/supabase'
+import { TEMPLATES } from '@/lib/templates'
 
 interface ATSResult {
   overall_score: number
@@ -135,6 +136,7 @@ function ATSCheckInner() {
   const [userEmail, setUserEmail] = useState<string | undefined>(undefined)
   const [editLoading, setEditLoading] = useState(false)
   const [rewriteLoading, setRewriteLoading] = useState(false)
+  const [showTemplatePicker, setShowTemplatePicker] = useState(false)
   const [savedResumes, setSavedResumes] = useState<UploadedResume[]>([])
   const [selectedResumeId, setSelectedResumeId] = useState<string | null>(null)
   const [savingToDashboard, setSavingToDashboard] = useState(false)
@@ -669,7 +671,9 @@ function ATSCheckInner() {
     }
   }
 
-  async function handleAIRewrite() {
+  async function handleAIRewrite(templateIdOverride?: string) {
+    const effectiveTemplateId = templateIdOverride ?? builderTemplateId
+    if (!effectiveTemplateId) return
     setRewriteLoading(true)
     setError('')
     try {
@@ -677,7 +681,7 @@ function ATSCheckInner() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          templateId: builderTemplateId,
+          templateId: effectiveTemplateId,
           resumeText,
           jobDescription,
           atsContext: result ? {
@@ -700,10 +704,11 @@ function ATSCheckInner() {
         comparison: payload.comparison,
         keyChanges: payload.keyChanges,
         accentColor: payload.accentColor,
-        templateId: builderTemplateId,
+        templateId: effectiveTemplateId,
         resumeId: selectedResumeId,
+        isUploadedResume: !builderTemplateId,
       }))
-      router.push(`/ats-rewrite?templateId=${builderTemplateId}`)
+      router.push(`/ats-rewrite?templateId=${effectiveTemplateId}`)
     } finally {
       setRewriteLoading(false)
     }
@@ -1023,22 +1028,26 @@ function ATSCheckInner() {
           {result && (
             <div className="border border-gray-100 rounded-2xl p-6 shadow-sm space-y-6">
               <div className="flex gap-2 flex-wrap">
-                {builderTemplateId && (
-                  <button
-                    onClick={handleAIRewrite}
-                    disabled={rewriteLoading}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-semibold text-sm transition-colors bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
-                  >
-                    {rewriteLoading ? (
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    ) : (
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-                      </svg>
-                    )}
-                    {rewriteLoading ? 'Rewriting…' : 'AI Re-write'}
-                  </button>
-                )}
+                <button
+                  onClick={() => {
+                    if (builderTemplateId) {
+                      handleAIRewrite()
+                    } else {
+                      setShowTemplatePicker(true)
+                    }
+                  }}
+                  disabled={rewriteLoading}
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-semibold text-sm transition-colors bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
+                >
+                  {rewriteLoading ? (
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                    </svg>
+                  )}
+                  {rewriteLoading ? 'Rewriting…' : 'AI Re-write'}
+                </button>
                 {builderTemplateId ? (
                   <Link
                     href={`/builder/${builderTemplateId}`}
@@ -1166,6 +1175,35 @@ function ATSCheckInner() {
           )}
         </div>
       </div>
+
+      {showTemplatePicker && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Choose a template</h3>
+                <p className="text-sm text-gray-500 mt-0.5">Your resume will be rewritten in this style</p>
+              </div>
+              <button onClick={() => setShowTemplatePicker(false)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {TEMPLATES.map(t => (
+                <button
+                  key={t.id}
+                  onClick={() => { setShowTemplatePicker(false); handleAIRewrite(t.id) }}
+                  className="border border-gray-200 rounded-xl overflow-hidden hover:border-blue-400 hover:shadow-md transition-all text-left"
+                >
+                  <img src={t.preview_image} alt={t.name} className="w-full aspect-[3/4] object-cover object-top" />
+                  <div className="px-3 py-2">
+                    <div className="text-sm font-semibold text-gray-800">{t.name}</div>
+                    <div className="text-xs text-gray-400 mt-0.5">{t.tag}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

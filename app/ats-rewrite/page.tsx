@@ -16,6 +16,7 @@ interface RewriteResult {
   accentColor: string
   templateId: string
   resumeId: string | null
+  isUploadedResume?: boolean
 }
 
 function ScoreRing({ score }: { score: number }) {
@@ -47,6 +48,7 @@ function ATSRewriteInner() {
   const [data, setData] = useState<RewriteResult | null>(null)
   const [accepting, setAccepting] = useState(false)
   const [error, setError] = useState('')
+  const [originalPdfUrl, setOriginalPdfUrl] = useState<string | null>(null)
 
   useEffect(() => {
     const raw = sessionStorage.getItem('rewrite_result')
@@ -55,7 +57,14 @@ function ATSRewriteInner() {
       return
     }
     try {
-      setData(JSON.parse(raw))
+      const parsed: RewriteResult = JSON.parse(raw)
+      setData(parsed)
+      if (parsed.isUploadedResume && parsed.resumeId) {
+        fetch(`/api/resume/${parsed.resumeId}`)
+          .then(r => r.json())
+          .then(d => { if (d.url) setOriginalPdfUrl(d.url) })
+          .catch(() => {})
+      }
     } catch {
       router.replace('/ats-check')
     }
@@ -160,9 +169,18 @@ function ATSRewriteInner() {
               </div>
             </div>
             <div className="p-4">
-              <div className="w-full rounded-lg overflow-hidden border border-gray-100 shadow-sm">
-                <ScaledPreview templateId={resolvedTemplateId} accentColor={data.accentColor} data={data.originalData} />
-              </div>
+              {data.isUploadedResume && originalPdfUrl ? (
+                <iframe
+                  src={originalPdfUrl}
+                  className="w-full rounded-lg border border-gray-100 shadow-sm"
+                  style={{ height: '560px' }}
+                  title="Original resume"
+                />
+              ) : (
+                <div className="w-full rounded-lg overflow-hidden border border-gray-100 shadow-sm">
+                  <ScaledPreview templateId={resolvedTemplateId} accentColor={data.accentColor} data={data.originalData} />
+                </div>
+              )}
             </div>
           </div>
 

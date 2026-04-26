@@ -299,7 +299,7 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // Step A: Fetch original ResumeData from Supabase
+    // Step A: Fetch original ResumeData from Supabase (may not exist for uploaded resumes)
     const adminClient = await createAdminClient()
     const { data: row } = await adminClient
       .from('resumes')
@@ -308,12 +308,8 @@ export async function POST(request: NextRequest) {
       .eq('template_id', templateId)
       .maybeSingle()
 
-    if (!row) {
-      return Response.json({ error: 'Resume not found' }, { status: 404 })
-    }
-
-    const originalData = validateResumeData(row.data)
-    const accentColor: string = row.accent_color ?? '#2563eb'
+    const accentColor: string = row?.accent_color ?? '#2563eb'
+    let originalData: ResumeData | null = row ? validateResumeData(row.data) : null
 
     // Step B: Call OpenAI rewrite
     const atsContextNote = atsContext
@@ -336,6 +332,14 @@ export async function POST(request: NextRequest) {
 
     const rewriteRaw = rewriteCompletion.choices[0].message.content ?? ''
     let aiOutput: {
+      original_resume?: {
+        contact?: { name?: string; title?: string; email?: string; phone?: string; location?: string; linkedin?: string }
+        summary?: string
+        experience?: { company: string; role: string; start_date: string; end_date: string; bullets: string[] }[]
+        education?: { institution: string; degree: string; end_year: string; details?: string[] }[]
+        skills?: unknown[]
+        achievements?: string[]
+      }
       rewritten_resume: {
         contact: { name: string; title: string; email: string; phone: string; location: string; linkedin: string }
         summary: string
@@ -356,6 +360,40 @@ export async function POST(request: NextRequest) {
     } catch {
       console.error('Rewrite OpenAI returned invalid JSON:', rewriteRaw)
       return Response.json({ error: 'Rewrite failed. Please try again.' }, { status: 500 })
+    }
+
+    // For uploaded resumes with no Supabase row, derive originalData from AI-parsed original_resume
+    if (!originalData) {
+      const o = aiOutput.original_resume ?? {}
+      originalData = validateResumeData({
+        personal: {
+          name: o.contact?.name ?? '',
+          title: o.contact?.title ?? '',
+          email: o.contact?.email ?? '',
+          phone: o.contact?.phone ?? '',
+          location: o.contact?.location ?? '',
+          linkedin: o.contact?.linkedin ?? '',
+          summary: o.summary ?? '',
+        },
+        experience: Array.isArray(o.experience) ? o.experience.map(e => ({
+          id: crypto.randomUUID(),
+          company: e.company || '',
+          role: e.role || '',
+          startDate: e.start_date || '',
+          endDate: e.end_date || '',
+          bullets: Array.isArray(e.bullets) ? e.bullets : [],
+        })) : [],
+        education: Array.isArray(o.education) ? o.education.map(e => ({
+          id: crypto.randomUUID(),
+          institution: e.institution || '',
+          degree: e.degree || '',
+          year: e.end_year || '',
+          gpa: e.details?.[0] ?? '',
+        })) : [],
+        skills: Array.isArray(o.skills) ? o.skills.filter((s): s is string => typeof s === 'string') : [],
+        skillCategories: [],
+        awards: Array.isArray(o.achievements) ? o.achievements.filter(Boolean) : [],
+      })
     }
 
     const r = aiOutput.rewritten_resume
