@@ -43,7 +43,7 @@ const BASE_STYLE = `* { margin:0; padding:0; box-sizing:border-box; } body { fon
 // ─── Classic ───────────────────────────────────────────────────────────────
 
 function buildClassicHtml(data: ResumeData, accentColor: string): string {
-  const { personal, experience, education, skills } = data
+  const { personal, experience, education, skills, skillCategories } = data
   const color = safeColor(accentColor)
   const name = esc(personal.name) || 'Your Name'
   const contact = [personal.email, personal.phone, personal.location, personal.linkedin].filter(Boolean).map(esc).join(' · ')
@@ -60,7 +60,9 @@ function buildClassicHtml(data: ResumeData, accentColor: string): string {
     ${personal.summary ? sectionLabel('Summary', color) + `<div style="font-size:10px;color:#555;line-height:1.7;">${esc(personal.summary)}</div>` : ''}
     ${experience.length ? sectionLabel('Experience', color) + expHtml(experience) : ''}
     ${education.length ? sectionLabel('Education', color) + eduHtml(education) : ''}
-    ${skills.length ? sectionLabel('Skills', color) + `<div style="font-size:10px;color:#555;">${skills.map(esc).join(' · ')}</div>` : ''}
+    ${(skillCategories?.length ?? skills.length) ? sectionLabel('Skills', color) + (skillCategories?.length
+      ? skillCategories.map(cat => `<div style="font-size:10px;color:#444;margin-bottom:4px;"><span style="font-weight:600;color:#1a1a1a;">${esc(cat.category)}:</span> ${cat.items.map(esc).join(' · ')}</div>`).join('')
+      : `<div style="font-size:10px;color:#555;">${skills.map(esc).join(' · ')}</div>`) : ''}
     ${data.awards?.length ? sectionLabel('Awards &amp; Achievements', color) + `<ul style="margin:0;padding-left:16px;">${data.awards.map(a => `<li style="font-size:10px;color:#444;margin-bottom:4px;">${esc(a)}</li>`).join('')}</ul>` : ''}
   </div></body></html>`
 }
@@ -68,13 +70,19 @@ function buildClassicHtml(data: ResumeData, accentColor: string): string {
 // ─── Modern ────────────────────────────────────────────────────────────────
 
 function buildModernHtml(data: ResumeData, accentColor: string): string {
-  const { personal, experience, education, skills } = data
+  const { personal, experience, education, skills, skillCategories } = data
   const color = safeColor(accentColor)
   const name = esc(personal.name) || 'Your Name'
   const initials = (personal.name || '').split(' ').map((w: string) => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || '??'
   const contact = [personal.email, personal.phone, personal.location].filter(Boolean).map(esc).join(' · ')
 
-  const skillBadges = skills.map(s => `<span style="background:${color};color:white;padding:3px 8px;border-radius:4px;font-size:9px;margin:2px;display:inline-block;">${esc(s)}</span>`).join('')
+  const skillsHtml = skillCategories?.length
+    ? skillCategories.map(cat => `
+        <div style="margin-bottom:8px;">
+          <div style="font-size:8px;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px;">${esc(cat.category)}</div>
+          <div>${cat.items.map(item => `<span style="background:${color};color:white;padding:3px 8px;border-radius:4px;font-size:9px;margin:2px;display:inline-block;">${esc(item)}</span>`).join('')}</div>
+        </div>`).join('')
+    : skills.map(s => `<span style="background:${color};color:white;padding:3px 8px;border-radius:4px;font-size:9px;margin:2px;display:inline-block;">${esc(s)}</span>`).join('')
 
   return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><style>
     ${BASE_STYLE}
@@ -99,7 +107,7 @@ function buildModernHtml(data: ResumeData, accentColor: string): string {
         ${personal.summary ? sectionLabel('Summary', color) + `<div style="font-size:10px;color:#555;line-height:1.7;">${esc(personal.summary)}</div>` : ''}
         ${experience.length ? sectionLabel('Experience', color) + expHtml(experience) : ''}
         ${education.length ? sectionLabel('Education', color) + eduHtml(education) : ''}
-        ${skills.length ? sectionLabel('Skills', color) + `<div style="margin-top:4px;">${skillBadges}</div>` : ''}
+        ${(skillCategories?.length ?? skills.length) ? sectionLabel('Skills', color) + `<div style="margin-top:4px;">${skillsHtml}</div>` : ''}
         ${data.awards?.length ? sectionLabel('Awards &amp; Achievements', color) + `<ul style="margin:0;padding-left:16px;">${data.awards.map(a => `<li style="font-size:10px;color:#444;margin-bottom:4px;">${esc(a)}</li>`).join('')}</ul>` : ''}
       </div>
     </div>

@@ -20,6 +20,7 @@ export default function ModernPreview({ accentColor = '#e94560', data }: Props) 
         { id: '2', role: 'UI Designer', company: "BYJU'S, Bangalore", startDate: '2019', endDate: '2022', bullets: [] },
       ]
 
+  const skillCategories = data?.skillCategories?.length ? data.skillCategories : null
   const skills = data?.skills.length ? data.skills.slice(0, 4) : ['Figma', 'Prototyping', 'User Research', 'Design Systems']
 
   return (
@@ -67,11 +68,26 @@ export default function ModernPreview({ accentColor = '#e94560', data }: Props) 
 
           <div>
             <div className="font-bold text-[5px] uppercase tracking-wider mb-0.5" style={{ color: accentColor }}>Skills</div>
-            <div className="flex flex-wrap gap-0.5">
-              {skills.map(s => (
-                <span key={s} className="px-1 py-0.5 rounded text-[4px] text-white" style={{ backgroundColor: accentColor }}>{s}</span>
-              ))}
-            </div>
+            {skillCategories ? (
+              <div className="space-y-0.5">
+                {skillCategories.map(cat => (
+                  <div key={cat.category}>
+                    <div className="text-[3.5px] uppercase tracking-wider text-gray-400 mb-0.5">{cat.category}</div>
+                    <div className="flex flex-wrap gap-0.5">
+                      {cat.items.slice(0, 4).map(item => (
+                        <span key={item} className="px-1 py-0.5 rounded text-[4px] text-white" style={{ backgroundColor: accentColor }}>{item}</span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-0.5">
+                {skills.map(s => (
+                  <span key={s} className="px-1 py-0.5 rounded text-[4px] text-white" style={{ backgroundColor: accentColor }}>{s}</span>
+                ))}
+              </div>
+            )}
           </div>
 
           {(data?.awards?.length ?? 0) > 0 && (

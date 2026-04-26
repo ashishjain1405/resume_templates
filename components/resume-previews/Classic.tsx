@@ -23,6 +23,7 @@ export default function ClassicPreview({ accentColor = '#1e3a5f', data }: Props)
     ? data.education
     : [{ id: '1', degree: 'MBA, Marketing', institution: 'IIM Ahmedabad', year: '2017' }]
 
+  const skillCategories = data?.skillCategories?.length ? data.skillCategories : null
   const skills = data?.skills.length ? data.skills : []
 
   return (
@@ -74,10 +75,20 @@ export default function ClassicPreview({ accentColor = '#1e3a5f', data }: Props)
       </div>
 
       {/* Skills */}
-      {skills.length > 0 && (
+      {(skillCategories || skills.length > 0) && (
         <div className="mb-2">
           <div className="font-bold uppercase tracking-widest text-[5px] mb-0.5" style={{ color: accentColor }}>Skills</div>
-          <div className="text-gray-500 text-[5px]">{skills.join(' · ')}</div>
+          {skillCategories ? (
+            <div className="space-y-0.5">
+              {skillCategories.map(cat => (
+                <div key={cat.category} className="text-[5px] text-gray-500">
+                  <span className="font-semibold text-gray-700">{cat.category}:</span> {cat.items.join(' · ')}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-gray-500 text-[5px]">{skills.join(' · ')}</div>
+          )}
         </div>
       )}
 
