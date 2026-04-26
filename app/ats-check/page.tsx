@@ -253,7 +253,11 @@ function ATSCheckInner() {
         setResult(null)
         try {
           const form = new FormData()
-          form.append('file', f)
+          try {
+            const extracted = await extractPdfText(f)
+            if (extracted.trim()) { setResumeText(extracted); form.append('resumeText', extracted) }
+            else form.append('file', f)
+          } catch { form.append('file', f) }
           const res = await fetch('/api/ats-check', { method: 'POST', body: form })
           const raw = await res.text()
           let parsed: { error?: string; _usage?: { used: number; limit: number } | null } & Partial<ATSResult> = {}
