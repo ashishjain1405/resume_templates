@@ -710,7 +710,7 @@ function ATSCheckInner() {
         resumeId: selectedResumeId,
         isUploadedResume: !builderTemplateId,
       }))
-      router.push(`/ats-rewrite?templateId=${effectiveTemplateId}`)
+      window.location.href = `/ats-rewrite?templateId=${effectiveTemplateId}`
     } finally {
       setRewriteLoading(false)
     }
