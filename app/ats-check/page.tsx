@@ -480,6 +480,7 @@ function ATSCheckInner() {
         try {
           const text = await extractPdfText(file)
           if (!text.trim()) { setError('Could not read text from this PDF. Please try pasting the text instead.'); return }
+          setResumeText(text)
           form.append('resumeText', text)
         } catch {
           setError('Could not parse this PDF. Please try pasting the text instead.')
@@ -495,6 +496,7 @@ function ATSCheckInner() {
         try {
           const text = await extractPdfText(blob)
           if (!text.trim()) { setError('Could not read text from this PDF. Please try pasting the text instead.'); return }
+          setResumeText(text)
           form.append('resumeText', text)
         } catch {
           setError('Could not parse this PDF. Please try pasting the text instead.')
