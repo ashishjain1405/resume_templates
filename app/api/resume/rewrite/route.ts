@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
-    if (!(await checkRateLimit(user.id, 'resume-rewrite', 5))) {
+    if (!(await checkRateLimit(user.id, 'resume-rewrite', 10))) {
       return Response.json({ error: 'rate_limited' }, { status: 429 })
     }
 
