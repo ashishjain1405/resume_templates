@@ -688,8 +688,9 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
                     className={`${inputCls} resize-none`}
                     rows={4}
                     placeholder="e.g. React, Node.js, Python, AWS, TypeScript"
-                    value={skillsStr}
-                    onChange={e => setSkills(e.target.value)}
+                    defaultValue={skillsStr}
+                    key={skillsStr}
+                    onBlur={e => setSkills(e.target.value)}
                   />
                   {data.skills.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-3">
@@ -716,7 +717,7 @@ export default function BuilderPage({ params }: { params: Promise<{ templateId: 
                       </div>
                       <div>
                         <label className={labelCls}>Skills (comma-separated)</label>
-                        <input className={inputCls} placeholder="e.g. Strategy, Roadmapping, OKRs" value={cat.items.join(', ')} onChange={e => updateSkillCategory(idx, 'items', e.target.value.split(',').map(s => s.trim()).filter(Boolean))} />
+                        <input className={inputCls} placeholder="e.g. Strategy, Roadmapping, OKRs" defaultValue={cat.items.join(', ')} key={cat.items.join(',')} onBlur={e => updateSkillCategory(idx, 'items', e.target.value.split(',').map(s => s.trim()).filter(Boolean))} />
                       </div>
                     </div>
                   ))}
