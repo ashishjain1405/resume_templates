@@ -277,6 +277,7 @@ function ATSCheckInner() {
         }
       })
       .catch(() => {})
+    return () => { sessionStorage.removeItem('ats_resumeId_processed') }
   }, [searchParams])
 
   // Restore pending state on mount — fires after login redirect returns to this page
