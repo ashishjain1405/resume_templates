@@ -294,6 +294,18 @@ function ATSCheckInner() {
       if (pending.fromBuilder && pending.data && pending.templateId) {
         setBuilderTemplateId(pending.templateId)
         setLoading(true)
+        const supabase = createClient()
+        supabase.auth.getUser().then(({ data }) => {
+          if (data.user) {
+            supabase.from('resumes').insert({
+              user_id: data.user.id,
+              template_id: pending.templateId,
+              data: pending.data,
+              accent_color: pending.accentColor ?? '#2563eb',
+              updated_at: new Date().toISOString(),
+            }, { ignoreDuplicates: true }).catch(() => {})
+          }
+        })
         fetch('/api/builder/pdf?pdf=1', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
