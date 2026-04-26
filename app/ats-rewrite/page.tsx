@@ -15,6 +15,7 @@ interface RewriteResult {
   keyChanges: string[]
   accentColor: string
   templateId: string
+  selectedResumeId?: string | null
 }
 
 function ScoreRing({ score }: { score: number }) {
@@ -82,6 +83,13 @@ function ATSRewriteInner() {
           updated_at: new Date().toISOString(),
         }, { onConflict: 'user_id,template_id' })
       if (upsertError) { setError('Failed to save. Please try again.'); return }
+      if (data.selectedResumeId) {
+        await fetch(`/api/resume/${data.selectedResumeId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ats_score: data.rewrittenScore.overall_score }),
+        }).catch(() => { /* best-effort */ })
+      }
       sessionStorage.removeItem('rewrite_result')
       router.push(`/builder/${data.templateId}`)
     } finally {
