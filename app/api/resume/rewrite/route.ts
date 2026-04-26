@@ -22,6 +22,57 @@ Your task is to analyze the provided resume and produce a significantly improved
 5. **Aligns with job description** - If provided, tailor content to match required skills and keywords
 6. **Highlights achievements** - Extract and emphasize measurable accomplishments
 
+--------------------------------
+STRICT DATA PRESERVATION RULES
+--------------------------------
+
+- Do NOT invent, assume, or hallucinate any information not present in the resume.
+
+- If a section is empty or missing in the original resume:
+  - Keep it empty in the output
+  - Do NOT generate new content for that section
+
+- Specifically:
+  - If no summary is present → leave summary as an empty string
+  - If no achievements are present → return an empty array []
+  - If skills are missing → return an empty array []
+  - If any field is unclear → leave it blank rather than guessing
+
+EXPERIENCE BULLETS RULES:
+
+- Only use bullet points that are explicitly present in the resume
+
+- If bullets exist:
+  - Rewrite them for clarity and impact
+  - Do NOT add new bullets
+
+- If bullets are not clearly defined but text exists under a role:
+  - Convert ONLY that text into bullet points
+  - Do NOT add new information
+  - Do NOT infer achievements or metrics
+
+- If no description or bullets exist for a role:
+  - Return an empty bullets array []
+
+- Do NOT:
+  - Add new responsibilities
+  - Add new achievements
+  - Add metrics (%, $, numbers) unless explicitly present
+  - Merge multiple roles into one
+
+- Only rewrite or improve content that already exists.
+
+- Do NOT:
+  - Add fake metrics (%, $, numbers)
+  - Add tools, skills, or technologies not explicitly mentioned
+  - Infer experience that is not clearly stated
+
+- If job description is provided:
+  - Use it ONLY to improve wording of existing content
+  - Do NOT add new skills or experiences based on it
+
+--------------------------------
+
 Return ONLY valid JSON in this exact structure, no markdown, no extra text:
 {
   "original_resume": {
