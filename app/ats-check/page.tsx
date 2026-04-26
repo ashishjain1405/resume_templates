@@ -16,7 +16,6 @@ interface ATSResult {
   top_issues: string[]
   missing_keywords: string[]
   bullet_improvements: { original: string; improved: string }[]
-  suggestions: { priority: 'high' | 'medium' | 'low'; action: string; example?: string }[]
   _usage?: { used: number; limit: number } | null
 }
 
@@ -1129,21 +1128,6 @@ function ATSCheckInner() {
                   </div>
                 </div>
               )}
-
-              <div>
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">How to Improve</div>
-                <ul className="space-y-2">
-                  {result.suggestions.map((s, i) => {
-                    const badgeClass = s.priority === 'high' ? 'bg-red-50 text-red-600' : s.priority === 'medium' ? 'bg-amber-50 text-amber-600' : 'bg-gray-100 text-gray-500'
-                    return (
-                      <li key={i} className="flex gap-2.5 text-sm text-gray-700">
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide flex-shrink-0 mt-0.5 ${badgeClass}`}>{s.priority}</span>
-                        <span>{s.action}{s.example && <span className="text-gray-400"> — e.g. {s.example}</span>}</span>
-                      </li>
-                    )
-                  })}
-                </ul>
-              </div>
 
               {result.missing_keywords.length > 0 && (
                 <div>
