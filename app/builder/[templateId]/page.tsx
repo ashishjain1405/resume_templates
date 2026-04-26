@@ -892,8 +892,8 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowChangeTemplateModal(false)}>
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl relative" onClick={e => e.stopPropagation()}>
             <button onClick={() => setShowChangeTemplateModal(false)} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
-            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Change template?</h3>
-            <p className="text-sm text-gray-500 text-center mb-5">Your current progress will be lost unless you save it first.</p>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Save a version before switching?</h3>
+            <p className="text-sm text-gray-500 text-center mb-5">Save your current resume to the Dashboard first, or switch without saving.</p>
             <div className="flex flex-col gap-2">
               <button
                 onClick={async () => {
