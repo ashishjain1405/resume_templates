@@ -6,6 +6,7 @@ import BuilderDemo from '@/components/BuilderDemo'
 import BuilderLink from '@/components/BuilderLink'
 import HowItWorks from '@/components/HowItWorks'
 import ATSPreview from '@/components/ATSPreview'
+import AIRewritePreview from '@/components/AIRewritePreview'
 import { TEMPLATES } from '@/lib/templates'
 
 export const metadata: Metadata = {
@@ -44,7 +45,10 @@ export default function HomePage() {
       {/* 3. ATS score preview */}
       <ATSPreview />
 
-      {/* 4. Pro upgrade section */}
+      {/* 4. AI Re-write preview */}
+      <AIRewritePreview />
+
+      {/* 5. Pro upgrade section */}
       <section className="py-16 px-4 bg-gray-50 border-y border-gray-100">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10">
@@ -103,7 +107,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5. Template grid */}
+      {/* 6. Template grid */}
       <section className="py-16 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-2 tracking-tight">Professional templates, built for India</h2>
@@ -137,7 +141,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. Builder demo */}
+      {/* 7. Builder demo */}
       <section className="py-20 px-4 bg-gray-50 border-t border-gray-100">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
@@ -163,7 +167,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 7. Footer CTA strip */}
+      {/* 8. Footer CTA strip */}
       <section className="py-14 px-4 bg-blue-600">
         <div className="max-w-6xl mx-auto text-center">
           <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Ready to land your next job?</h2>

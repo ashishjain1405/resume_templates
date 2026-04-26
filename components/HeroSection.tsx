@@ -219,7 +219,7 @@ function ATSAnimation() {
             : { zIndex: 0, opacity: 0, pointerEvents: 'none' }}
         >
           <div className="flex items-center justify-between mb-2 lg:mb-3">
-            <span className="text-[9px] lg:text-[11px] font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 lg:px-2.5 lg:py-1 rounded-full">Suggested Rewrites</span>
+            <span className="text-[9px] lg:text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 lg:px-2.5 lg:py-1 rounded-full">AI Re-write</span>
             <span className="text-[9px] lg:text-[11px] font-medium text-green-600">✓ Done</span>
           </div>
           <div className="space-y-2.5 lg:space-y-4">
