@@ -359,6 +359,17 @@ export async function POST(request: NextRequest) {
     }
 
     const r = aiOutput.rewritten_resume
+
+    // Defensive skills mapping — AI may return grouped [{category,items}] or flat ["skill"]
+    const aiSkills = Array.isArray(r.skills) ? r.skills : []
+    const isGrouped = aiSkills.length > 0 && typeof aiSkills[0] === 'object' && 'items' in (aiSkills[0] as object)
+    const skillsFlat = isGrouped
+      ? aiSkills.flatMap((s: { items: string[] }) => Array.isArray(s.items) ? s.items : [])
+      : aiSkills.filter((s: unknown) => typeof s === 'string')
+    const skillCats = isGrouped ? aiSkills : []
+    const finalSkillsFlat = skillsFlat.length > 0 ? skillsFlat : originalData.skills
+    const finalSkillCats = skillCats.length > 0 ? skillCats : (originalData.skillCategories ?? [])
+
     const rewrittenData = validateResumeData({
       personal: {
         name: r.contact?.name ?? '',
@@ -369,14 +380,22 @@ export async function POST(request: NextRequest) {
         linkedin: r.contact?.linkedin ?? '',
         summary: r.summary ?? '',
       },
-      experience: Array.isArray(r.experience) ? r.experience.map(e => ({
-        id: crypto.randomUUID(),
-        company: e.company,
-        role: e.role,
-        startDate: e.start_date,
-        endDate: e.end_date,
-        bullets: e.bullets,
-      })) : [],
+      experience: (() => {
+        const aiExp = Array.isArray(r.experience) ? r.experience : []
+        if (aiExp.length === 0) return originalData.experience
+        return aiExp.map((e, i) => {
+          const orig = originalData.experience[i]
+          const aiBullets = Array.isArray(e.bullets) ? e.bullets.filter((b: unknown) => typeof b === 'string' && (b as string).trim()) : []
+          return {
+            id: orig?.id ?? crypto.randomUUID(),
+            company: e.company || orig?.company || '',
+            role: e.role || orig?.role || '',
+            startDate: e.start_date || orig?.startDate || '',
+            endDate: e.end_date || orig?.endDate || '',
+            bullets: aiBullets.length > 0 ? aiBullets : (orig?.bullets ?? []),
+          }
+        })
+      })(),
       education: Array.isArray(r.education) ? r.education.map(e => ({
         id: crypto.randomUUID(),
         institution: e.institution,
@@ -384,9 +403,12 @@ export async function POST(request: NextRequest) {
         year: e.end_year,
         gpa: e.details?.[0] ?? '',
       })) : [],
-      skills: Array.isArray(r.skills) ? r.skills.flatMap((s: { items: string[] }) => s.items) : [],
-      skillCategories: Array.isArray(r.skills) ? r.skills : [],
-      awards: Array.isArray(r.achievements) ? r.achievements.map((a: { text: string }) => a.text) : [],
+      skills: finalSkillsFlat,
+      skillCategories: finalSkillCats,
+      awards: (() => {
+        const aiAwards = Array.isArray(r.achievements) ? r.achievements.map((a: { text: string }) => a.text).filter(Boolean) : []
+        return aiAwards.length > 0 ? aiAwards : (originalData.awards ?? [])
+      })(),
     })
 
     // Step C: Score the rewritten resume
