@@ -36,6 +36,14 @@ function CheckATSButton({ user, data, accentColor, templateId }: {
     }
     setSaving(true)
     try {
+      const supabase = createClient()
+      await supabase.from('resumes').upsert({
+        user_id: user.id,
+        template_id: templateId,
+        data,
+        accent_color: accentColor,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id,template_id' })
       const pdfRes = await fetch('/api/builder/pdf?pdf=1', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
