@@ -297,13 +297,13 @@ function ATSCheckInner() {
         const supabase = createClient()
         supabase.auth.getUser().then(({ data }) => {
           if (data.user) {
-            supabase.from('resumes').insert({
+            supabase.from('resumes').upsert({
               user_id: data.user.id,
               template_id: pending.templateId,
               data: pending.data,
               accent_color: pending.accentColor ?? '#2563eb',
               updated_at: new Date().toISOString(),
-            }, { ignoreDuplicates: true }).catch(() => {})
+            }, { onConflict: 'user_id,template_id', ignoreDuplicates: true }).catch(() => {})
           }
         })
         fetch('/api/builder/pdf?pdf=1', {
