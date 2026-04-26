@@ -294,18 +294,6 @@ function ATSCheckInner() {
       if (pending.fromBuilder && pending.data && pending.templateId) {
         setBuilderTemplateId(pending.templateId)
         setLoading(true)
-        const supabase = createClient()
-        supabase.auth.getUser().then(({ data }) => {
-          if (data.user) {
-            void supabase.from('resumes').upsert({
-              user_id: data.user.id,
-              template_id: pending.templateId,
-              data: pending.data,
-              accent_color: pending.accentColor ?? '#2563eb',
-              updated_at: new Date().toISOString(),
-            }, { onConflict: 'user_id,template_id', ignoreDuplicates: true })
-          }
-        })
         fetch('/api/builder/pdf?pdf=1', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -321,6 +309,19 @@ function ATSCheckInner() {
             uploadForm.append('template_id', pending.templateId)
             const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: uploadForm })
             const uploadData = await uploadRes.json()
+            try {
+              const supabase = createClient()
+              const { data: authData } = await supabase.auth.getUser()
+              if (authData.user) {
+                await supabase.from('resumes').upsert({
+                  user_id: authData.user.id,
+                  template_id: pending.templateId,
+                  data: pending.data,
+                  accent_color: pending.accentColor ?? '#2563eb',
+                  updated_at: new Date().toISOString(),
+                }, { onConflict: 'user_id,template_id', ignoreDuplicates: true })
+              }
+            } catch { /* non-blocking */ }
             if (uploadData.resume?.id) {
               window.location.href = `/ats-check?resumeId=${uploadData.resume.id}`
             } else {
