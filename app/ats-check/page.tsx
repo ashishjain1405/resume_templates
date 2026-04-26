@@ -129,6 +129,7 @@ function ATSCheckInner() {
   const [loading, setLoading] = useState(false)
   const [modal, setModal] = useState<'login_required' | 'pro_required' | null>(null)
   const [showProDocsModal, setShowProDocsModal] = useState(false)
+  const [showProRewriteModal, setShowProRewriteModal] = useState(false)
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
   const [result, setResult] = useState<ATSResult | null>(null)
@@ -832,6 +833,22 @@ function ATSCheckInner() {
         </div>
       )}
 
+      {showProRewriteModal && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowProRewriteModal(false)}>
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl relative" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowProRewriteModal(false)} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+            <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">AI Re-write is a Pro feature</h3>
+            <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for lifetime access — AI resume rewrite, unlimited checks, PDF downloads, Google Docs editing, and an expert session. ₹999, one-time.</p>
+            <ProUpgradeCTAs layout="stack" userEmail={userEmail} source="rewrite" returnPath="/ats-check" />
+          </div>
+        </div>
+      )}
+
       {editLoading && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
           <div className="bg-white rounded-2xl p-8 max-w-xs w-full mx-4 text-center shadow-2xl">
@@ -1067,6 +1084,7 @@ function ATSCheckInner() {
               <div className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => {
+                    if (!isPro) { setShowProRewriteModal(true); return }
                     if (builderTemplateId) {
                       handleAIRewrite()
                     } else {
@@ -1078,6 +1096,10 @@ function ATSCheckInner() {
                 >
                   {rewriteLoading ? (
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : !isPro ? (
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clipRule="evenodd" />
+                    </svg>
                   ) : (
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
