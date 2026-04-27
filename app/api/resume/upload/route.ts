@@ -46,6 +46,20 @@ export async function POST(request: NextRequest) {
       if (!Number.isInteger(score) || score < 0 || score > 100) return Response.json({ error: 'Invalid ats_score' }, { status: 400 })
       atsScoreValue = score
     }
+
+    // Same-name dedup: if template_id is present, find any existing row with same (user, template, filename)
+    let existingRow: { id: string; storage_path: string } | null = null
+    if (templateIdRaw) {
+      const { data: existing } = await adminClient
+        .from('uploaded_resumes')
+        .select('id, storage_path')
+        .eq('user_id', user.id)
+        .eq('template_id', templateIdRaw)
+        .eq('filename', file.name)
+        .maybeSingle()
+      existingRow = existing ?? null
+    }
+
     const { data: row, error: dbError } = await adminClient
       .from('uploaded_resumes')
       .insert({
@@ -65,6 +79,12 @@ export async function POST(request: NextRequest) {
       // Clean up orphaned storage object
       await adminClient.storage.from('user-resumes').remove([storagePath])
       return Response.json({ error: 'Failed to save resume record' }, { status: 500 })
+    }
+
+    // Delete old file and record now that new insert succeeded
+    if (existingRow) {
+      await adminClient.storage.from('user-resumes').remove([existingRow.storage_path])
+      await adminClient.from('uploaded_resumes').delete().eq('id', existingRow.id)
     }
 
     return Response.json({ resume: row })
