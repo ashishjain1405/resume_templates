@@ -11,8 +11,8 @@ const STEPS: { n: string; title: string; desc: string; pro?: boolean }[] = [
   },
   {
     n: '3',
-    title: 'Fix, download & apply',
-    desc: 'Improve your resume, download the polished version, and apply with confidence.',
+    title: 'Let AI rewrite it',
+    desc: 'One click and AI rewrites your bullets - stronger, more specific, ATS-optimised. Download and apply.',
     pro: true,
   },
   {

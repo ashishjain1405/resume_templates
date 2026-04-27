@@ -52,7 +52,7 @@ export default function HomePage() {
       <section className="py-16 px-4 bg-gray-50 border-y border-gray-100">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">Go further with Pro</h2>
+            <h2 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">Everything you need to land the job</h2>
             <p className="text-gray-500 text-sm">One-time payment. Lifetime access.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
@@ -77,8 +77,8 @@ export default function HomePage() {
               </div>
               <div>
                 <div className="text-2xl font-black text-blue-600 mb-1">Unlimited</div>
-                <div className="text-base font-semibold text-gray-700 mb-1.5">Resume checks</div>
-                <p className="text-sm text-gray-400 leading-relaxed">Keep improving until your score is interview-ready. Check as many times as you need.</p>
+                <div className="text-base font-semibold text-gray-700 mb-1.5">Resume scoring & AI Re-write</div>
+                <p className="text-sm text-gray-400 leading-relaxed">Check your score as many times as you need - and let AI rewrite your resume to fix what&apos;s holding you back.</p>
               </div>
             </div>
 
@@ -170,8 +170,8 @@ export default function HomePage() {
       {/* 8. Footer CTA strip */}
       <section className="py-14 px-4 bg-blue-600">
         <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Ready to land your next job?</h2>
-          <p className="text-blue-100 text-sm mb-6">Check your resume score in seconds — it&apos;s free.</p>
+          <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Your next interview starts here.</h2>
+          <p className="text-blue-100 text-sm mb-6">Get your free resume score in seconds - it&apos;s free.</p>
           <Link
             href="/ats-check"
             className="inline-block bg-white text-blue-600 px-8 py-3.5 rounded-lg font-semibold hover:bg-blue-50 transition-colors text-sm"
