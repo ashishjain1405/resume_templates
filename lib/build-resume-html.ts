@@ -60,7 +60,7 @@ function buildClassicHtml(data: ResumeData, accentColor: string): string {
     ${personal.summary ? sectionLabel('Summary', color) + `<div style="font-size:15px;color:#555;line-height:1.7;">${esc(personal.summary)}</div>` : ''}
     ${experience.length ? sectionLabel('Experience', color) + expHtml(experience) : ''}
     ${education.length ? sectionLabel('Education', color) + eduHtml(education) : ''}
-    ${(skillCategories?.length ?? skills.length) ? sectionLabel('Skills', color) + (skillCategories?.length
+    ${(skillCategories?.length || skills.length) ? sectionLabel('Skills', color) + (skillCategories?.length
       ? skillCategories.map(cat => `<div style="font-size:15px;color:#444;margin-bottom:4px;"><span style="font-weight:600;color:#1a1a1a;">${esc(cat.category)}:</span> ${cat.items.map(esc).join(' · ')}</div>`).join('')
       : `<div style="font-size:15px;color:#555;">${skills.map(esc).join(' · ')}</div>`) : ''}
     ${data.awards?.length ? sectionLabel('Awards &amp; Achievements', color) + `<ul style="margin:0;padding-left:16px;">${data.awards.map(a => `<li style="font-size:15px;color:#444;margin-bottom:4px;">${esc(a)}</li>`).join('')}</ul>` : ''}
@@ -107,7 +107,7 @@ function buildModernHtml(data: ResumeData, accentColor: string): string {
         ${personal.summary ? sectionLabel('Summary', color) + `<div style="font-size:15px;color:#555;line-height:1.7;">${esc(personal.summary)}</div>` : ''}
         ${experience.length ? sectionLabel('Experience', color) + expHtml(experience) : ''}
         ${education.length ? sectionLabel('Education', color) + eduHtml(education) : ''}
-        ${(skillCategories?.length ?? skills.length) ? sectionLabel('Skills', color) + `<div style="margin-top:4px;">${skillsHtml}</div>` : ''}
+        ${(skillCategories?.length || skills.length) ? sectionLabel('Skills', color) + `<div style="margin-top:4px;">${skillsHtml}</div>` : ''}
         ${data.awards?.length ? sectionLabel('Awards &amp; Achievements', color) + `<ul style="margin:0;padding-left:16px;">${data.awards.map(a => `<li style="font-size:15px;color:#444;margin-bottom:4px;">${esc(a)}</li>`).join('')}</ul>` : ''}
       </div>
     </div>
@@ -181,7 +181,7 @@ function buildMulticolumnHtml(data: ResumeData, accentColor: string): string {
 // ─── Quotation ─────────────────────────────────────────────────────────────
 
 function buildQuotationHtml(data: ResumeData, accentColor: string): string {
-  const { personal, experience, education } = data
+  const { personal, experience, education, skills, skillCategories } = data
   const color = safeColor(accentColor)
   const name = esc(personal.name) || 'Your Name'
   const contact = [personal.email, personal.location].filter(Boolean).map(esc).join(' · ')
@@ -221,6 +221,12 @@ function buildQuotationHtml(data: ResumeData, accentColor: string): string {
         </div>
       `).join('')}
     ` : ''}
+    ${(skillCategories?.length || skills.length) ? `
+      <div style="font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${color};margin-bottom:10px;margin-top:20px;">Skills</div>
+      ${skillCategories?.length
+        ? skillCategories.map(cat => `<div style="font-size:15px;color:#444;margin-bottom:4px;"><span style="font-weight:600;color:#1a1a1a;">${esc(cat.category)}:</span> ${cat.items.map(esc).join(' · ')}</div>`).join('')
+        : `<div style="font-size:15px;color:#555;">${skills.map(esc).join(' · ')}</div>`}
+    ` : ''}
     ${data.awards?.length ? `
       <div style="font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${color};margin-bottom:10px;margin-top:20px;">Awards &amp; Achievements</div>
       <ul style="margin:0;padding-left:16px;">
@@ -233,7 +239,7 @@ function buildQuotationHtml(data: ResumeData, accentColor: string): string {
 // ─── Executive ─────────────────────────────────────────────────────────────
 
 function buildExecutiveHtml(data: ResumeData, accentColor: string): string {
-  const { personal, experience, education } = data
+  const { personal, experience, education, skills, skillCategories } = data
   const color = safeColor(accentColor)
   const name = esc(personal.name) || 'Your Name'
   const initials = (personal.name || '').split(' ').map((w: string) => w[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || '??'
@@ -262,6 +268,9 @@ function buildExecutiveHtml(data: ResumeData, accentColor: string): string {
         ${expHtml(experience)}
       ` : ''}
       ${education.length ? sectionLabel('Education', color) + eduHtml(education) : ''}
+      ${(skillCategories?.length || skills.length) ? sectionLabel('Skills', color) + (skillCategories?.length
+        ? skillCategories.map(cat => `<div style="font-size:15px;color:#444;margin-bottom:4px;"><span style="font-weight:600;color:#1a1a1a;">${esc(cat.category)}:</span> ${cat.items.map(esc).join(' · ')}</div>`).join('')
+        : `<div style="font-size:15px;color:#555;">${skills.map(esc).join(' · ')}</div>`) : ''}
       ${data.awards?.length ? sectionLabel('Awards &amp; Achievements', color) + `<ul style="margin:0;padding-left:16px;">${data.awards.map(a => `<li style="font-size:15px;color:#444;margin-bottom:4px;">${esc(a)}</li>`).join('')}</ul>` : ''}
     </div>
   </div></body></html>`
