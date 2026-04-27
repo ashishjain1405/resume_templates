@@ -24,7 +24,7 @@ export default function QuotationPreview({ accentColor = '#d4a853', data }: Prop
     : [{ id: '1', degree: 'BA English Literature', institution: 'Delhi University', year: '2018' }]
 
   return (
-    <div className="w-full h-full bg-[#fdfaf5] text-[5.5px] leading-tight overflow-hidden p-3 font-sans relative">
+    <div className="w-full bg-[#fdfaf5] text-[5.5px] leading-tight p-3 font-sans relative">
       <div className="absolute top-2 right-2 text-[40px] leading-none font-serif opacity-10" style={{ color: accentColor }}>"</div>
 
       <div className="mb-2">

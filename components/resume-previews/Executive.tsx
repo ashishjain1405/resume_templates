@@ -25,7 +25,7 @@ export default function ExecutivePreview({ accentColor = '#1c1c1c', data }: Prop
     : [{ id: '1', degree: 'MBA, Harvard Business School', institution: '', year: '2003' }]
 
   return (
-    <div className="w-full h-full bg-white text-[5.5px] leading-tight overflow-hidden font-sans">
+    <div className="w-full bg-white text-[5.5px] leading-tight font-sans">
       <div className="px-3 py-2.5" style={{ backgroundColor: accentColor }}>
         <div className="flex items-center justify-between">
           <div>

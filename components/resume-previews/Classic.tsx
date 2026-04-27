@@ -27,7 +27,7 @@ export default function ClassicPreview({ accentColor = '#1e3a5f', data }: Props)
   const skills = data?.skills.length ? data.skills : []
 
   return (
-    <div className="w-full h-full bg-white text-[6px] leading-tight overflow-hidden p-3 font-sans">
+    <div className="w-full bg-white text-[6px] leading-tight p-3 font-sans">
       {/* Header */}
       <div className="text-center border-b-2 pb-2 mb-2" style={{ borderColor: accentColor }}>
         <div className="font-bold text-[9px] text-gray-900 tracking-wide">{name.toUpperCase()}</div>

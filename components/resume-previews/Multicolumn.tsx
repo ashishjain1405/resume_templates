@@ -27,7 +27,7 @@ export default function MulticolumnPreview({ accentColor = '#2c3e50', data }: Pr
     : [{ id: '1', degree: 'B.Tech Computer Science', institution: 'IIT Delhi', year: '2018' }]
 
   return (
-    <div className="w-full h-full bg-white text-[5.5px] leading-tight overflow-hidden flex font-sans">
+    <div className="w-full bg-white text-[5.5px] leading-tight flex font-sans" style={{ minHeight: 297 }}>
       {/* Left sidebar */}
       <div className="w-2/5 text-white p-2 flex flex-col gap-1.5" style={{ backgroundColor: accentColor }}>
         <div className="w-10 h-10 rounded-full bg-white/20 mx-auto mb-1 flex items-center justify-center">

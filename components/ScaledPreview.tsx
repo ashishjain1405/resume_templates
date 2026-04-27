@@ -94,17 +94,24 @@ export default function ScaledPreview({ templateId, accentColor, data }: Props) 
           </button>
         </div>
       )}
-      <div ref={outerRef} className="w-full overflow-hidden" style={{ height: DESIGN_HEIGHT * scale }}>
+      <div ref={outerRef} className="relative w-full overflow-hidden" style={{ height: DESIGN_HEIGHT * scale }}>
         <div
           ref={innerRef}
           style={{
             width: DESIGN_WIDTH,
+            minHeight: DESIGN_HEIGHT,
             transform: `scale(${scale}) translateY(-${offset}px)`,
             transformOrigin: 'top left',
           }}
         >
           <Preview accentColor={accentColor} data={data} />
         </div>
+        {totalPages > 1 && currentPage < totalPages && (
+          <div
+            className="absolute left-0 right-0 bottom-0 pointer-events-none"
+            style={{ borderTop: '1.5px dashed #93c5fd' }}
+          />
+        )}
       </div>
     </div>
   )

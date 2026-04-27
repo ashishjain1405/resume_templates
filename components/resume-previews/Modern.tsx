@@ -24,7 +24,7 @@ export default function ModernPreview({ accentColor = '#e94560', data }: Props) 
   const skills = data?.skills.length ? data.skills.slice(0, 4) : ['Figma', 'Prototyping', 'User Research', 'Design Systems']
 
   return (
-    <div className="w-full h-full bg-white text-[5.5px] leading-tight overflow-hidden flex font-sans">
+    <div className="w-full bg-white text-[5.5px] leading-tight flex font-sans" style={{ minHeight: 297 }}>
       <div className="w-1.5 flex-shrink-0" style={{ backgroundColor: accentColor }} />
       <div className="flex-1 flex flex-col">
         <div className="p-2 pb-1.5" style={{ backgroundColor: accentColor }}>
