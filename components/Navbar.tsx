@@ -103,7 +103,7 @@ export default function Navbar() {
               <Link href="/ats-check" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
                 Check Resume Score
               </Link>
-              <button onClick={() => { const href = getBuilderHref(); const guard = (window as any).__builderNavGuard ?? (window as any).__atsNavGuard; if (guard) { guard(href); return } router.push(href) }} className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
+              <button onClick={() => { const href = getBuilderHref(); const guard = (window as any).__atsNavGuard; if (guard) { guard(href); return } router.push(href) }} className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
                 Create my Resume
               </button>
               {!isPro && <GoProLink />}
@@ -157,7 +157,7 @@ export default function Navbar() {
               <Link href="/ats-check" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
                 Check Resume Score
               </Link>
-              <button onClick={() => { const href = getBuilderHref(); const guard = (window as any).__builderNavGuard ?? (window as any).__atsNavGuard; if (guard) { guard(href); return } router.push(href) }} className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
+              <button onClick={() => { const href = getBuilderHref(); const guard = (window as any).__atsNavGuard; if (guard) { guard(href); return } router.push(href) }} className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
                 Create my Resume
               </button>
               <GoProLink />
@@ -171,7 +171,7 @@ export default function Navbar() {
           <Link href="/ats-check" className="text-xs text-gray-700 border border-gray-200 px-2.5 py-1.5 rounded-lg font-medium whitespace-nowrap">
             Check
           </Link>
-          <button onClick={() => { const href = getBuilderHref(); const guard = (window as any).__builderNavGuard ?? (window as any).__atsNavGuard; if (guard) { guard(href); return } router.push(href) }} className="text-xs text-gray-700 border border-gray-200 px-2.5 py-1.5 rounded-lg font-medium whitespace-nowrap">
+          <button onClick={() => { const href = getBuilderHref(); const guard = (window as any).__atsNavGuard; if (guard) { guard(href); return } router.push(href) }} className="text-xs text-gray-700 border border-gray-200 px-2.5 py-1.5 rounded-lg font-medium whitespace-nowrap">
             Create
           </button>
           <button className="p-2 text-gray-500" onClick={() => setMobileOpen(o => !o)} aria-label="Toggle menu">
