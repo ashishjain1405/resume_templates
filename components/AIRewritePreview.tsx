@@ -50,6 +50,7 @@ function ScoreRing({ score, size = 60, color, bgStroke = '#f3f4f6' }: { score: n
 export default function AIRewritePreview() {
   const sectionRef = useRef<HTMLElement>(null)
   const [triggered, setTriggered] = useState(false)
+  const [cycle, setCycle] = useState(0)
   const [struckIdx, setStruckIdx] = useState(-1)
   const [score, setScore] = useState(ORIG_SCORE)
   const [atsScore, setAtsScore] = useState(ORIG_ATS)
@@ -69,9 +70,11 @@ export default function AIRewritePreview() {
   useEffect(() => {
     if (!triggered) return
 
+    const timers: ReturnType<typeof setTimeout>[] = []
+
     // Phase 1: strike through left bullets sequentially
     REWRITES.forEach((_, i) => {
-      setTimeout(() => setStruckIdx(i), 400 + i * 350)
+      timers.push(setTimeout(() => setStruckIdx(i), 400 + i * 350))
     })
 
     // Phase 2: animate scores on the right
@@ -94,17 +97,29 @@ export default function AIRewritePreview() {
       }
       raf = requestAnimationFrame(tick)
     }, scoreStart)
+    timers.push(scoreTimer)
 
     // Phase 3: right bullets appear
     REWRITES.forEach((_, i) => {
-      setTimeout(() => setBulletIdx(i), 2400 + i * 350)
+      timers.push(setTimeout(() => setBulletIdx(i), 2400 + i * 350))
     })
 
     // Phase 4: badges pop in
-    setTimeout(() => setBadgeVisible(true), 3300)
+    timers.push(setTimeout(() => setBadgeVisible(true), 3300))
 
-    return () => { clearTimeout(scoreTimer); cancelAnimationFrame(raf) }
-  }, [triggered])
+    // Phase 5: reset and loop
+    timers.push(setTimeout(() => {
+      setStruckIdx(-1)
+      setBulletIdx(-1)
+      setBadgeVisible(false)
+      setScore(ORIG_SCORE)
+      setAtsScore(ORIG_ATS)
+      setRecScore(ORIG_REC)
+      setCycle(c => c + 1)
+    }, 6500))
+
+    return () => { timers.forEach(clearTimeout); cancelAnimationFrame(raf) }
+  }, [triggered, cycle])
 
   const rewRingColor = score >= 75 ? '#16a34a' : '#d97706'
 
@@ -112,8 +127,8 @@ export default function AIRewritePreview() {
     <section ref={sectionRef} className="py-16 px-4 bg-white">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10">
-          <h2 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">AI Re-write — before &amp; after</h2>
-          <p className="text-gray-500 text-sm">See how your bullets transform with one click.</p>
+          <h2 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">AI Re-write - before &amp; after</h2>
+          <p className="text-gray-500 text-sm">See your bullets transform with one click.</p>
         </div>
 
         <div className="max-w-2xl mx-auto">
@@ -140,18 +155,13 @@ export default function AIRewritePreview() {
               </div>
               <div className="px-4 py-3 space-y-2.5">
                 {REWRITES.map((rw, i) => (
-                  <div key={i} className="relative">
-                    <p className="text-[11px] text-gray-600 leading-snug">{rw.original}</p>
-                    {/* Animated strikethrough line */}
-                    <div
-                      className="absolute top-1/2 left-0 h-px bg-gray-400"
-                      style={{
-                        width: struckIdx >= i ? '100%' : '0%',
-                        transition: 'width 400ms ease',
-                        marginTop: '-0.5px',
-                      }}
-                    />
-                  </div>
+                  <p key={i} className="text-[11px] text-gray-600 leading-snug"
+                    style={{
+                      textDecorationLine: 'line-through',
+                      textDecorationColor: struckIdx >= i ? 'rgba(156,163,175,1)' : 'rgba(156,163,175,0)',
+                      transition: 'text-decoration-color 400ms ease',
+                    }}
+                  >{rw.original}</p>
                 ))}
               </div>
             </div>
