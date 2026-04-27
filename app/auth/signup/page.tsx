@@ -92,6 +92,9 @@ function SignupForm() {
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12 bg-gray-50">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+          <div className="flex justify-center mb-6">
+            <img src="/logo.png" alt="Resume Expert" className="h-16 w-16 object-contain" />
+          </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Let&apos;s get you set up</h1>
           <p className="text-gray-500 text-sm mb-6">Stand out to recruiters with a polished resume</p>
 
