@@ -106,7 +106,7 @@ function Modal({ type, onClose, userEmail }: { type: 'login_required'; onClose: 
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
           </svg>
         </div>
-        <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Want to save your results?</h3>
+        <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Save your score before you go</h3>
         <p className="text-sm text-gray-500 text-center mb-5">Sign in to save your score and review it anytime from your dashboard.</p>
         <Link href="/auth/signup?redirect=/ats-check" className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
           Sign in or create account
@@ -842,8 +842,8 @@ function ATSCheckInner() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">AI Re-write is a Pro feature</h3>
-            <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for lifetime access — AI resume rewrite, unlimited checks, PDF downloads, Google Docs editing, and an expert session. ₹999, one-time.</p>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Let AI rewrite your resume</h3>
+            <p className="text-sm text-gray-500 text-center mb-5">Your resume rewritten in seconds - stronger bullets, better keywords, higher score. Plus an expert 1:1 session, unlimited resume checks and PDF downloads. ₹999, one-time.</p>
             <ProUpgradeCTAs layout="stack" userEmail={userEmail} source="rewrite" returnPath="/ats-check" />
           </div>
         </div>
@@ -902,7 +902,7 @@ function ATSCheckInner() {
       <div className="mb-10 flex items-start justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Resume Checker</h1>
-          <p className="text-gray-500 max-w-xl">Upload your resume and optionally paste a job description. Get an instant Resume score with actionable improvements.</p>
+          <p className="text-gray-500 max-w-xl">Find out why you&apos;re not getting interviews. Get an instant score, spot the gaps, and let AI fix them.</p>
         </div>
         {limitReached && (
           <div className="flex items-center gap-2">
@@ -1026,8 +1026,8 @@ function ATSCheckInner() {
 
           {limitReached ? (
             <div className="w-full bg-amber-50 border border-amber-200 rounded-xl px-4 py-4 text-center">
-              <p className="text-sm font-semibold text-amber-800 mb-1">You've used all 5 free checks</p>
-              <p className="text-xs text-amber-600 mb-3">Upgrade to Pro for unlimited Resume checks — ₹999, one-time.</p>
+              <p className="text-sm font-semibold text-amber-800 mb-1">You&apos;ve hit your free limit</p>
+              <p className="text-xs text-amber-600 mb-3">Ready to keep going? Unlock unlimited checks, AI re-write, 1:1 expert session and PDF downloads - ₹999, one-time.</p>
               <div className="flex justify-center">
                 <ProUpgradeCTAs layout="row" userEmail={userEmail} source="ats" />
               </div>
@@ -1061,7 +1061,7 @@ function ATSCheckInner() {
                   </svg>
                 </div>
                 <p className="text-sm font-medium">Your results will show up here.</p>
-                <p className="text-xs mt-1">Upload your resume above and hit Analyse.</p>
+                <p className="text-xs mt-1">Upload your resume above and hit Analyse - results appear in seconds.</p>
               </div>
             </div>
           )}
@@ -1232,7 +1232,7 @@ function ATSCheckInner() {
 
               {!isPro && (
                 <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3.5">
-                  <div className="text-xs text-amber-700 mb-3">Unlimited checks · PDF download · Edit in Google Docs · Expert session</div>
+                  <div className="text-xs text-amber-700 mb-3">Unlimited checks · AI Re-write · Expert 1:1 Session · PDF download</div>
                   <ProUpgradeCTAs layout="row" userEmail={userEmail} source="ats" />
                 </div>
               )}

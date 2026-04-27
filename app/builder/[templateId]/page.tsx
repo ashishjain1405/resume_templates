@@ -903,7 +903,7 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
                 onClick={() => { sessionStorage.setItem(`builder_session_${templateId}`, JSON.stringify({ data, accentColor })) }}
                 className="w-full text-center bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors"
               >
-                {(authForDownload || authForDocs) ? 'Create account to continue' : 'Create account'}
+                {(authForDownload || authForDocs) ? 'Create free account' : 'Create free account'}
               </a>
               <a
                 href={`/auth/login?redirect=${encodeURIComponent(`/builder/${templateId}`)}`}
@@ -923,8 +923,8 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowChangeTemplateModal(false)}>
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl relative" onClick={e => e.stopPropagation()}>
             <button onClick={() => setShowChangeTemplateModal(false)} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
-            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Save a version before switching?</h3>
-            <p className="text-sm text-gray-500 text-center mb-4">Save your current resume to the Dashboard first, or switch without saving.</p>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Save before switching?</h3>
+            <p className="text-sm text-gray-500 text-center mb-4">Save your current resume to the Dashboard, or switch without saving.</p>
             <input
               type="text"
               value={saveNameDraft}
@@ -968,8 +968,8 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Edit in Google Docs is a Pro feature</h3>
-            <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for lifetime access — edit in Google Docs, unlimited Resume checks, PDF downloads, and an expert session. ₹999, one-time.</p>
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Edit in Google Docs</h3>
+            <p className="text-sm text-gray-500 text-center mb-5">Edit your resume in Google Docs, run unlimited checks, and let AI rewrite it - all for ₹999, one-time.</p>
             <ProUpgradeCTAs layout="stack" source="docs" returnPath={`/builder/${templateId}`} />
           </div>
         </div>
@@ -985,7 +985,7 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
               </svg>
             </div>
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Download your resume</h3>
-            <p className="text-sm text-gray-500 text-center mb-5">Choose what works for you — buy just this template or unlock everything with Pro.</p>
+            <p className="text-sm text-gray-500 text-center mb-5">Choose what works for you - buy just this template, or get Pro for AI re-write, unlimited checks, and more.</p>
             <div className="flex flex-col gap-2">
               <button
                 onClick={handleBuyTemplate}

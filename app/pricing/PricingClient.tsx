@@ -13,6 +13,7 @@ interface Props {
 
 const COMPARISON: { feature: string; free: boolean | string; pro: boolean | string }[] = [
   { feature: 'Resume Checks', free: '5', pro: 'Unlimited' },
+  { feature: 'AI Re-write', free: false, pro: true },
   { feature: 'Create Resume', free: 'Create & Preview', pro: 'Create, Preview & Download' },
   { feature: 'Access to all 5 templates', free: true, pro: true },
   { feature: 'Buy individual templates', free: true, pro: true },
@@ -25,7 +26,7 @@ const COMPARISON: { feature: string; free: boolean | string; pro: boolean | stri
 const FAQS = [
   {
     q: 'What exactly do I get with Pro?',
-    a: 'Unlimited ATS checks, the ability to download your resume from the Builder, one 1:1 expert review session, and priority support — all for a single one-time payment.',
+    a: 'Unlimited ATS checks, AI resume re-write, the ability to download your resume from the Builder, one 1:1 expert review session, and priority support - all for a single one-time payment.',
   },
   {
     q: 'Is this really a one-time payment?',
@@ -136,7 +137,7 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
               <div className="inline-block bg-green-50 text-green-700 text-xs font-semibold px-3 py-1 rounded-full mb-4">Unlimited checks</div>
               <h2 className="text-2xl font-bold text-gray-900 mb-3 tracking-tight">Resume Score Checker</h2>
               <p className="text-gray-500 text-sm leading-relaxed mb-4">
-                Most resumes don&apos;t fail just because of ATS — they fail because they don&apos;t convince recruiters either. Our analyzer evaluates your resume across both ATS requirements and real hiring criteria: keyword relevance, clarity, formatting, impact, and measurable achievements — then shows you exactly what&apos;s holding you back and how to fix it.
+                Most resumes don&apos;t fail just because of ATS - they fail because they don&apos;t convince recruiters either. Our analyzer evaluates your resume across both ATS requirements and real hiring criteria and lets AI fix it for you in one click.
               </p>
               <ul className="space-y-2">
                 {['Instant score out of 100', 'Section-by-section breakdown', 'Missing keyword detection', '5 actionable improvement suggestions', 'Paste text or upload PDF'].map(f => (
@@ -377,8 +378,8 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
 
       {/* Bottom CTA */}
       <section className="py-14 px-4 bg-blue-600 text-center">
-        <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Ready to get hired faster?</h2>
-        <p className="text-blue-100 text-sm mb-6">Join thousands of Indian job seekers who landed their next role with Resume Expert Pro.</p>
+        <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Ready to land more interviews?</h2>
+        <p className="text-blue-100 text-sm mb-6">Join thousands of Indian job seekers already using Resume Expert Pro.</p>
         <UpgradeButton className="inline-block px-10" />
       </section>
 
