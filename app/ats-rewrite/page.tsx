@@ -124,11 +124,6 @@ function ATSRewriteInner() {
       const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
       if (!uploadRes.ok) { setError('Failed to save to Dashboard. Please try again.'); return }
 
-      // 4. Delete original file only after new upload succeeds
-      if (data.resumeId) {
-        await fetch(`/api/resume/${data.resumeId}`, { method: 'DELETE' })
-      }
-
       sessionStorage.removeItem('rewrite_result')
       router.push('/dashboard?tab=resumes')
     } finally {
@@ -150,7 +145,7 @@ function ATSRewriteInner() {
       <div className="max-w-5xl mx-auto space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">AI Resume Re-write</h1>
-          <p className="text-sm text-gray-500 mt-1">Review the changes before saving. The AI rewritten version will replace your existing resume.</p>
+          <p className="text-sm text-gray-500 mt-1">Review the changes and save the AI rewritten version to your dashboard.</p>
         </div>
 
         {error && (
