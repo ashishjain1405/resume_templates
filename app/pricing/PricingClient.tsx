@@ -98,9 +98,7 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
       <section className="py-16 px-4 text-center border-b border-gray-100">
         <div className="max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 text-xs font-semibold px-3 py-1.5 rounded-full mb-5">
-            <div className="bg-white rounded p-0.5 flex items-center justify-center">
-              <img src="/logo.png" alt="" className="h-5 w-5 object-contain" />
-            </div>
+            <img src="/logo.png" alt="" className="h-7 w-7 object-contain" />
             Resume Expert Pro
           </div>
           <h1 className="text-4xl font-bold text-gray-900 tracking-tight mb-4">

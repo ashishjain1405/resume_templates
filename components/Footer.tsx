@@ -7,9 +7,7 @@ export default function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="bg-white rounded-lg p-1 flex items-center justify-center">
-                <img src="/logo.png" alt="Resume Expert" className="h-16 w-16 object-contain" />
-              </div>
+              <img src="/logo.png" alt="Resume Expert" className="h-24 w-24 object-contain" />
               <span className="text-white font-bold">Resume Expert</span>
             </div>
             <p className="text-sm leading-relaxed">Everything you need to get noticed — and hired.</p>
