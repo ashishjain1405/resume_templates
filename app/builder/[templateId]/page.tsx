@@ -389,7 +389,7 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
       const res = await fetch('/api/resume/list')
       const json = await res.json()
       const match = (json.resumes ?? []).find((r: { template_id: string | null; filename: string }) => r.template_id === templateId)
-      const name = match ? match.filename.replace(/\.pdf$/i, '').replace(/_v\d+$/, '') : ''
+      const name = match ? match.filename.replace(/\.pdf$/i, '').replace(/_v\d+$/, '').replace(/_/g, ' ').trim() : ''
       previousNamesRef.current[templateId] = name
       return name
     } catch {
