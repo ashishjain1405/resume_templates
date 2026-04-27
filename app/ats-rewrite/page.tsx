@@ -50,6 +50,7 @@ function ATSRewriteInner() {
   const [accepting, setAccepting] = useState(false)
   const [error, setError] = useState('')
   const [originalPdfUrl, setOriginalPdfUrl] = useState<string | null>(null)
+  const [originalFilename, setOriginalFilename] = useState<string | null>(null)
   const [showSaveNameModal, setShowSaveNameModal] = useState(false)
   const [saveNameDraft, setSaveNameDraft] = useState('')
 
@@ -65,7 +66,10 @@ function ATSRewriteInner() {
       if (parsed.isUploadedResume && parsed.resumeId) {
         fetch(`/api/resume/${parsed.resumeId}`)
           .then(r => r.json())
-          .then(d => { if (d.url) setOriginalPdfUrl(d.url) })
+          .then(d => {
+            if (d.url) setOriginalPdfUrl(d.url)
+            if (d.filename) setOriginalFilename(d.filename.replace(/\.pdf$/i, '').replace(/_/g, ' ').trim())
+          })
           .catch(() => {})
       }
     } catch {
@@ -249,7 +253,11 @@ function ATSRewriteInner() {
           <div className="flex flex-col items-end gap-1">
             <button
               onClick={() => {
-                setSaveNameDraft(data.rewrittenData.personal?.name?.trim() || '')
+                setSaveNameDraft(
+                  (data.isUploadedResume && originalFilename)
+                    ? originalFilename
+                    : (data.rewrittenData.personal?.name?.trim() || '')
+                )
                 setShowSaveNameModal(true)
               }}
               disabled={accepting}
