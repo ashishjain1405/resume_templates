@@ -201,13 +201,14 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
         ? (sessionStorage.getItem(`builder_session_${templateId}`) ?? localStorage.getItem(`builder_session_restore_${templateId}`))
         : null
       if (sessionRaw) {
-        sessionStorage.removeItem(`builder_session_${templateId}`)
-        localStorage.removeItem(`builder_session_restore_${templateId}`)
         try {
           const { data: saved, accentColor: savedColor } = JSON.parse(sessionRaw)
           setData(saved)
           if (savedColor) setAccentColor(savedColor)
-          // Persist restored state to Supabase immediately
+          // Persist restored state to Supabase immediately.
+          // Only clear the snapshot keys after a successful upsert so that if
+          // user is null on this run (auth not yet resolved), the keys survive
+          // and the upsert fires on the next run when user is available.
           if (user) {
             await supabase.from('resumes').upsert({
               user_id: user.id,
@@ -216,6 +217,8 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
               accent_color: savedColor,
               updated_at: new Date().toISOString(),
             }, { onConflict: 'user_id,template_id' })
+            sessionStorage.removeItem(`builder_session_${templateId}`)
+            localStorage.removeItem(`builder_session_restore_${templateId}`)
           }
         } catch {}
       } else if (user) {
