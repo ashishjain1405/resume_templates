@@ -55,43 +55,43 @@ export default function HomePage() {
             <h2 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">Everything you need to land the job</h2>
             <p className="text-gray-500 text-sm">One-time payment. Lifetime access.</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
-            <div className="bg-white rounded-2xl border border-gray-200 p-7 flex flex-col gap-4 hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-gray-500">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
-                </svg>
-              </div>
-              <div>
-                <div className="text-2xl font-black text-blue-600 mb-1">5 templates</div>
-                <div className="text-base font-semibold text-gray-700 mb-1.5">Resume Creator</div>
-                <p className="text-sm text-gray-400 leading-relaxed">Build and download your resume in a professional template. No design skills needed.</p>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl border border-gray-200 p-7 flex flex-col gap-4 hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-gray-500">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-10">
+            <div className="flex flex-col gap-3 bg-blue-50/60 rounded-xl p-6 border-l-4 border-blue-500">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div>
-                <div className="text-2xl font-black text-blue-600 mb-1">Unlimited</div>
-                <div className="text-base font-semibold text-gray-700 mb-1.5">Resume scoring & AI Re-write</div>
-                <p className="text-sm text-gray-400 leading-relaxed">Check your score as many times as you need - and let AI rewrite your resume to fix what&apos;s holding you back.</p>
+                <div className="text-xl font-black text-blue-600 mb-0.5">Unlimited</div>
+                <div className="text-sm font-semibold text-gray-800 mb-1">Resume scoring & AI Re-write</div>
+                <p className="text-xs text-gray-500 leading-relaxed">Check your score as many times as you need - and let AI rewrite your resume to fix what&apos;s holding you back.</p>
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 p-7 flex flex-col gap-4 hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-gray-500">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <div className="flex flex-col gap-3 bg-amber-50/60 rounded-xl p-6 border-l-4 border-amber-400">
+              <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 9v7.5" />
                 </svg>
               </div>
               <div>
-                <div className="text-2xl font-black text-blue-600 mb-1">1:1 Expert Session</div>
-                <div className="text-base font-semibold text-gray-700 mb-1.5">30 min session</div>
-                <p className="text-sm text-gray-400 leading-relaxed">Live resume review with an expert. Get actionable feedback before you apply.</p>
+                <div className="text-xl font-black text-amber-600 mb-0.5">1:1 Expert Session</div>
+                <div className="text-sm font-semibold text-gray-800 mb-1">30 min session</div>
+                <p className="text-xs text-gray-500 leading-relaxed">Live resume review with an expert. Get actionable feedback before you apply.</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 bg-indigo-50/60 rounded-xl p-6 border-l-4 border-indigo-400">
+              <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                </svg>
+              </div>
+              <div>
+                <div className="text-xl font-black text-indigo-600 mb-0.5">5 templates</div>
+                <div className="text-sm font-semibold text-gray-800 mb-1">Resume Creator</div>
+                <p className="text-xs text-gray-500 leading-relaxed">Build and download your resume in a professional template. No design skills needed.</p>
               </div>
             </div>
           </div>
