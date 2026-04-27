@@ -16,8 +16,6 @@ const COMPARISON: { feature: string; free: boolean | string; pro: boolean | stri
   { feature: 'AI Re-write', free: false, pro: true },
   { feature: 'Create Resume', free: 'Create & Preview', pro: 'Create, Preview & Download' },
   { feature: 'Access to all 5 templates', free: true, pro: true },
-  { feature: 'Buy individual templates', free: true, pro: true },
-  { feature: 'Save & sync resumes', free: true, pro: true },
   { feature: 'Edit resume in Google Docs', free: false, pro: true },
   { feature: '1:1 Expert Review Session', free: false, pro: true },
   { feature: 'Priority support', free: false, pro: true },
