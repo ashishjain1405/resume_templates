@@ -200,8 +200,8 @@ export default function UserResumes({
               <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
             </svg>
           </div>
-          <p className="text-sm font-medium text-gray-600">No resumes uploaded yet</p>
-          <p className="text-xs text-gray-400 mt-1">Upload a PDF or DOCX to get started</p>
+          <p className="text-sm font-medium text-gray-600">No resumes saved yet</p>
+          <p className="text-xs text-gray-400 mt-1">Upload a resume or save one from the Resume Creator to get started.</p>
         </div>
       ) : (
         <div className="space-y-2.5">
@@ -296,7 +296,7 @@ export default function UserResumes({
               </svg>
             </div>
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Download your resume</h3>
-            <p className="text-sm text-gray-500 text-center mb-5">Choose what works for you — buy just this template or unlock everything with Pro.</p>
+            <p className="text-sm text-gray-500 text-center mb-5">Choose what works for you - buy just this template, or get Pro for AI re-write, unlimited checks, and more.</p>
             <div className="flex flex-col gap-2">
               {upgradeTemplate && (
                 <button

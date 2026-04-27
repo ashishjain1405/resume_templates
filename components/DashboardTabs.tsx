@@ -150,7 +150,7 @@ export default function DashboardTabs({
                 </div>
                 <div>
                   <div className="text-sm font-bold text-gray-900 mb-0.5">See how your resume stacks up</div>
-                  <div className="text-xs text-gray-400">Find out how recruiters and ATS systems see your resume</div>
+                  <div className="text-xs text-gray-400">Find out exactly what&apos;s holding you back - and let AI fix it.</div>
                 </div>
                 <Link href="/ats-check" className="mt-auto inline-flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors self-start">
                   Check resume score →
@@ -161,7 +161,7 @@ export default function DashboardTabs({
                   <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" /></svg>
                 </div>
                 <div>
-                  <div className="text-sm font-bold text-gray-900 mb-0.5">No resume yet?</div>
+                  <div className="text-sm font-bold text-gray-900 mb-0.5">Build your resume in minutes</div>
                   <div className="text-xs text-gray-400">Build one from scratch — it only takes a few minutes.</div>
                 </div>
                 <BuilderLink className="mt-auto inline-flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors self-start">
@@ -251,7 +251,7 @@ export default function DashboardTabs({
               )}
             </div>
             <p className="text-sm text-gray-500 mb-5">
-              Most companies use ATS (Applicant Tracking Systems) to filter resumes before a human ever reads them. Upload your resume to get an instant score, see which keywords you&apos;re missing, and get specific suggestions to improve it.
+              Get your instant score, see what&apos;s missing, and let AI rewrite it to fix the gaps. Check as many times as you need.
             </p>
             {!isPro && (
               <div className="mb-5">
@@ -277,7 +277,7 @@ export default function DashboardTabs({
                   Check my resume score →
                 </Link>
                 <Link href="/pricing" className="inline-flex items-center gap-2 bg-amber-50 text-amber-700 border border-amber-200 px-5 py-2.5 rounded-lg font-semibold text-sm hover:bg-amber-100 transition-colors">
-                  Upgrade to Pro for Unlimited checks ✦
+                  Unlock AI Re-write + unlimited checks ✦
                 </Link>
               </div>
             )}
@@ -311,7 +311,7 @@ export default function DashboardTabs({
               <h2 className="text-base font-bold text-gray-900">Resume Creator</h2>
             </div>
             <p className="text-sm text-gray-500 mb-2">
-              Build a polished resume from scratch using one of our professionally designed templates. Edit in real time with a live preview, then download as a PDF or open in Google Docs.
+              Build a polished resume in minutes using a professionally designed template. Edit live, download as PDF, or open in Google Docs.
             </p>
             <div className="flex flex-wrap gap-3 text-xs text-gray-400 mb-5">
               <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />Live preview</span>
@@ -400,7 +400,7 @@ export default function DashboardTabs({
               <h2 className="text-base font-bold text-gray-900">Expert Sessions</h2>
             </div>
             <p className="text-sm text-gray-500 mb-5">
-              A 30-minute 1:1 video call with a resume expert. You&apos;ll get personalised feedback on your resume, tips tailored to your target role, and a clear action plan to improve your chances.
+              Still not landing interviews after the AI re-write? A 30-min 1:1 with a resume expert gives you personalised feedback and a clear action plan - tailored to your target role.
             </p>
             {isPro ? (
               <div className="flex gap-3 flex-wrap items-center">
@@ -417,7 +417,7 @@ export default function DashboardTabs({
               </div>
             ) : (
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                <p className="text-sm text-amber-800 font-medium mb-3">Expert sessions are included with Pro.</p>
+                <p className="text-sm text-amber-800 font-medium mb-3">Expert sessions are a Pro feature - included with your ₹999 upgrade.</p>
                 <Link href="/pricing" className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-amber-100 transition-colors">
                   Upgrade to Pro ✦
                 </Link>
