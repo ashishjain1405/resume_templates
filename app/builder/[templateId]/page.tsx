@@ -130,9 +130,13 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
   const [showSaveNameModal, setShowSaveNameModal] = useState(false)
   const [saveNameDraft, setSaveNameDraft] = useState('')
 
+  const [pendingNavUrl, setPendingNavUrl] = useState<string | null>(null)
+  const [showLeaveModal, setShowLeaveModal] = useState(false)
+
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const previousNamesRef = useRef<Record<string, string>>({})
   const saveNameTouchedRef = useRef(false)
+  const pendingNavAfterSaveRef = useRef<string | null>(null)
 
   // Load user + pro status
   useEffect(() => {
@@ -183,8 +187,18 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
         if (!proFlag) {
           setIsPro(false)
           if (typeof window !== 'undefined') {
+            // Snapshot current in-memory state before clearing so the restore logic
+            // on SIGNED_IN can recover it (covers guest → login flow)
+            setData(d => {
+              setAccentColor(c => {
+                const snapshot = JSON.stringify({ data: d, accentColor: c })
+                sessionStorage.setItem(`builder_session_${templateId}`, snapshot)
+                localStorage.setItem(`builder_session_restore_${templateId}`, snapshot)
+                return c
+              })
+              return d
+            })
             localStorage.removeItem(`resume_builder_${templateId}`)
-            localStorage.removeItem(`builder_session_restore_${templateId}`)
           }
         }
       }
@@ -340,6 +354,27 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
     setAccentColor(color)
     autoSave(data, color)
   }
+
+  // Gap 2: expose nav guard so Navbar can intercept navigation when there are unsaved changes
+  useEffect(() => {
+    if (!isDirty) {
+      ;(window as any).__builderNavGuard = null
+      return
+    }
+    ;(window as any).__builderNavGuard = (url: string) => {
+      setPendingNavUrl(url)
+      setShowLeaveModal(true)
+    }
+    return () => { ;(window as any).__builderNavGuard = null }
+  }, [isDirty])
+
+  // Gap 3: native browser warning on tab close / hard navigation
+  useEffect(() => {
+    if (!isDirty) return
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault() }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [isDirty])
 
   // Personal field updater
   function setPersonal(field: keyof ResumeData['personal'], value: string) {
@@ -976,6 +1011,38 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
         </div>
       )}
 
+      {/* Leave without saving modal */}
+      {showLeaveModal && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl relative">
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Save before leaving?</h3>
+            <p className="text-sm text-gray-500 text-center mb-4">You have unsaved changes. Save to Dashboard first, or leave without saving.</p>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={async () => {
+                  pendingNavAfterSaveRef.current = pendingNavUrl
+                  setShowLeaveModal(false)
+                  saveNameTouchedRef.current = false
+                  setSaveNameDraft(data.personal.name || '')
+                  fetchPreviousName().then(prev => { if (prev && !saveNameTouchedRef.current) setSaveNameDraft(prev) })
+                  setShowSaveNameModal(true)
+                }}
+                className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors"
+              >
+                Save to Dashboard
+              </button>
+              <button
+                onClick={() => { setShowLeaveModal(false); if (pendingNavUrl) router.push(pendingNavUrl) }}
+                className="w-full border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors"
+              >
+                Leave without saving
+              </button>
+              <button onClick={() => { setShowLeaveModal(false); setPendingNavUrl(null) }} className="text-xs text-gray-400 hover:text-gray-600 pt-1">Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Pro download modal */}
       {showProDocsModal && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowProDocsModal(false)}>
@@ -1023,7 +1090,7 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
         <SaveNameModal
           defaultName={saveNameDraft}
           saving={savingVersion}
-          onSave={(name) => { setShowSaveNameModal(false); handleSaveVersion(name) }}
+          onSave={async (name) => { setShowSaveNameModal(false); const ok = await handleSaveVersion(name); if (ok && pendingNavAfterSaveRef.current) { router.push(pendingNavAfterSaveRef.current); pendingNavAfterSaveRef.current = null } }}
           onCancel={() => setShowSaveNameModal(false)}
         />
       )}
