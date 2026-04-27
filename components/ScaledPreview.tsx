@@ -1,24 +1,11 @@
 'use client'
 
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import type { ResumeData } from '@/lib/resume-data'
-import ClassicPreview from '@/components/resume-previews/Classic'
-import ModernPreview from '@/components/resume-previews/Modern'
-import MulticolumnPreview from '@/components/resume-previews/Multicolumn'
-import QuotationPreview from '@/components/resume-previews/Quotation'
-import ExecutivePreview from '@/components/resume-previews/Executive'
-import type React from 'react'
+import { buildResumeHtml } from '@/lib/build-resume-html'
 
-const PREVIEW_MAP: Record<string, React.ComponentType<{ accentColor?: string; data?: ResumeData }>> = {
-  classic: ClassicPreview,
-  modern: ModernPreview,
-  multicolumn: MulticolumnPreview,
-  quotation: QuotationPreview,
-  executive: ExecutivePreview,
-}
-
-const DESIGN_WIDTH = 210
-const DESIGN_HEIGHT = DESIGN_WIDTH * (297 / 210) // A4: 297
+const DESIGN_WIDTH = 750
+const DESIGN_HEIGHT = Math.round(DESIGN_WIDTH * (297 / 210)) // 1063
 
 interface Props {
   templateId: string
@@ -26,12 +13,23 @@ interface Props {
   data?: ResumeData
 }
 
-export default function ScaledPreview({ templateId, accentColor, data }: Props) {
+const EMPTY_RESUME: ResumeData = {
+  personal: { name: '', title: '', email: '', phone: '', location: '', linkedin: '', summary: '' },
+  experience: [],
+  education: [],
+  skills: [],
+  skillCategories: [],
+  awards: [],
+}
+
+export default function ScaledPreview({ templateId, accentColor = '#2563eb', data }: Props) {
   const outerRef = useRef<HTMLDivElement>(null)
-  const innerRef = useRef<HTMLDivElement>(null)
+  const iframeRef = useRef<HTMLIFrameElement>(null)
   const [scale, setScale] = useState(1)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+
+  const html = buildResumeHtml(data ?? EMPTY_RESUME, accentColor, templateId)
 
   // Measure container width → scale
   useEffect(() => {
@@ -50,21 +48,18 @@ export default function ScaledPreview({ templateId, accentColor, data }: Props) 
     setCurrentPage(1)
   }, [data, templateId])
 
-  // Measure total pages after layout settles
-  useEffect(() => {
-    const id = requestAnimationFrame(() => {
-      const h = innerRef.current?.scrollHeight ?? 0
-      setTotalPages(Math.max(1, Math.ceil(h / DESIGN_HEIGHT)))
-    })
-    return () => cancelAnimationFrame(id)
-  }, [scale, data, templateId])
+  const measurePages = useCallback(() => {
+    const doc = iframeRef.current?.contentDocument
+    if (!doc) return
+    const h = doc.documentElement.scrollHeight
+    setTotalPages(Math.max(1, Math.ceil(h / DESIGN_HEIGHT)))
+  }, [])
 
-  // Clamp current page if total pages shrinks (e.g. on resize)
+  // Clamp current page if total pages shrinks
   useEffect(() => {
     setCurrentPage(p => Math.min(p, totalPages))
   }, [totalPages])
 
-  const Preview = PREVIEW_MAP[templateId] ?? ClassicPreview
   const offset = (currentPage - 1) * DESIGN_HEIGHT
 
   return (
@@ -95,17 +90,21 @@ export default function ScaledPreview({ templateId, accentColor, data }: Props) 
         </div>
       )}
       <div ref={outerRef} className="relative w-full overflow-hidden" style={{ height: DESIGN_HEIGHT * scale }}>
-        <div
-          ref={innerRef}
+        <iframe
+          ref={iframeRef}
+          srcDoc={html}
+          title="Resume preview"
+          onLoad={measurePages}
           style={{
+            border: 'none',
+            overflow: 'hidden',
             width: DESIGN_WIDTH,
-            minHeight: DESIGN_HEIGHT,
+            height: DESIGN_HEIGHT * totalPages,
             transform: `scale(${scale}) translateY(-${offset}px)`,
             transformOrigin: 'top left',
+            pointerEvents: 'none',
           }}
-        >
-          <Preview accentColor={accentColor} data={data} />
-        </div>
+        />
         {totalPages > 1 && currentPage < totalPages && (
           <div
             className="absolute left-0 right-0 bottom-0 pointer-events-none"
