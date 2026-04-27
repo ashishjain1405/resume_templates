@@ -6,6 +6,7 @@ import { TEMPLATES } from '@/lib/templates'
 import { EMPTY_RESUME, type ResumeData, type ExperienceEntry, type EducationEntry } from '@/lib/resume-data'
 import { createClient } from '@/lib/supabase'
 import ScaledPreview from '@/components/ScaledPreview'
+import SaveNameModal from '@/components/SaveNameModal'
 import type { User } from '@supabase/supabase-js'
 import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
 
@@ -126,8 +127,11 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
   const [authForDownload, setAuthForDownload] = useState(false)
   const [authForDocs, setAuthForDocs] = useState(false)
   const [docsLoading, setDocsLoading] = useState(false)
+  const [showSaveNameModal, setShowSaveNameModal] = useState(false)
+  const [saveNameDraft, setSaveNameDraft] = useState('')
 
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const previousNamesRef = useRef<Record<string, string>>({})
 
   // Load user + pro status
   useEffect(() => {
@@ -265,7 +269,7 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
     const savePending = localStorage.getItem(`save_pending_${templateId}`)
     if (savePending) {
       localStorage.removeItem(`save_pending_${templateId}`)
-      setTimeout(() => handleSaveVersion(), 0)
+      setTimeout(() => handleSaveVersion(data.personal.name || 'My Resume'), 0)
     }
     const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
     if (docsPending) {
@@ -374,7 +378,21 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
     updateData({ ...data, awards: (data.awards ?? []).map((a, i) => i === idx ? value : a) })
   }
 
-  async function handleSaveVersion(): Promise<boolean> {
+  async function fetchPreviousName(): Promise<string> {
+    if (previousNamesRef.current[templateId] !== undefined) return previousNamesRef.current[templateId]
+    try {
+      const res = await fetch('/api/resume/list')
+      const json = await res.json()
+      const match = (json.resumes ?? []).find((r: { template_id: string | null; filename: string }) => r.template_id === templateId)
+      const name = match ? match.filename.replace(/\.pdf$/i, '').replace(/_v\d+$/, '') : ''
+      previousNamesRef.current[templateId] = name
+      return name
+    } catch {
+      return ''
+    }
+  }
+
+  async function handleSaveVersion(resumeName: string): Promise<boolean> {
     if (!user) {
       const sessionSnapshot = JSON.stringify({ data, accentColor })
       sessionStorage.setItem(`builder_session_${templateId}`, sessionSnapshot)
@@ -393,11 +411,10 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
       })
       if (!res.ok) { const err = await res.text(); alert(`Could not generate resume: ${err}`); return false }
       const blob = await res.blob()
-      const base = `${data.personal.name?.replace(/\s+/g, '_') || 'resume'}_${templateId}`
-      const version = saveCount + 1
-      const versionSuffix = version > 1 ? `_v${version}` : ''
-      const name = `${base}${versionSuffix}.pdf`
-      const file = new File([blob], name, { type: 'application/pdf' })
+      const sanitized = resumeName.trim().replace(/[^a-zA-Z0-9 \-(). ]/g, '').trim() || 'My Resume'
+      const fileName = `${sanitized.replace(/\s+/g, '_')}.pdf`
+      previousNamesRef.current[templateId] = sanitized
+      const file = new File([blob], fileName, { type: 'application/pdf' })
       const form = new FormData()
       form.append('file', file)
       form.append('template_id', templateId)
@@ -760,7 +777,11 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
             </span>
           )}
           <button
-            onClick={handleSaveVersion}
+            onClick={async () => {
+              const prev = await fetchPreviousName()
+              setSaveNameDraft(prev || data.personal.name || '')
+              setShowSaveNameModal(true)
+            }}
             disabled={savingVersion}
             className="border border-gray-200 text-gray-700 text-sm px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50 flex items-center gap-1.5 flex-shrink-0"
           >
@@ -827,8 +848,10 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
               {!isPro && <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clipRule="evenodd" /></svg>}
             </button>
             <button
-              onClick={() => {
+              onClick={async () => {
                 if (isDirty) {
+                  const prev = await fetchPreviousName()
+                  setSaveNameDraft(prev || data.personal.name || '')
                   setShowChangeTemplateModal(true)
                 } else {
                   localStorage.removeItem(storageKey(templateId))
@@ -893,14 +916,24 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl relative" onClick={e => e.stopPropagation()}>
             <button onClick={() => setShowChangeTemplateModal(false)} className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Save a version before switching?</h3>
-            <p className="text-sm text-gray-500 text-center mb-5">Save your current resume to the Dashboard first, or switch without saving.</p>
+            <p className="text-sm text-gray-500 text-center mb-4">Save your current resume to the Dashboard first, or switch without saving.</p>
+            <input
+              type="text"
+              value={saveNameDraft}
+              onChange={e => setSaveNameDraft(e.target.value)}
+              placeholder="Name your resume"
+              maxLength={60}
+              disabled={savingVersion}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:opacity-60"
+            />
             <div className="flex flex-col gap-2">
               <button
                 onClick={async () => {
-                  const saved = await handleSaveVersion()
+                  if (!saveNameDraft.trim()) return
+                  const saved = await handleSaveVersion(saveNameDraft.trim())
                   if (saved) router.push('/builder')
                 }}
-                disabled={savingVersion}
+                disabled={savingVersion || !saveNameDraft.trim()}
                 className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
               >
                 {savingVersion ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Saving…</> : 'Save to Dashboard'}
@@ -957,6 +990,16 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
             </div>
           </div>
         </div>
+      )}
+
+      {/* Save name modal */}
+      {showSaveNameModal && (
+        <SaveNameModal
+          defaultName={saveNameDraft}
+          saving={savingVersion}
+          onSave={(name) => { setShowSaveNameModal(false); handleSaveVersion(name) }}
+          onCancel={() => setShowSaveNameModal(false)}
+        />
       )}
 
       {/* Google Docs loading overlay */}

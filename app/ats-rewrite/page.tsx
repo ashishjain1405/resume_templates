@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import type { ResumeData } from '@/lib/resume-data'
 import ScaledPreview from '@/components/ScaledPreview'
+import SaveNameModal from '@/components/SaveNameModal'
 
 interface RewriteResult {
   originalData: ResumeData
@@ -49,6 +50,8 @@ function ATSRewriteInner() {
   const [accepting, setAccepting] = useState(false)
   const [error, setError] = useState('')
   const [originalPdfUrl, setOriginalPdfUrl] = useState<string | null>(null)
+  const [showSaveNameModal, setShowSaveNameModal] = useState(false)
+  const [saveNameDraft, setSaveNameDraft] = useState('')
 
   useEffect(() => {
     const raw = sessionStorage.getItem('rewrite_result')
@@ -74,7 +77,7 @@ function ATSRewriteInner() {
 
   const resolvedTemplateId = templateId || data.templateId
 
-  async function handleAccept() {
+  async function handleAcceptWithName(resumeName: string) {
     if (!data) return
     setAccepting(true)
     setError('')
@@ -103,7 +106,8 @@ function ATSRewriteInner() {
       })
       if (!pdfRes.ok) { setError('Failed to generate PDF. Please try again.'); return }
       const blob = await pdfRes.blob()
-      const name = `${data.rewrittenData.personal?.name?.replace(/\s+/g, '_') || 'resume'}_${data.templateId}.pdf`
+      const sanitized = resumeName.trim().replace(/[^a-zA-Z0-9 \-(). ]/g, '').trim() || 'My Resume'
+      const name = `${sanitized.replace(/\s+/g, '_')}.pdf`
       const file = new File([blob], name, { type: 'application/pdf' })
 
       // 3. Upload new PDF with rewritten score
@@ -244,7 +248,10 @@ function ATSRewriteInner() {
           </button>
           <div className="flex flex-col items-end gap-1">
             <button
-              onClick={handleAccept}
+              onClick={() => {
+                setSaveNameDraft(data.rewrittenData.personal?.name?.trim() || '')
+                setShowSaveNameModal(true)
+              }}
               disabled={accepting}
               className="px-6 py-2.5 rounded-xl font-semibold text-sm bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-60 flex items-center gap-2"
             >
@@ -255,6 +262,15 @@ function ATSRewriteInner() {
           </div>
         </div>
       </div>
+
+      {showSaveNameModal && (
+        <SaveNameModal
+          defaultName={saveNameDraft}
+          saving={accepting}
+          onSave={(name) => { setShowSaveNameModal(false); handleAcceptWithName(name) }}
+          onCancel={() => setShowSaveNameModal(false)}
+        />
+      )}
     </div>
   )
 }
