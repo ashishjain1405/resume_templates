@@ -8,8 +8,20 @@ import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
 import { useProUpgrade } from '@/lib/use-pro-upgrade'
 import { createClient } from '@/lib/supabase'
 import { TEMPLATES } from '@/lib/templates'
-import ScaledPreview from '@/components/ScaledPreview'
-import { EMPTY_RESUME } from '@/lib/resume-data'
+
+import ClassicPreview from '@/components/resume-previews/Classic'
+import ModernPreview from '@/components/resume-previews/Modern'
+import MulticolumnPreview from '@/components/resume-previews/Multicolumn'
+import QuotationPreview from '@/components/resume-previews/Quotation'
+import ExecutivePreview from '@/components/resume-previews/Executive'
+
+const TEMPLATE_PREVIEW_MAP: Record<string, React.ComponentType<{ accentColor?: string }>> = {
+  classic: ClassicPreview,
+  modern: ModernPreview,
+  multicolumn: MulticolumnPreview,
+  quotation: QuotationPreview,
+  executive: ExecutivePreview,
+}
 
 interface ATSResult {
   overall_score: number
@@ -1259,8 +1271,8 @@ function ATSCheckInner() {
                   onClick={() => { setShowTemplatePicker(false); handleAIRewrite(t.id) }}
                   className="border border-gray-200 rounded-xl overflow-hidden hover:border-blue-400 hover:shadow-md transition-all text-left"
                 >
-                  <div className="w-full aspect-[3/4] overflow-hidden pointer-events-none">
-                    <ScaledPreview templateId={t.id} accentColor={t.colors[0]} data={EMPTY_RESUME} />
+                  <div className="w-full aspect-[3/4] overflow-hidden pointer-events-none relative">
+                    {(() => { const P = TEMPLATE_PREVIEW_MAP[t.id] ?? ClassicPreview; return <div className="absolute inset-0 origin-top"><P accentColor={t.colors[0]} /></div> })()}
                   </div>
                   <div className="px-3 py-2">
                     <div className="text-sm font-semibold text-gray-800">{t.name}</div>
