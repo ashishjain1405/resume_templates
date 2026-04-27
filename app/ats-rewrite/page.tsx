@@ -263,7 +263,7 @@ function ATSRewriteInner() {
               {accepting && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
               {accepting ? 'Saving…' : 'Save to Dashboard'}
             </button>
-            {!accepting && <p className="text-xs text-gray-400">Replaces your existing resume with the AI rewritten version</p>}
+
           </div>
         </div>
       </div>
