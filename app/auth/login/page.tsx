@@ -71,7 +71,7 @@ function LoginForm() {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
           <div className="flex justify-center mb-6">
-            <img src="/logo.png" alt="Resume Expert" className="h-24 w-24 object-contain" />
+            <img src="/logo.png" alt="Resume Expert" className="h-32 w-32 object-contain" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Welcome back</h1>
           <p className="text-gray-500 text-sm mb-6">Pick up where you left off.</p>

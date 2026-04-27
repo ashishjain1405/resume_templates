@@ -88,7 +88,7 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-          <img src="/logo.png" alt="Resume Expert" className="h-10 w-10 object-contain" />
+          <img src="/logo.png" alt="Resume Expert" className="h-20 w-20 object-contain" />
           <span className="font-bold text-gray-900 text-base">Resume Expert</span>
         </Link>
 
