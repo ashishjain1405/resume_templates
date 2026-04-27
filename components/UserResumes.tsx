@@ -213,7 +213,7 @@ export default function UserResumes({
                 </svg>
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-gray-900 truncate">{r.filename}</div>
+                <div className="text-sm font-medium text-gray-900 truncate">{r.filename.replace(/\.pdf$/i, '').replace(/_/g, ' ')}</div>
                 <div className="text-xs text-gray-400 flex items-center gap-2">
                   <span>{formatSize(r.size_bytes)} · {formatDate(r.created_at)}</span>
                   {r.ats_score != null && (
