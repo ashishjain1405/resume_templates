@@ -268,8 +268,9 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
     }
     const savePending = localStorage.getItem(`save_pending_${templateId}`)
     if (savePending) {
+      const savedName = savePending !== '1' ? savePending : (data.personal.name || 'My Resume')
       localStorage.removeItem(`save_pending_${templateId}`)
-      setTimeout(() => handleSaveVersion(data.personal.name || 'My Resume'), 0)
+      setTimeout(() => handleSaveVersion(savedName), 0)
     }
     const docsPending = localStorage.getItem(`docs_pending_${templateId}`)
     if (docsPending) {
@@ -397,7 +398,7 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
       const sessionSnapshot = JSON.stringify({ data, accentColor })
       sessionStorage.setItem(`builder_session_${templateId}`, sessionSnapshot)
       localStorage.setItem(`builder_session_restore_${templateId}`, sessionSnapshot)
-      localStorage.setItem(`save_pending_${templateId}`, '1')
+      localStorage.setItem(`save_pending_${templateId}`, resumeName || '1')
       setShowChangeTemplateModal(false)
       setShowAuthModal(true)
       return false
