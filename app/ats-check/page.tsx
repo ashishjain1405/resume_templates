@@ -106,7 +106,7 @@ function Modal({ type, onClose, userEmail }: { type: 'login_required'; onClose: 
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
           </svg>
         </div>
-        <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Save your score before you go</h3>
+        <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Create account to view your score</h3>
         <p className="text-sm text-gray-500 text-center mb-5">Sign in to save your score and review it anytime from your dashboard.</p>
         <Link href="/auth/signup?redirect=/ats-check" className="w-full block text-center bg-blue-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors">
           Sign in or create account
