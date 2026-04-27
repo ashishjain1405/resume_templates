@@ -137,6 +137,8 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
   const previousNamesRef = useRef<Record<string, string>>({})
   const saveNameTouchedRef = useRef(false)
   const pendingNavAfterSaveRef = useRef<string | null>(null)
+  const dataRef = useRef<ResumeData>(EMPTY_RESUME)
+  const accentColorRef = useRef<string>(template?.colors[0] ?? '#2c3e50')
 
   // Load user + pro status
   useEffect(() => {
@@ -187,17 +189,10 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
         if (!proFlag) {
           setIsPro(false)
           if (typeof window !== 'undefined') {
-            // Snapshot current in-memory state before clearing so the restore logic
-            // on SIGNED_IN can recover it (covers guest → login flow)
-            setData(d => {
-              setAccentColor(c => {
-                const snapshot = JSON.stringify({ data: d, accentColor: c })
-                sessionStorage.setItem(`builder_session_${templateId}`, snapshot)
-                localStorage.setItem(`builder_session_restore_${templateId}`, snapshot)
-                return c
-              })
-              return d
-            })
+            // Use refs — the closure captures initial values, refs are always current
+            const snapshot = JSON.stringify({ data: dataRef.current, accentColor: accentColorRef.current })
+            sessionStorage.setItem(`builder_session_${templateId}`, snapshot)
+            localStorage.setItem(`builder_session_restore_${templateId}`, snapshot)
             localStorage.removeItem(`resume_builder_${templateId}`)
           }
         }
@@ -344,16 +339,22 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
   }, [user, templateId])
 
   function updateData(next: ResumeData) {
+    dataRef.current = next
     setIsDirty(true)
     setData(next)
     autoSave(next, accentColor)
   }
 
   function updateColor(color: string) {
+    accentColorRef.current = color
     setIsDirty(true)
     setAccentColor(color)
     autoSave(data, color)
   }
+
+  // Keep refs in sync so stale closures (onAuthStateChange) always read current values
+  useEffect(() => { dataRef.current = data }, [data])
+  useEffect(() => { accentColorRef.current = accentColor }, [accentColor])
 
   // Gap 2: expose nav guard so Navbar can intercept navigation when there are unsaved changes
   useEffect(() => {
