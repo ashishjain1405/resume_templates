@@ -132,6 +132,7 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
 
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const previousNamesRef = useRef<Record<string, string>>({})
+  const saveNameTouchedRef = useRef(false)
 
   // Load user + pro status
   useEffect(() => {
@@ -849,11 +850,14 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
               {!isPro && <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clipRule="evenodd" /></svg>}
             </button>
             <button
-              onClick={async () => {
+              onClick={() => {
                 if (isDirty) {
-                  const prev = await fetchPreviousName()
-                  setSaveNameDraft(prev || data.personal.name || '')
+                  saveNameTouchedRef.current = false
+                  setSaveNameDraft(data.personal.name || '')
                   setShowChangeTemplateModal(true)
+                  fetchPreviousName().then(prev => {
+                    if (prev && !saveNameTouchedRef.current) setSaveNameDraft(prev)
+                  })
                 } else {
                   localStorage.removeItem(storageKey(templateId))
                   router.push('/builder')
@@ -921,7 +925,7 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
             <input
               type="text"
               value={saveNameDraft}
-              onChange={e => setSaveNameDraft(e.target.value)}
+              onChange={e => { saveNameTouchedRef.current = true; setSaveNameDraft(e.target.value) }}
               placeholder="Name your resume"
               maxLength={60}
               disabled={savingVersion}
