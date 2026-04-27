@@ -13,7 +13,7 @@ function sectionLabel(text: string, color: string) {
   return `<div style="font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:${color};border-bottom:1px solid ${color};padding-bottom:4px;margin-bottom:10px;margin-top:20px;">${text}</div>`
 }
 
-function expHtml(experience: ResumeData['experience'], bulletLimit = 3) {
+function expHtml(experience: ResumeData['experience']) {
   return experience.map(exp => `
     <div style="margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:baseline;">
@@ -21,7 +21,7 @@ function expHtml(experience: ResumeData['experience'], bulletLimit = 3) {
         <span style="font-size:9px;color:#888;">${esc(exp.startDate)}${exp.endDate ? ' – ' + esc(exp.endDate) : exp.startDate ? ' – Present' : ''}</span>
       </div>
       <div style="font-size:10px;color:#555;margin-bottom:4px;">${esc(exp.company)}</div>
-      ${exp.bullets.slice(0, bulletLimit).map(b => `<div style="font-size:10px;color:#444;margin-left:10px;margin-top:2px;">· ${esc(b)}</div>`).join('')}
+      ${exp.bullets.map(b => `<div style="font-size:10px;color:#444;margin-left:10px;margin-top:2px;">· ${esc(b)}</div>`).join('')}
     </div>
   `).join('')
 }
