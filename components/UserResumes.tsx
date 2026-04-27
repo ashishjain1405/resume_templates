@@ -23,6 +23,8 @@ interface UploadedResume {
   ats_score: number | null
   created_at: string
   template_id: string | null
+  resume_data?: object | null
+  accent_color?: string | null
 }
 
 function formatSize(bytes: number) {
@@ -226,7 +228,7 @@ export default function UserResumes({
               <div className="flex items-center gap-2 flex-shrink-0">
                 {r.template_id && (
                   <Link
-                    href={`/builder/${r.template_id}`}
+                    href={`/builder/${r.template_id}?resumeId=${r.id}`}
                     className="text-xs bg-blue-50 text-blue-600 border border-blue-100 px-2.5 py-1 rounded-lg font-medium hover:bg-blue-100 transition-colors"
                   >
                     Edit

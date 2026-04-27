@@ -113,6 +113,8 @@ CREATE TABLE IF NOT EXISTS uploaded_resumes (
 );
 -- Migration: ALTER TABLE uploaded_resumes ADD COLUMN IF NOT EXISTS ats_score INTEGER;
 -- Migration: ALTER TABLE uploaded_resumes ADD COLUMN IF NOT EXISTS template_id TEXT;
+-- Migration: ALTER TABLE uploaded_resumes ADD COLUMN IF NOT EXISTS resume_data JSONB;
+-- Migration: ALTER TABLE uploaded_resumes ADD COLUMN IF NOT EXISTS accent_color TEXT;
 
 ALTER TABLE uploaded_resumes ENABLE ROW LEVEL SECURITY;
 

@@ -119,6 +119,8 @@ function ATSRewriteInner() {
       form.append('file', file)
       form.append('template_id', data.templateId)
       form.append('ats_score', String(data.rewrittenScore.overall_score))
+      form.append('resume_data', JSON.stringify(data.rewrittenData))
+      if (data.accentColor) form.append('accent_color', data.accentColor)
       const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
       if (!uploadRes.ok) { setError('Failed to save to Dashboard. Please try again.'); return }
 

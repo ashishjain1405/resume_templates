@@ -222,6 +222,22 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
           }
         } catch {}
       } else if (user) {
+        const resumeId = searchParams.get('resumeId')
+        if (resumeId) {
+          const { data: versionRow } = await supabase
+            .from('uploaded_resumes')
+            .select('resume_data, accent_color')
+            .eq('id', resumeId)
+            .eq('user_id', user.id)
+            .maybeSingle()
+          if (versionRow?.resume_data) {
+            setData(versionRow.resume_data as ResumeData)
+            if (versionRow.accent_color) setAccentColor(versionRow.accent_color)
+            router.replace(`/builder/${templateId}`)
+            return
+          }
+          // resume_data is null (old row) — fall through to resumes table load
+        }
         const { data: row } = await supabase
           .from('resumes')
           .select('data, accent_color')
@@ -423,6 +439,8 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
       const form = new FormData()
       form.append('file', file)
       form.append('template_id', templateId)
+      form.append('resume_data', JSON.stringify(data))
+      form.append('accent_color', accentColor)
       const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
       if (!uploadRes.ok) { alert('Could not save to Dashboard. Please try again.'); return false }
       setSaveCount(c => c + 1)

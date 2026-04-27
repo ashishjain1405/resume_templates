@@ -46,6 +46,12 @@ export async function POST(request: NextRequest) {
       if (!Number.isInteger(score) || score < 0 || score > 100) return Response.json({ error: 'Invalid ats_score' }, { status: 400 })
       atsScoreValue = score
     }
+    const resumeDataRaw = form.get('resume_data') as string | null
+    const accentColorRaw = form.get('accent_color') as string | null
+    let resumeDataValue: object | undefined
+    if (resumeDataRaw) {
+      try { resumeDataValue = JSON.parse(resumeDataRaw) } catch { /* ignore invalid JSON */ }
+    }
 
     // Same-name dedup: if template_id is present, find any existing row with same (user, template, filename)
     let existingRow: { id: string; storage_path: string } | null = null
@@ -70,6 +76,8 @@ export async function POST(request: NextRequest) {
         size_bytes: file.size,
         ...(atsScoreValue !== undefined ? { ats_score: atsScoreValue } : {}),
         ...(templateIdRaw ? { template_id: templateIdRaw } : {}),
+        ...(resumeDataValue ? { resume_data: resumeDataValue } : {}),
+        ...(accentColorRaw ? { accent_color: accentColorRaw } : {}),
       })
       .select('id, filename, mime_type, size_bytes, ats_score, created_at')
       .single()
