@@ -19,13 +19,13 @@ const STEPS: { n: string; title: string; desc: string; pro?: boolean }[] = [
     n: '4',
     title: 'Book an expert review',
     pro: true,
-    desc: 'Want an expert opinion? Book a 30-minute 1:1 with a resume expert and get personalised feedback before you hit send.',
+    desc: 'Want an expert opinion? Book a 30-minute 1:1 with a resume expert and get personalised feedback.',
   },
 ]
 
 export default function HowItWorks() {
   return (
-    <section className="py-16 px-4 bg-gray-50 border-y border-gray-100">
+    <section className="py-10 px-4 bg-gray-50 border-y border-gray-100">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-2xl font-bold text-gray-900 text-center mb-10 tracking-tight">How it works</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
