@@ -157,9 +157,10 @@ export default function AIRewritePreview() {
                 {REWRITES.map((rw, i) => (
                   <p key={i} className="text-[11px] text-gray-600 leading-snug"
                     style={{
-                      textDecorationLine: 'line-through',
-                      textDecorationColor: struckIdx >= i ? 'rgba(156,163,175,1)' : 'rgba(156,163,175,0)',
-                      transition: 'text-decoration-color 400ms ease',
+                      textDecorationLine: struckIdx >= i ? 'line-through' : 'none',
+                      textDecorationColor: 'rgba(156,163,175,1)',
+                      transition: 'text-decoration-line 0s, opacity 400ms ease',
+                      opacity: struckIdx >= i ? 0.5 : 1,
                     }}
                   >{rw.original}</p>
                 ))}
@@ -218,7 +219,7 @@ export default function AIRewritePreview() {
 
           <div className="text-center mt-6">
             <Link href="/ats-check" className="inline-block bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-colors shadow-sm">
-              Try AI Re-write
+              Try AI re-write
             </Link>
           </div>
         </div>
