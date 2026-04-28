@@ -138,7 +138,7 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
                 Most resumes don&apos;t fail just because of ATS - they fail because they don&apos;t convince recruiters either. Our analyzer evaluates your resume across both ATS requirements and real hiring criteria and lets AI fix it for you in one click.
               </p>
               <ul className="space-y-2">
-                {['Instant score out of 100', 'Section-by-section breakdown', 'Unlimited AI re-write', 'Missing keyword detection', '5 actionable improvement suggestions'].map(f => (
+                {['ATS and Recruiter scores', 'Section-by-section breakdown', 'AI driven re-write', 'Missing keyword detection', '5 actionable improvement suggestions'].map(f => (
                   <li key={f} className="flex items-center gap-2 text-sm text-gray-700">
                     <Check color="green" />{f}
                   </li>
