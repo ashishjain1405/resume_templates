@@ -81,6 +81,11 @@ export default function DashboardTabs({
   const effectiveLocked = isPro ? [] : lockedTemplates
 
   const firstName = userEmail?.split('@')[0]?.split('.')[0] ?? 'there'
+  const [greeting, setGreeting] = useState('Hi')
+  useEffect(() => {
+    const h = new Date().getHours()
+    setGreeting(h >= 5 && h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening')
+  }, [])
   const atsRemaining = Math.max(0, FREE_ATS_LIMIT - atsChecksUsed)
 
   return (
@@ -116,7 +121,7 @@ export default function DashboardTabs({
 
           {/* Greeting */}
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">Good morning, {firstName}</h2>
+            <h2 className="text-xl font-semibold text-gray-900">{greeting}, {firstName}</h2>
             {isPro && (
               <span className="text-xs font-bold bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full">Pro</span>
             )}
@@ -184,7 +189,7 @@ export default function DashboardTabs({
                   )}
                 </div>
                 <Link href="/ats-check" className="mt-auto inline-flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors self-start">
-                  Run another check →
+                  {latestResume.ats_score != null ? 'Run another check →' : 'Check resume score →'}
                 </Link>
               </div>
               <div className="flex flex-col gap-3 p-6 bg-white border border-gray-200 rounded-2xl">
@@ -217,7 +222,7 @@ export default function DashboardTabs({
               </div>
               <div className="flex items-center justify-between gap-3 flex-wrap">
                 <Link href="/ats-check" className="inline-flex items-center gap-1.5 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors">
-                  Run another check →
+                  {latestResume.ats_score != null ? 'Run another check →' : 'Check resume score →'}
                 </Link>
                 <span className="text-xs text-gray-400">{atsChecksUsed} of {FREE_ATS_LIMIT} free checks used</span>
               </div>
