@@ -56,8 +56,7 @@ export async function POST(request: NextRequest) {
   </div>
   <div style="padding:32px;">
     <h1 style="font-size:22px;font-weight:700;color:#111;margin:0 0 10px;">Welcome to Pro - this is a big step.</h1>
-    <p style="font-size:15px;color:#555;line-height:1.6;margin:0 0 6px;">Seriously - most people keep putting off their resume. You didn't. That already puts you ahead.</p>
-    <p style="font-size:13px;color:#9ca3af;margin:0 0 28px;">&#8377;999 - Lifetime access - No renewals</p>
+    <p style="font-size:15px;color:#555;line-height:1.6;margin:0 0 28px;">Seriously - most people keep putting off their resume. You didn't. That already puts you ahead.</p>
     <div style="background:#f0f9ff;border-radius:10px;padding:20px;margin-bottom:24px;">
       <p style="font-size:14px;font-weight:700;color:#1e40af;margin:0 0 12px;">Here's what's yours now:</p>
       <p style="font-size:14px;color:#1e3a5f;margin:0 0 8px;line-height:1.6;">&#10003; &nbsp;Run as many resume score checks as you want - no limits</p>
