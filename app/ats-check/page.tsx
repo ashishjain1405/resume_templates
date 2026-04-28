@@ -734,6 +734,7 @@ function ATSCheckInner() {
             overall_score: result.overall_score,
             top_issues: result.top_issues,
             missing_keywords: result.missing_keywords,
+            bullet_improvements: result.bullet_improvements,
           } : undefined,
         }),
       })

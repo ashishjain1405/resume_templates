@@ -55,25 +55,30 @@ REWRITE (rewritten_resume)
 Improve content while preserving meaning.
 
 SUMMARY:
-- If present → rewrite
+- If present → rewrite to be stronger, more specific, and keyword-rich
+- If job description is provided → align with the role's language and keywords
 - If not present → keep empty
 - Never remove existing summary
 
 EXPERIENCE:
-- Rewrite bullets only if content exists
-- Keep same or fewer bullets (do NOT add new ones)
+- Rewrite bullets to use stronger action verbs and clearer impact language
+- If job description is provided → align bullet language with relevant JD keywords
+- If ATS context provides suggested bullet rewrites → apply them or improve further
+- Keep the same number of bullets — do NOT drop any, do NOT add new ones
+- If bullets are weak, combine or rewrite them, do NOT remove them
 - If paragraph text → convert only that text into bullets
-- Do NOT add new responsibilities or metrics
+- Do NOT add new responsibilities or metrics not present in the original
 
 EDUCATION:
 - Standardize formatting only
 
 SKILLS:
-- Extract all skills
+- Extract all skills from the resume
 - Remove duplicates
+- If job description or missing keywords are provided → include any that are genuinely present in the resume text but were missed
 - Group into 1–4 categories
 - Do NOT remove valid skills
-- Do NOT add new skills
+- Do NOT add skills that have no basis in the resume content
 
 ACHIEVEMENTS:
 - Include only if present in original
@@ -84,8 +89,20 @@ ACHIEVEMENTS:
 JOB DESCRIPTION (if provided)
 --------------------------------
 
-- Align wording of summary and bullets with relevant keywords
-- Do NOT add new skills or experience
+- Rewrite summary to reflect the target role's language and priorities
+- Align experience bullet wording with relevant JD keywords
+- Incorporate missing keywords naturally where the content supports it
+- Do NOT add new skills or experience not present in the original
+
+--------------------------------
+ATS IMPROVEMENT REQUIREMENT
+--------------------------------
+
+When ATS context is provided:
+- The rewritten resume MUST score higher than the original
+- Incorporate suggested bullet rewrites from the scorer — use them exactly or improve upon them
+- Naturally weave in missing keywords where the existing content supports it
+- Do NOT produce a rewrite that is weaker than the original in any section
 
 --------------------------------
 COMPARISON
@@ -292,7 +309,7 @@ export async function POST(request: NextRequest) {
       templateId: string
       resumeText: string
       jobDescription?: string
-      atsContext?: { overall_score: number; top_issues: string[]; missing_keywords: string[] }
+      atsContext?: { overall_score: number; top_issues: string[]; missing_keywords: string[]; bullet_improvements?: { original: string; improved: string }[] }
     }
 
     if (!templateId || !resumeText?.trim()) {
@@ -313,7 +330,12 @@ export async function POST(request: NextRequest) {
 
     // Step B: Call OpenAI rewrite
     const atsContextNote = atsContext
-      ? `\n\nATS CONTEXT (current score: ${atsContext.overall_score}/100):\nTop issues: ${atsContext.top_issues?.join('; ')}\nMissing keywords: ${atsContext.missing_keywords?.join(', ')}`
+      ? `\n\nATS CONTEXT (current score: ${atsContext.overall_score}/100):
+Missing keywords to naturally incorporate (from job description and role): ${atsContext.missing_keywords?.join(', ')}${
+        atsContext.bullet_improvements?.length
+          ? `\nSuggested bullet rewrites from scorer (MUST use these or stronger versions):\n${atsContext.bullet_improvements.map(b => `  Original: "${b.original}"\n  Use: "${b.improved}"`).join('\n')}`
+          : ''
+      }`
       : ''
 
     const userPrompt = jobDescription?.trim()
