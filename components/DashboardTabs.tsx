@@ -84,7 +84,7 @@ export default function DashboardTabs({
   const [greeting, setGreeting] = useState('Hi')
   useEffect(() => {
     const h = new Date().getHours()
-    setGreeting(h >= 5 && h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening')
+    setGreeting(h >= 5 && h < 12 ? 'Good morning' : h >= 12 && h < 17 ? 'Good afternoon' : 'Good evening')
   }, [])
   const atsRemaining = Math.max(0, FREE_ATS_LIMIT - atsChecksUsed)
 
@@ -458,7 +458,7 @@ export default function DashboardTabs({
             </div>
             <div>
               <h2 className="text-base font-bold text-gray-900 mb-0.5">My Resumes</h2>
-              <p className="text-sm text-gray-500">Upload your existing resume to run an ATS check or edit it in Google Docs. Files are stored securely and only accessible by you.</p>
+              <p className="text-sm text-gray-500">Upload your resume to see how it scores and let AI fix it for you. Your files are stored securely and only visible to you.</p>
             </div>
           </div>
           <UserResumes
