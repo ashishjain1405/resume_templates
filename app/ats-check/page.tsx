@@ -159,7 +159,6 @@ function ATSCheckInner() {
   const [saveCount, setSaveCount] = useState(0)
   const [showSaveModal, setShowSaveModal] = useState(false)
   const [resultRestored, setResultRestored] = useState(false)
-  const [debugInfo, setDebugInfo] = useState<string | null>(null)
   const [pendingNavUrl, setPendingNavUrl] = useState<string | null>(null)
   const [builderTemplateId, setBuilderTemplateId] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
@@ -514,10 +513,13 @@ function ATSCheckInner() {
     setResult(null)
     try {
       const form = new FormData()
+      let fileBuffer: ArrayBuffer | null = null
       if (currentTab === 'upload' && currentFile) {
-        // Parse PDF text in the browser — avoids server-side WASM cold start on mobile
+        // Read bytes first — on Android Chrome the File handle can become unreadable
+        // after extractPdfText consumes it via arrayBuffer().
+        fileBuffer = await currentFile.arrayBuffer()
         try {
-          const text = await extractPdfText(currentFile)
+          const text = await extractPdfText(new Blob([fileBuffer], { type: 'application/pdf' }))
           if (!text.trim()) { setError('Could not read text from this PDF. Please try pasting the text instead.'); return }
           setResumeTextSync(text)
           form.append('resumeText', text)
@@ -629,22 +631,15 @@ function ATSCheckInner() {
       if (atsResult._usage) setUsage(atsResult._usage)
       // Upload file to storage after analysis so resumeId is ready for AI Re-write iframe.
       // Non-blocking — does not affect result display.
-      const dbg = { tab: currentTab, hasFile: !!currentFile, fileSize: currentFile?.size ?? 0, refId: selectedResumeIdRef.current, entered: false, status: '', response: '' }
-      if (currentTab === 'upload' && currentFile && !selectedResumeIdRef.current) {
-        dbg.entered = true
+      if (currentTab === 'upload' && fileBuffer && !selectedResumeIdRef.current) {
+        const uploadFile = new File([fileBuffer], currentFile?.name ?? 'resume.pdf', { type: 'application/pdf' })
         const uploadForm = new FormData()
-        uploadForm.append('file', currentFile)
+        uploadForm.append('file', uploadFile)
         if (atsResult.overall_score != null) uploadForm.append('ats_score', String(atsResult.overall_score))
         fetch('/api/resume/upload', { method: 'POST', body: uploadForm })
-          .then(r => { dbg.status = String(r.status); return r.json() })
-          .then(d => {
-            dbg.response = JSON.stringify(d).slice(0, 200)
-            setDebugInfo(JSON.stringify(dbg))
-            if (d.resume?.id) { setResumeId(d.resume.id); setSaveCount(1) }
-          })
-          .catch(err => { dbg.response = String(err); setDebugInfo(JSON.stringify(dbg)) })
-      } else {
-        setDebugInfo(JSON.stringify(dbg))
+          .then(r => r.json())
+          .then(d => { if (d.resume?.id) { setResumeId(d.resume.id); setSaveCount(1) } })
+          .catch(() => { /* non-blocking */ })
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.')
@@ -1100,12 +1095,6 @@ function ATSCheckInner() {
                 </div>
               </div>
               {[1,2,3,4].map(i => <div key={i} className="h-3 bg-gray-100 rounded" />)}
-            </div>
-          )}
-
-          {debugInfo && (
-            <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-3 text-xs font-mono text-yellow-900 break-all">
-              <strong>DEBUG auto-save:</strong> {debugInfo}
             </div>
           )}
 
