@@ -506,15 +506,16 @@ function ATSCheckInner() {
   }
 
   async function handleAnalyse() {
+    const currentFile = file
     setError('')
     setLoading(true)
     setResult(null)
     try {
       const form = new FormData()
-      if (tab === 'upload' && file) {
+      if (tab === 'upload' && currentFile) {
         // Parse PDF text in the browser — avoids server-side WASM cold start on mobile
         try {
-          const text = await extractPdfText(file)
+          const text = await extractPdfText(currentFile)
           if (!text.trim()) { setError('Could not read text from this PDF. Please try pasting the text instead.'); return }
           setResumeTextSync(text)
           form.append('resumeText', text)
@@ -563,21 +564,21 @@ function ATSCheckInner() {
             const payload = JSON.stringify({ tab: 'paste', resumeText, jobDescription })
             sessionStorage.setItem(STORAGE_KEY, payload)
             localStorage.setItem(STORAGE_KEY, payload)
-          } else if (tab === 'upload' && file) {
+          } else if (tab === 'upload' && currentFile) {
             const reader = new FileReader()
             reader.onload = () => {
               const payload = JSON.stringify({
                 tab: 'upload',
                 jobDescription,
                 fileData: reader.result as string,
-                fileName: file.name,
-                fileType: file.type,
+                fileName: currentFile.name,
+                fileType: currentFile.type,
               })
               sessionStorage.setItem(STORAGE_KEY, payload)
               localStorage.setItem(STORAGE_KEY, payload)
               setModal('login_required')
             }
-            reader.readAsDataURL(file)
+            reader.readAsDataURL(currentFile)
             return
           }
           setModal('login_required')
@@ -595,10 +596,10 @@ function ATSCheckInner() {
             sessionStorage.setItem(STORAGE_KEY, payload)
             localStorage.setItem(STORAGE_KEY, payload)
             setModal('pro_required')
-          } else if (tab === 'upload' && file) {
+          } else if (tab === 'upload' && currentFile) {
             // Upload file to storage so we have a stable resumeId for post-payment restore
             const uploadForm = new FormData()
-            uploadForm.append('file', file)
+            uploadForm.append('file', currentFile)
             const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: uploadForm })
             const uploadData = await uploadRes.json()
             const resumeId = uploadData.resume?.id ?? null
@@ -626,9 +627,9 @@ function ATSCheckInner() {
       if (atsResult._usage) setUsage(atsResult._usage)
       // Upload file to storage after analysis so resumeId is ready for AI Re-write iframe.
       // Non-blocking — does not affect result display.
-      if (tab === 'upload' && file && !selectedResumeIdRef.current) {
+      if (tab === 'upload' && currentFile && !selectedResumeIdRef.current) {
         const uploadForm = new FormData()
-        uploadForm.append('file', file)
+        uploadForm.append('file', currentFile)
         if (atsResult.overall_score != null) uploadForm.append('ats_score', String(atsResult.overall_score))
         fetch('/api/resume/upload', { method: 'POST', body: uploadForm })
           .then(r => r.json())
