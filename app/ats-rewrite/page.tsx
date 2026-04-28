@@ -7,12 +7,18 @@ import type { ResumeData } from '@/lib/resume-data'
 import ScaledPreview from '@/components/ScaledPreview'
 import SaveNameModal from '@/components/SaveNameModal'
 
+interface ComparisonData {
+  summary?: { original: string; rewritten: string }
+  experience?: { company: string; role: string; bullets: { original: string; rewritten: string }[] }[]
+  achievements?: { original: string; rewritten: string }[]
+}
+
 interface RewriteResult {
   originalData: ResumeData
   originalScore: { overall_score: number; ats_score: number; recruiter_score: number }
   rewrittenData: ResumeData
   rewrittenScore: { overall_score: number; ats_score: number; recruiter_score: number }
-  comparison: unknown
+  comparison: ComparisonData
   keyChanges: string[]
   accentColor: string
   templateId: string
@@ -53,6 +59,7 @@ function ATSRewriteInner() {
   const [originalFilename, setOriginalFilename] = useState<string | null>(null)
   const [showSaveNameModal, setShowSaveNameModal] = useState(false)
   const [saveNameDraft, setSaveNameDraft] = useState('')
+  const [showChanges, setShowChanges] = useState(false)
 
   useEffect(() => {
     const raw = sessionStorage.getItem('rewrite_result')
@@ -140,12 +147,47 @@ function ATSRewriteInner() {
   const rewScore = data.rewrittenScore
   const scoreDiff = rewScore.overall_score - origScore.overall_score
 
+  const comparison = data.comparison ?? {}
+  const hasComparison = !!(
+    (comparison.summary?.original && comparison.summary?.rewritten) ||
+    comparison.experience?.length ||
+    comparison.achievements?.length
+  )
+
+  function openSaveModal() {
+    setSaveNameDraft(
+      (data!.isUploadedResume && originalFilename)
+        ? originalFilename
+        : (data!.rewrittenData.personal?.name?.trim() || '')
+    )
+    setShowSaveNameModal(true)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-5xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">AI Resume Re-write</h1>
-          <p className="text-sm text-gray-500 mt-1">Review the changes and save the AI rewritten version to your dashboard.</p>
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">AI Resume Re-write</h1>
+            <p className="text-sm text-gray-500 mt-1">Review the changes and save the AI rewritten version to your dashboard.</p>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={handleReject}
+              disabled={accepting}
+              className="px-6 py-2.5 rounded-xl font-semibold text-sm border border-gray-200 text-gray-700 bg-white hover:bg-gray-50 transition-colors disabled:opacity-50"
+            >
+              Discard
+            </button>
+            <button
+              onClick={openSaveModal}
+              disabled={accepting}
+              className="px-6 py-2.5 rounded-xl font-semibold text-sm bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-60 flex items-center gap-2"
+            >
+              {accepting && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+              {accepting ? 'Saving…' : 'Save to Dashboard'}
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -223,6 +265,90 @@ function ATSRewriteInner() {
           </div>
         </div>
 
+        {/* What changed — collapsible */}
+        {hasComparison && (
+          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+            <button
+              onClick={() => setShowChanges(v => !v)}
+              className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-50 transition-colors"
+            >
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">What Changed</span>
+              <svg className={`w-4 h-4 text-gray-400 transition-transform ${showChanges ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {showChanges && (
+              <div className="px-5 pb-5 space-y-6 border-t border-gray-100">
+
+                {/* Summary */}
+                {comparison.summary?.original && comparison.summary?.rewritten && comparison.summary.original !== comparison.summary.rewritten && (
+                  <div className="pt-4">
+                    <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Summary</div>
+                    <div className="space-y-2">
+                      <div className="bg-gray-50 rounded-lg px-4 py-3 text-sm text-gray-500 leading-relaxed">
+                        <span className="text-[10px] font-bold uppercase tracking-wide text-gray-400 block mb-1">Before</span>
+                        {comparison.summary.original}
+                      </div>
+                      <div className="bg-blue-50 rounded-lg px-4 py-3 text-sm text-blue-900 leading-relaxed">
+                        <span className="text-[10px] font-bold uppercase tracking-wide text-blue-400 block mb-1">After</span>
+                        {comparison.summary.rewritten}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Experience bullets */}
+                {comparison.experience?.map((exp, ei) => (
+                  exp.bullets?.length > 0 && (
+                    <div key={ei} className={ei === 0 && !comparison.summary ? 'pt-4' : ''}>
+                      <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
+                        {exp.role} — {exp.company}
+                      </div>
+                      <div className="space-y-3">
+                        {exp.bullets.map((b, bi) => (
+                          <div key={bi} className="space-y-1.5">
+                            <div className="bg-gray-50 rounded-lg px-4 py-2.5 text-sm text-gray-500 leading-relaxed">
+                              <span className="text-[10px] font-bold uppercase tracking-wide text-gray-400 block mb-1">Before</span>
+                              {b.original}
+                            </div>
+                            <div className="bg-blue-50 rounded-lg px-4 py-2.5 text-sm text-blue-900 leading-relaxed">
+                              <span className="text-[10px] font-bold uppercase tracking-wide text-blue-400 block mb-1">After</span>
+                              {b.rewritten}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                ))}
+
+                {/* Achievements */}
+                {comparison.achievements?.length ? (
+                  <div>
+                    <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Achievements</div>
+                    <div className="space-y-3">
+                      {comparison.achievements.map((a, ai) => (
+                        <div key={ai} className="space-y-1.5">
+                          <div className="bg-gray-50 rounded-lg px-4 py-2.5 text-sm text-gray-500 leading-relaxed">
+                            <span className="text-[10px] font-bold uppercase tracking-wide text-gray-400 block mb-1">Before</span>
+                            {a.original}
+                          </div>
+                          <div className="bg-blue-50 rounded-lg px-4 py-2.5 text-sm text-blue-900 leading-relaxed">
+                            <span className="text-[10px] font-bold uppercase tracking-wide text-blue-400 block mb-1">After</span>
+                            {a.rewritten}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Key changes */}
         {data.keyChanges?.length > 0 && (
           <div className="bg-white rounded-2xl border border-gray-200 p-5">
@@ -247,24 +373,14 @@ function ATSRewriteInner() {
           >
             Discard
           </button>
-          <div className="flex flex-col items-end gap-1">
-            <button
-              onClick={() => {
-                setSaveNameDraft(
-                  (data.isUploadedResume && originalFilename)
-                    ? originalFilename
-                    : (data.rewrittenData.personal?.name?.trim() || '')
-                )
-                setShowSaveNameModal(true)
-              }}
-              disabled={accepting}
-              className="px-6 py-2.5 rounded-xl font-semibold text-sm bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-60 flex items-center gap-2"
-            >
-              {accepting && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-              {accepting ? 'Saving…' : 'Save to Dashboard'}
-            </button>
-
-          </div>
+          <button
+            onClick={openSaveModal}
+            disabled={accepting}
+            className="px-6 py-2.5 rounded-xl font-semibold text-sm bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-60 flex items-center gap-2"
+          >
+            {accepting && <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+            {accepting ? 'Saving…' : 'Save to Dashboard'}
+          </button>
         </div>
       </div>
 

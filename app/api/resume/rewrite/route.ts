@@ -146,7 +146,8 @@ Return ONLY valid JSON in this exact structure, no markdown, no extra text:
   },
   "comparison": {
     "summary": { "original": "string", "rewritten": "string" },
-    "experience": [{ "company": "string", "role": "string", "bullets": [{ "original": "string", "rewritten": "string" }] }]
+    "experience": [{ "company": "string", "role": "string", "bullets": [{ "original": "string", "rewritten": "string" }] }],
+    "achievements": [{ "original": "string", "rewritten": "string" }]
   },
   "key_changes": ["string"]
 }`
@@ -373,6 +374,7 @@ Missing keywords to naturally incorporate (from job description and role): ${ats
       comparison: {
         summary: { original: string; rewritten: string }
         experience: { company: string; role: string; bullets: { original: string; rewritten: string }[] }[]
+        achievements?: { original: string; rewritten: string }[]
       }
       key_changes: string[]
     }
