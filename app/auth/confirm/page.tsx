@@ -24,7 +24,14 @@ export default function ConfirmPage() {
           return
         }
         setStatus('success')
-        fetch('/api/email/welcome', { method: 'POST' }).catch(() => {})
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user?.email) {
+          fetch('/api/email/welcome', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: user.email }),
+          }).catch(() => {})
+        }
         setTimeout(() => { window.location.href = redirect }, 2000)
         return
       }

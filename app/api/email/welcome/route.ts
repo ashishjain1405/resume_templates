@@ -1,11 +1,10 @@
-import { createClient } from '@/lib/supabase-server'
+import { NextRequest } from 'next/server'
 import { resend, FROM } from '@/lib/resend'
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user?.email) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    const { email } = await request.json()
+    if (!email) return Response.json({ error: 'Missing email' }, { status: 400 })
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
 
@@ -39,7 +38,7 @@ export async function POST() {
 
     const { error: emailError } = await resend.emails.send({
       from: FROM,
-      to: user.email,
+      to: email,
       subject: 'Welcome to Resume Expert - here\'s how to start',
       html,
     })
