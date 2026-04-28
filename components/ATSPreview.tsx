@@ -65,7 +65,8 @@ export default function ATSPreview() {
             <div className="flex items-center gap-5">
               <MiniRing score={58} />
               <div>
-                <div className="text-base font-bold text-gray-900 mb-1">Needs improvement</div>
+                <div className="text-base font-bold text-gray-900 mb-0.5">Almost There</div>
+                <div className="text-xs text-gray-500 mb-1">A few improvements can boost results</div>
                 <div className="flex gap-3">
                   <div>
                     <div className="text-[10px] text-gray-400 uppercase tracking-wide font-medium">ATS</div>

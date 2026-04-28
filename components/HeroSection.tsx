@@ -148,8 +148,11 @@ function ATSAnimation() {
               </div>
             </div>
             <div>
-              <div className="text-xs lg:text-sm font-bold text-gray-900 mb-1 lg:mb-1.5">
-                {score >= 75 ? 'Strong resume' : score >= 50 ? 'Needs improvement' : 'Significant gaps'}
+              <div className="text-xs lg:text-sm font-bold text-gray-900 mb-0.5 lg:mb-1">
+                {score >= 75 ? 'Interview Ready' : score >= 50 ? 'Almost There' : 'Needs Attention'}
+              </div>
+              <div className="text-[9px] lg:text-xs text-gray-500 mb-1 lg:mb-1.5">
+                {score >= 75 ? 'Your resume is performing strongly' : score >= 50 ? 'A few improvements can boost results' : 'Critical improvements are recommended'}
               </div>
               <div className="flex gap-2 lg:gap-3">
                 <div>

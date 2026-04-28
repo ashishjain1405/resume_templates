@@ -161,7 +161,7 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
                   </div>
                 </div>
                 <div>
-                  <div className="text-sm font-bold text-gray-900">Strong resume</div>
+                  <div className="text-sm font-bold text-gray-900">Interview Ready</div>
                   <div className="text-xs text-gray-400 mt-0.5">Resume Score</div>
                 </div>
               </div>
