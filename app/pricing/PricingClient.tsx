@@ -138,7 +138,7 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
                 Most resumes don&apos;t fail just because of ATS - they fail because they don&apos;t convince recruiters either. Our analyzer evaluates your resume across both ATS requirements and real hiring criteria and lets AI fix it for you in one click.
               </p>
               <ul className="space-y-2">
-                {['Instant score out of 100', 'Section-by-section breakdown', 'Missing keyword detection', '5 actionable improvement suggestions', 'Paste text or upload PDF'].map(f => (
+                {['Instant score out of 100', 'Section-by-section breakdown', 'Unlimited AI re-write', 'Missing keyword detection', '5 actionable improvement suggestions'].map(f => (
                   <li key={f} className="flex items-center gap-2 text-sm text-gray-700">
                     <Check color="green" />{f}
                   </li>
@@ -176,9 +176,18 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
                   </div>
                 </div>
               ))}
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                {['Leadership', 'Agile', 'SQL'].map(kw => (
-                  <span key={kw} className="bg-red-50 text-red-600 border border-red-100 text-xs px-2 py-0.5 rounded-full">{kw}</span>
+              <div className="space-y-3 pt-1">
+                <div className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">AI Re-write</div>
+                {[
+                  { original: 'Responsible for managing a team of 5 engineers', improved: 'Led 5-engineer team delivering 3 features on time, reducing backlog by 40%' },
+                  { original: 'Worked on improving application performance', improved: 'Optimised API response time by 35% (800ms → 520ms) via query indexing' },
+                ].map((rw, i) => (
+                  <div key={i} className="text-xs space-y-1">
+                    <p className="text-gray-400 line-through leading-snug">{rw.original}</p>
+                    <p className="text-gray-800 leading-snug flex gap-1.5">
+                      <span className="text-green-500 font-bold flex-shrink-0">→</span>{rw.improved}
+                    </p>
+                  </div>
                 ))}
               </div>
             </div>
