@@ -45,7 +45,7 @@ export default function HomePage() {
       {/* 3. ATS score preview */}
       <ATSPreview />
 
-      {/* 4. AI Re-write preview */}
+      {/* 4. AI re-write preview */}
       <AIRewritePreview />
 
       {/* 5. Pro upgrade section */}
@@ -64,8 +64,14 @@ export default function HomePage() {
               </div>
               <div>
                 <div className="text-xl font-black text-blue-600 mb-0.5">Unlimited</div>
-                <div className="text-sm font-semibold text-gray-800 mb-1">Resume scoring & AI Re-write</div>
-                <p className="text-xs text-gray-500 leading-relaxed">Check your score as many times as you need - and let AI rewrite your resume to fix what&apos;s holding you back.</p>
+                <div className="text-sm font-semibold text-gray-800 mb-1">Resume scoring & AI re-write</div>
+                <p className="text-xs text-gray-500 leading-relaxed">Check your score as many times as you need - and let AI re-write your resume to fix what&apos;s holding you back.</p>
+                <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2">
+                  <span className="text-[10px] text-green-600 font-medium">Interview Ready</span>
+                  <span className="text-[10px] text-amber-600 font-medium">Almost There</span>
+                  <span className="text-[10px] text-red-500 font-medium">Needs Attention</span>
+                </div>
+                <p className="text-[10px] text-gray-400 mt-1">Score bands with actionable subtext so you know exactly where you stand.</p>
               </div>
             </div>
 

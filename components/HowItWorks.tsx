@@ -11,8 +11,8 @@ const STEPS: { n: string; title: string; desc: string; pro?: boolean }[] = [
   },
   {
     n: '3',
-    title: 'Let AI rewrite it',
-    desc: 'One click and AI rewrites your bullets - stronger, more specific, ATS-optimised. Download and apply.',
+    title: 'Let AI re-write it',
+    desc: 'One click and AI re-writes your bullets - stronger, more specific, ATS-optimised. Download and apply.',
     pro: true,
   },
   {

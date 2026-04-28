@@ -103,9 +103,9 @@ export default function ATSPreview() {
               </ul>
             </div>
 
-            {/* Suggested Rewrites */}
+            {/* Suggested re-writes */}
             <div>
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Suggested Rewrites</div>
+              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Suggested re-writes</div>
               <div className="space-y-4">
                 {REWRITES.map((r, i) => (
                   <div key={i} className="text-sm space-y-1.5">

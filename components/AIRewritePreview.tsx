@@ -127,7 +127,7 @@ export default function AIRewritePreview() {
     <section ref={sectionRef} className="py-16 px-4 bg-white">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-10">
-          <h2 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">AI Re-write - before &amp; after</h2>
+          <h2 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">AI re-write - before &amp; after</h2>
           <p className="text-gray-500 text-sm">See your bullets transform with one click.</p>
         </div>
 
@@ -170,7 +170,7 @@ export default function AIRewritePreview() {
             <div className="bg-blue-50 rounded-2xl border border-blue-200 overflow-hidden">
               <div className="px-4 py-3 border-b border-blue-100">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="bg-blue-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">AI Re-write</span>
+                  <span className="bg-blue-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">AI re-write</span>
                   <span
                     className="text-xs font-black px-2 py-0.5 rounded-full bg-green-100 text-green-700"
                     style={{ opacity: badgeVisible ? 1 : 0, transform: badgeVisible ? 'scale(1)' : 'scale(0.8)', transition: 'opacity 0.3s ease, transform 0.3s ease' }}

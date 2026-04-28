@@ -222,7 +222,7 @@ function ATSAnimation() {
             : { zIndex: 0, opacity: 0, pointerEvents: 'none' }}
         >
           <div className="flex items-center justify-between mb-2 lg:mb-3">
-            <span className="text-[9px] lg:text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 lg:px-2.5 lg:py-1 rounded-full">AI Re-write</span>
+            <span className="text-[9px] lg:text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 lg:px-2.5 lg:py-1 rounded-full">AI re-write</span>
             <span className="text-[9px] lg:text-[11px] font-medium text-green-600">✓ Done</span>
           </div>
           <div className="space-y-2.5 lg:space-y-4">
@@ -256,7 +256,7 @@ export default function HeroSection() {
               <span className="text-blue-600">Hire-ready.</span>
             </h1>
             <p className="text-gray-500 text-base mb-5 leading-relaxed">
-              Upload your resume, get an instant score, and let AI rewrite it to land more interviews. Free to start.
+              Upload your resume, get an instant score, and let AI re-write it to land more interviews.
             </p>
             <div className="flex flex-col gap-3">
               <Link href="/ats-check" className="w-full text-center bg-blue-600 text-white py-3.5 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-sm">
