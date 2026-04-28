@@ -507,12 +507,13 @@ function ATSCheckInner() {
 
   async function handleAnalyse() {
     const currentFile = file
+    const currentTab = tab
     setError('')
     setLoading(true)
     setResult(null)
     try {
       const form = new FormData()
-      if (tab === 'upload' && currentFile) {
+      if (currentTab === 'upload' && currentFile) {
         // Parse PDF text in the browser — avoids server-side WASM cold start on mobile
         try {
           const text = await extractPdfText(currentFile)
@@ -523,7 +524,7 @@ function ATSCheckInner() {
           setError('Could not parse this PDF. Please try pasting the text instead.')
           return
         }
-      } else if (tab === 'saved' && selectedResumeId) {
+      } else if (currentTab === 'saved' && selectedResumeId) {
         // Fetch signed URL, download file, parse in browser
         const urlRes = await fetch(`/api/resume/${selectedResumeId}`)
         const urlData = await urlRes.json()
@@ -548,7 +549,7 @@ function ATSCheckInner() {
       try {
         res = await fetch('/api/ats-check', { method: 'POST', body: form })
       } catch {
-        if (tab === 'upload') {
+        if (currentTab === 'upload') {
           setError('PDF upload failed. Please try pasting your resume text instead.')
         } else {
           setError('Could not reach the server. Please check your connection and try again.')
@@ -560,11 +561,11 @@ function ATSCheckInner() {
       try { data = JSON.parse(raw) } catch { /* non-JSON */ }
       if (!res.ok) {
         if (res.status === 401) {
-          if (tab === 'paste' && resumeText.trim()) {
+          if (currentTab === 'paste' && resumeText.trim()) {
             const payload = JSON.stringify({ tab: 'paste', resumeText, jobDescription })
             sessionStorage.setItem(STORAGE_KEY, payload)
             localStorage.setItem(STORAGE_KEY, payload)
-          } else if (tab === 'upload' && currentFile) {
+          } else if (currentTab === 'upload' && currentFile) {
             const reader = new FileReader()
             reader.onload = () => {
               const payload = JSON.stringify({
@@ -586,17 +587,17 @@ function ATSCheckInner() {
           // Save pending state so analysis auto-re-runs after payment reload.
           // For upload tab: upload file to storage now so resumeId survives reload
           // and Edit in Google Docs can reference it.
-          if (tab === 'paste' && resumeText.trim()) {
+          if (currentTab === 'paste' && resumeText.trim()) {
             const payload = JSON.stringify({ tab: 'paste', resumeText, jobDescription })
             sessionStorage.setItem(STORAGE_KEY, payload)
             localStorage.setItem(STORAGE_KEY, payload)
             setModal('pro_required')
-          } else if ((tab === 'saved' || tab === 'upload') && selectedResumeId) {
+          } else if ((currentTab === 'saved' || currentTab === 'upload') && selectedResumeId) {
             const payload = JSON.stringify({ tab: 'saved', selectedResumeId, jobDescription })
             sessionStorage.setItem(STORAGE_KEY, payload)
             localStorage.setItem(STORAGE_KEY, payload)
             setModal('pro_required')
-          } else if (tab === 'upload' && currentFile) {
+          } else if (currentTab === 'upload' && currentFile) {
             // Upload file to storage so we have a stable resumeId for post-payment restore
             const uploadForm = new FormData()
             uploadForm.append('file', currentFile)
@@ -627,7 +628,7 @@ function ATSCheckInner() {
       if (atsResult._usage) setUsage(atsResult._usage)
       // Upload file to storage after analysis so resumeId is ready for AI Re-write iframe.
       // Non-blocking — does not affect result display.
-      if (tab === 'upload' && currentFile && !selectedResumeIdRef.current) {
+      if (currentTab === 'upload' && currentFile && !selectedResumeIdRef.current) {
         const uploadForm = new FormData()
         uploadForm.append('file', currentFile)
         if (atsResult.overall_score != null) uploadForm.append('ats_score', String(atsResult.overall_score))
