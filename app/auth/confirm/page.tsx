@@ -40,6 +40,13 @@ export default function ConfirmPage() {
       const { data } = await supabase.auth.getUser()
       if (data.user) {
         setStatus('success')
+        if (data.user.email) {
+          await fetch('/api/email/welcome', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: data.user.email }),
+          }).catch(() => {})
+        }
         setTimeout(() => { window.location.href = redirect }, 2000)
       } else {
         setStatus('error')
