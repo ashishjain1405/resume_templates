@@ -3,7 +3,7 @@ import { createClient, createAdminClient } from '@/lib/supabase-server'
 import { isPro } from '@/lib/pro'
 import { getAvailableSlots, createBookingEvent, deleteBookingEvent } from '@/lib/google-calendar'
 import { checkRateLimit } from '@/lib/rate-limit'
-import { Resend } from 'resend'
+import { resend, FROM } from '@/lib/resend'
 
 export async function POST(request: NextRequest) {
   try {
@@ -62,13 +62,12 @@ export async function POST(request: NextRequest) {
 
     // Notify expert by email
     try {
-      const resend = new Resend(process.env.RESEND_API_KEY)
       const scheduledDate = new Date(start).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'full', timeStyle: 'short' })
       const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
       const safeName = esc(userName || 'Not provided')
       const safeEmail = esc(user.email ?? '')
       const { data: emailData, error: emailError } = await resend.emails.send({
-        from: 'onboarding@resend.dev',
+        from: FROM,
         to: process.env.EXPERT_EMAIL!,
         subject: `New session booked — ${userName || user.email}`,
         html: `<p>A new resume session has been booked.</p>

@@ -72,6 +72,11 @@ function SignupForm() {
       setError(error.message)
     } else {
       setMessage('Check your inbox! We\'ve sent you a link to get started.')
+      fetch('/api/auth/send-confirmation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, redirect }),
+      }).catch(() => {})
     }
     setLoading(false)
   }

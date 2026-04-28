@@ -24,6 +24,7 @@ export default function ConfirmPage() {
           return
         }
         setStatus('success')
+        fetch('/api/email/welcome', { method: 'POST' }).catch(() => {})
         setTimeout(() => { window.location.href = redirect }, 2000)
         return
       }
