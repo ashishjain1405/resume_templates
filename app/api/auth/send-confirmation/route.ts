@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
 
     const adminClient = await createAdminClient()
     const { data, error } = await adminClient.auth.admin.generateLink({
-      type: 'signup',
+      type: 'magiclink',
       email,
       options: { redirectTo },
     })

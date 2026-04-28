@@ -76,7 +76,7 @@ function SignupForm() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, redirect }),
-      }).catch(() => {})
+      }).then(r => r.json()).then(d => { if (d.error) console.error('send-confirmation:', d.error) }).catch(console.error)
     }
     setLoading(false)
   }
