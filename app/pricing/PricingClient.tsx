@@ -162,7 +162,7 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
                 </div>
                 <div>
                   <div className="text-sm font-bold text-gray-900">Interview Ready</div>
-                  <div className="text-xs text-gray-400 mt-0.5">Resume Score</div>
+                  <div className="text-xs text-gray-400 mt-0.5">Your resume is performing strongly</div>
                 </div>
               </div>
               {[['Keyword Matching', 78, 'bg-amber-500'], ['Formatting & Structure', 92, 'bg-green-500'], ['Measurable Achievements', 70, 'bg-amber-500']].map(([label, score, color]) => (
