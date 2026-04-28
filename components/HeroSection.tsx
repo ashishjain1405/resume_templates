@@ -84,17 +84,15 @@ function ATSAnimation() {
 
   useEffect(() => {
     if (!done) return
-    const t1 = setTimeout(() => setStage(1), 800)
-    const t2 = setTimeout(() => setStage(2), 800 + 600 + 2500)
-    const t3 = setTimeout(() => reset(), 800 + 600 + 2500 + 600 + 3000)
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
+    const t1 = setTimeout(() => setStage(1), 1200)
+    const t2 = setTimeout(() => reset(), 1200 + 600 + 3500)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [done])
 
   const fill = started ? circ - (score / 100) * circ : circ
   const ringColor = score >= 75 ? '#16a34a' : score >= 50 ? '#d97706' : '#dc2626'
 
-  const card1Bars = BARS.slice(0, isMobile ? 2 : 3)
-  const card2Bars = BARS.slice(0, isMobile ? 3 : 5)
+  const card1Bars = BARS.slice(0, isMobile ? 3 : 5)
   const rewrites = REWRITES
 
   return (
@@ -111,6 +109,10 @@ function ATSAnimation() {
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(5px); }
           to   { opacity: 1; transform: none; }
+        }
+        @keyframes badgeGlow {
+          0%, 100% { box-shadow: 0 0 4px 1px rgba(59,130,246,0.3); }
+          50% { box-shadow: 0 0 10px 3px rgba(59,130,246,0.5); }
         }
       `}</style>
 
@@ -185,50 +187,22 @@ function ATSAnimation() {
           </div>
         </div>
 
-        {/* Card 2 — Section Breakdown */}
+        {/* Card 2 — AI re-write */}
         <div
           className={CARD_STYLE}
           style={stage === 1
             ? { zIndex: 2, animation: 'cardSlideFront 0.6s cubic-bezier(0.4,0,0.2,1) forwards' }
-            : stage > 1
-              ? { zIndex: 0, animation: 'cardSlideBack 0.6s cubic-bezier(0.4,0,0.2,1) forwards', opacity: 0, pointerEvents: 'none' }
-              : { zIndex: 0, opacity: 0, pointerEvents: 'none' }}
-        >
-          <div className="flex items-center justify-between mb-2 lg:mb-3">
-            <span className="text-[9px] lg:text-[11px] font-semibold text-green-700 bg-green-50 px-2 py-0.5 lg:px-2.5 lg:py-1 rounded-full">Section Breakdown</span>
-            <span className="text-[9px] lg:text-[11px] font-medium text-green-600">✓ Done</span>
-          </div>
-          <div className="space-y-1.5 lg:space-y-2.5">
-            {card2Bars.map((bar, i) => (
-              <div key={bar.label}>
-                <div className="flex justify-between text-[9px] lg:text-[11px] mb-0.5">
-                  <span className="text-gray-600 font-medium">{bar.label}</span>
-                  <span className="text-gray-400">{bar.value}</span>
-                </div>
-                <div className="h-1 lg:h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div className={`h-full ${bar.color} rounded-full`}
-                    style={{ width: stage >= 1 ? `${bar.value}%` : '0%', transition: 'width 0.6s ease', transitionDelay: stage >= 1 ? `${i * 0.13}s` : '0s' }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Card 3 — Suggested Rewrites */}
-        <div
-          className={CARD_STYLE}
-          style={stage === 2
-            ? { zIndex: 2, animation: 'cardSlideFront 0.6s cubic-bezier(0.4,0,0.2,1) forwards' }
             : { zIndex: 0, opacity: 0, pointerEvents: 'none' }}
         >
           <div className="flex items-center justify-between mb-2 lg:mb-3">
-            <span className="text-[9px] lg:text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 lg:px-2.5 lg:py-1 rounded-full">AI re-write</span>
+            <span className="text-[9px] lg:text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 lg:px-2.5 lg:py-1 rounded-full"
+              style={{ animation: stage === 1 ? 'badgeGlow 2s ease-in-out infinite' : undefined }}>AI re-write</span>
             <span className="text-[9px] lg:text-[11px] font-medium text-green-600">✓ Done</span>
           </div>
           <div className="space-y-2.5 lg:space-y-4">
             {rewrites.map((rw, i) => (
               <div key={i} className="text-[10px] lg:text-xs space-y-1 lg:space-y-1.5"
-                style={{ opacity: 0, animation: stage === 2 ? 'fadeInUp 0.3s ease forwards' : undefined, animationDelay: `${0.3 + i * 0.2}s` }}>
+                style={{ opacity: 0, animation: stage === 1 ? 'fadeInUp 0.3s ease forwards' : undefined, animationDelay: `${0.3 + i * 0.2}s` }}>
                 <p className="text-gray-400 line-through leading-snug">{rw.original}</p>
                 <p className="text-gray-800 leading-snug flex gap-1.5">
                   <span className="text-green-500 font-bold flex-shrink-0">→</span>{rw.improved}
