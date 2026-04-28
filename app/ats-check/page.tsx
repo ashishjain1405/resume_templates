@@ -1175,7 +1175,10 @@ function ATSCheckInner() {
                 <ScoreRing score={result.overall_score} instant={resultRestored} />
                 <div>
                   <div className="text-lg font-bold text-gray-900">
-                    {result.overall_score >= 75 ? 'Strong resume' : result.overall_score >= 50 ? 'Needs improvement' : 'Significant gaps found'}
+                    {result.overall_score >= 75 ? 'Interview Ready' : result.overall_score >= 50 ? 'Almost There' : 'Needs Attention'}
+                  </div>
+                  <div className="text-sm text-gray-500 mt-0.5">
+                    {result.overall_score >= 75 ? 'Your resume is performing strongly' : result.overall_score >= 50 ? 'A few improvements can boost results' : 'Critical improvements are recommended'}
                   </div>
                   <div className="flex gap-4 mt-2">
                     <div>
