@@ -182,10 +182,6 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
           && (localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked'))
         if (!proFlag) {
           setIsPro(false)
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem(`resume_builder_${templateId}`)
-            localStorage.removeItem(`builder_session_restore_${templateId}`)
-          }
         }
       }
     })
