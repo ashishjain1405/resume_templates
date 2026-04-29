@@ -6,6 +6,8 @@ const TEMPLATE_IDS = ['multicolumn', 'classic', 'modern', 'quotation', 'executiv
 
 export function getBuilderHref(): string {
   if (typeof window === 'undefined') return '/builder'
+  const last = localStorage.getItem('resume_builder_last_template')
+  if (last && TEMPLATE_IDS.includes(last)) return `/builder/${last}`
   for (const id of TEMPLATE_IDS) {
     if (localStorage.getItem(`resume_builder_${id}`)) return `/builder/${id}`
   }

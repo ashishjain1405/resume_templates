@@ -234,6 +234,15 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
             setData(versionRow.resume_data as ResumeData)
             if (versionRow.accent_color) setAccentColor(versionRow.accent_color)
             router.replace(`/builder/${templateId}`)
+            // Make this dashboard version the new working draft
+            await supabase.from('resumes').upsert({
+              user_id: user.id,
+              template_id: templateId,
+              data: versionRow.resume_data,
+              accent_color: versionRow.accent_color,
+              updated_at: new Date().toISOString(),
+            }, { onConflict: 'user_id,template_id' })
+            localStorage.setItem('resume_builder_last_template', templateId)
             return
           }
           // resume_data is null (old row) — fall through to resumes table load
@@ -264,6 +273,7 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
           try { setData(JSON.parse(stored)) } catch {}
         }
       }
+      localStorage.setItem('resume_builder_last_template', templateId)
     }
     const wasPaymentReload = !!localStorage.getItem(`download_pending_${templateId}`)
     load().then(() => { if (wasPaymentReload) setIsDirty(true) })
@@ -311,6 +321,7 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
   const autoSave = useCallback((next: ResumeData, color: string) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem(storageKey(templateId), JSON.stringify(next))
+      localStorage.setItem('resume_builder_last_template', templateId)
     }
     if (!user) return
     if (saveTimer.current) clearTimeout(saveTimer.current)

@@ -19,10 +19,11 @@ const PREVIEW_MAP: Record<string, React.ComponentType<{ accentColor?: string }>>
 interface Props {
   template: Template
   selected: boolean
+  hasDraft?: boolean
   onSelect: () => void
 }
 
-export default function TemplatePickerCard({ template, selected, onSelect }: Props) {
+export default function TemplatePickerCard({ template, selected, hasDraft, onSelect }: Props) {
   const [activeColor, setActiveColor] = useState(template.colors[0])
   const Preview = PREVIEW_MAP[template.id] ?? ClassicPreview
 
@@ -44,6 +45,11 @@ export default function TemplatePickerCard({ template, selected, onSelect }: Pro
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </div>
+        )}
+        {hasDraft && (
+          <span className="absolute top-2 left-2 text-[10px] font-semibold bg-blue-600 text-white px-2 py-0.5 rounded-full shadow">
+            Continue draft
+          </span>
         )}
       </div>
 

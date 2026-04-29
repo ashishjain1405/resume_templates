@@ -12,23 +12,35 @@ export default function Navbar() {
   const [isPro, setIsPro] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [lastDraftTemplateId, setLastDraftTemplateId] = useState<string | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const currentUserIdRef = useRef<string | null>(null)
   const router = useRouter()
   const pathname = usePathname()
   const supabase = createClient()
 
+  async function fetchLastDraft(userId: string) {
+    const { data } = await supabase
+      .from('resumes')
+      .select('template_id')
+      .eq('user_id', userId)
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    if (data?.template_id) setLastDraftTemplateId(data.template_id)
+  }
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setUser(data.user)
       currentUserIdRef.current = data.user?.id ?? null
-      if (data.user) checkPro(data.user.id)
+      if (data.user) { checkPro(data.user.id); fetchLastDraft(data.user.id) }
     })
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
       currentUserIdRef.current = session?.user?.id ?? null
       setUser(session?.user ?? null)
-      if (session?.user) checkPro(session.user.id)
-      else setIsPro(false)
+      if (session?.user) { checkPro(session.user.id); fetchLastDraft(session.user.id) }
+      else { setIsPro(false); setLastDraftTemplateId(null) }
     })
     return () => subscription.unsubscribe()
   }, [])
@@ -103,7 +115,7 @@ export default function Navbar() {
               <Link href="/ats-check" className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
                 Check Resume Score
               </Link>
-              <button onClick={() => { const href = getBuilderHref(); const guard = (window as any).__atsNavGuard; if (guard) { guard(href); return } router.push(href) }} className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
+              <button onClick={() => { const href = lastDraftTemplateId ? `/builder/${lastDraftTemplateId}` : getBuilderHref(); const guard = (window as any).__atsNavGuard; if (guard) { guard(href); return } router.push(href) }} className="text-sm text-gray-700 border border-gray-200 px-4 py-2 rounded-lg hover:border-blue-400 hover:text-blue-600 transition-colors font-medium">
                 Create my Resume
               </button>
               {!isPro && <GoProLink />}
@@ -171,7 +183,7 @@ export default function Navbar() {
           <Link href="/ats-check" className="text-xs text-gray-700 border border-gray-200 px-2.5 py-1.5 rounded-lg font-medium whitespace-nowrap">
             Check
           </Link>
-          <button onClick={() => { const href = getBuilderHref(); const guard = (window as any).__atsNavGuard; if (guard) { guard(href); return } router.push(href) }} className="text-xs text-gray-700 border border-gray-200 px-2.5 py-1.5 rounded-lg font-medium whitespace-nowrap">
+          <button onClick={() => { const href = lastDraftTemplateId ? `/builder/${lastDraftTemplateId}` : getBuilderHref(); const guard = (window as any).__atsNavGuard; if (guard) { guard(href); return } router.push(href) }} className="text-xs text-gray-700 border border-gray-200 px-2.5 py-1.5 rounded-lg font-medium whitespace-nowrap">
             Create
           </button>
           <button className="p-2 text-gray-500" onClick={() => setMobileOpen(o => !o)} aria-label="Toggle menu">

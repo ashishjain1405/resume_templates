@@ -1,13 +1,34 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { TEMPLATES } from '@/lib/templates'
+import { createClient } from '@/lib/supabase'
 import TemplatePickerCard from '@/components/TemplatePickerCard'
 
 export default function BuilderPickerPage() {
   const router = useRouter()
   const [selected, setSelected] = useState('multicolumn')
+  const [draftTemplateIds, setDraftTemplateIds] = useState<Set<string>>(new Set())
+
+  useEffect(() => {
+    const localDrafts = new Set(
+      TEMPLATES.map(t => t.id).filter(id => localStorage.getItem(`resume_builder_${id}`))
+    )
+    setDraftTemplateIds(localDrafts)
+
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) return
+      supabase
+        .from('resumes')
+        .select('template_id')
+        .eq('user_id', data.user.id)
+        .then(({ data: rows }) => {
+          if (rows) setDraftTemplateIds(new Set(rows.map((r: { template_id: string }) => r.template_id)))
+        })
+    })
+  }, [])
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
@@ -22,6 +43,7 @@ export default function BuilderPickerPage() {
             key={t.id}
             template={t}
             selected={selected === t.id}
+            hasDraft={draftTemplateIds.has(t.id)}
             onSelect={() => setSelected(t.id)}
           />
         ))}
