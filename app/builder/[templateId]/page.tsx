@@ -1008,7 +1008,7 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
               </svg>
             </div>
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Edit in Google Docs</h3>
-            <p className="text-sm text-gray-500 text-center mb-5">Edit your resume in Google Docs, run unlimited checks, and let AI rewrite it - all for ₹999, one-time.</p>
+            <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for lifetime access - edit in Google Docs, let AI rewrite your resume, run unlimited checks, and get a 1:1 expert session. ₹999, one-time.</p>
             <ProUpgradeCTAs layout="stack" source="docs" returnPath={`/builder/${templateId}`} />
           </div>
         </div>

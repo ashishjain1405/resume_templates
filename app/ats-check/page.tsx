@@ -92,7 +92,7 @@ function ModalProRequired({ onClose, userEmail }: { onClose: () => void; userEma
           </svg>
         </div>
         <h3 className="text-lg font-bold text-gray-900 text-center mb-1">You&apos;ve hit your free limit</h3>
-        <p className="text-sm text-gray-500 text-center mb-5">You&apos;ve used all 5 free checks — nice work! Upgrade for unlimited checks, lifetime access, and more. One-time payment of ₹999.</p>
+        <p className="text-sm text-gray-500 text-center mb-5">You&apos;ve used all 5 free checks. Upgrade to let AI rewrite your resume for a higher score, run unlimited checks, and unlock PDF downloads - ₹999, one-time.</p>
         <div className="flex flex-col gap-2">
           <button
             onClick={() => { onClose(); startUpgrade(userEmail, 'ats') }}
@@ -846,7 +846,7 @@ function ATSCheckInner() {
               </svg>
             </div>
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Edit in Google Docs is a Pro feature</h3>
-            <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for lifetime access — edit in Google Docs, unlimited Resume checks, PDF downloads, and an expert session. ₹999, one-time.</p>
+            <p className="text-sm text-gray-500 text-center mb-5">Upgrade once for lifetime access - edit in Google Docs, let AI rewrite your resume, run unlimited checks, and get a 1:1 expert session. ₹999, one-time.</p>
             <ProUpgradeCTAs layout="stack" userEmail={userEmail} source="docs" returnPath="/ats-check" />
           </div>
         </div>
@@ -862,7 +862,7 @@ function ATSCheckInner() {
               </svg>
             </div>
             <h3 className="text-lg font-bold text-gray-900 text-center mb-1">Let AI rewrite your resume</h3>
-            <p className="text-sm text-gray-500 text-center mb-5">Your resume rewritten in seconds - stronger bullets, better keywords, higher score. Plus an expert 1:1 session, unlimited resume checks and PDF downloads. ₹999, one-time.</p>
+            <p className="text-sm text-gray-500 text-center mb-5">Your resume rewritten in seconds - stronger bullets, better keywords, higher score. Plus unlimited checks, a 1:1 expert session, and PDF download. ₹999, one-time.</p>
             <ProUpgradeCTAs layout="stack" userEmail={userEmail} source="rewrite" returnPath="/ats-check" />
           </div>
         </div>
@@ -1046,7 +1046,7 @@ function ATSCheckInner() {
           {limitReached ? (
             <div className="w-full bg-amber-50 border border-amber-200 rounded-xl px-4 py-4 text-center">
               <p className="text-sm font-semibold text-amber-800 mb-1">You&apos;ve hit your free limit</p>
-              <p className="text-xs text-amber-600 mb-3">Ready to keep going? Unlock unlimited checks, AI re-write, 1:1 expert session and PDF downloads - ₹999, one-time.</p>
+              <p className="text-xs text-amber-600 mb-3">Let AI rewrite your resume based on this score - stronger bullets, better keywords, higher chances. Plus unlimited checks and an expert session. ₹999, one-time.</p>
               <div className="flex justify-center">
                 <ProUpgradeCTAs layout="row" userEmail={userEmail} source="ats" />
               </div>
