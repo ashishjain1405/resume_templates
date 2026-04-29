@@ -109,7 +109,7 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
             Everything you need to<br />land your next job
           </h1>
           <p className="text-gray-500 text-base mb-8">
-            One payment. Lifetime access. AI rewrites your resume.
+            One payment. Lifetime access.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <UpgradeButton className="w-full sm:w-auto px-10" />
