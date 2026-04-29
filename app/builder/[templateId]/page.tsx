@@ -257,10 +257,20 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
             router.replace(`/builder/${templateId}`)
           }
         } else {
-          // No Supabase row yet — fall back to localStorage draft (e.g. guest typed data, then signed up via ATS flow)
+          // No Supabase row yet — fall back to localStorage draft and migrate it
           const stored = typeof window !== 'undefined' ? localStorage.getItem(storageKey(templateId)) : null
           if (stored) {
-            try { setData(JSON.parse(stored)) } catch {}
+            try {
+              const parsed = JSON.parse(stored)
+              setData(parsed)
+              await supabase.from('resumes').upsert({
+                user_id: user.id,
+                template_id: templateId,
+                data: parsed,
+                accent_color: accentColor,
+                updated_at: new Date().toISOString(),
+              }, { onConflict: 'user_id,template_id' })
+            } catch {}
           }
         }
       } else {

@@ -25,7 +25,7 @@ export default function BuilderPickerPage() {
         .select('template_id')
         .eq('user_id', data.user.id)
         .then(({ data: rows }) => {
-          if (rows) setDraftTemplateIds(new Set(rows.map((r: { template_id: string }) => r.template_id)))
+          if (rows) setDraftTemplateIds(prev => new Set([...prev, ...rows.map((r: { template_id: string }) => r.template_id)]))
         })
     })
   }, [])
