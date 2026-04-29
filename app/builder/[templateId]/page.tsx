@@ -879,7 +879,7 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
             </button>
             <button
               onClick={() => {
-                if (isDirty) {
+                if (isDirty && user) {
                   saveNameTouchedRef.current = false
                   setSaveNameDraft(data.personal.name || '')
                   setShowChangeTemplateModal(true)
@@ -887,7 +887,7 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
                     if (prev && !saveNameTouchedRef.current) setSaveNameDraft(prev)
                   })
                 } else {
-                  localStorage.removeItem(storageKey(templateId))
+                  if (user) localStorage.removeItem(storageKey(templateId))
                   router.push('/builder')
                 }
               }}
