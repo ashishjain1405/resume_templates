@@ -222,13 +222,17 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
         if (resumeId) {
           const { data: versionRow } = await supabase
             .from('uploaded_resumes')
-            .select('resume_data, accent_color')
+            .select('resume_data, accent_color, filename')
             .eq('id', resumeId)
             .eq('user_id', user.id)
             .maybeSingle()
           if (versionRow?.resume_data) {
             setData(versionRow.resume_data as ResumeData)
             if (versionRow.accent_color) setAccentColor(versionRow.accent_color)
+            if (versionRow.filename) {
+              previousNamesRef.current[templateId] = versionRow.filename
+                .replace(/\.pdf$/i, '').replace(/_v\d+$/, '').replace(/_/g, ' ').trim()
+            }
             router.replace(`/builder/${templateId}`)
             // Make this dashboard version the new working draft
             await supabase.from('resumes').upsert({
