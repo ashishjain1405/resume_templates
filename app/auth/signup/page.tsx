@@ -4,6 +4,7 @@ import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
+import posthog from 'posthog-js'
 
 function SignupForm() {
   const [email, setEmail] = useState(() => {
@@ -71,6 +72,7 @@ function SignupForm() {
     } else if (error) {
       setError(error.message)
     } else {
+      posthog.capture('auth_signup_success', { method: 'email' })
       setMessage('Check your inbox! We\'ve sent you a link to get started.')
     }
     setLoading(false)
@@ -78,6 +80,7 @@ function SignupForm() {
 
   async function handleGoogleSignup() {
     setGoogleLoading(true)
+    posthog.capture('auth_signup_google', { method: 'google' })
     const redirect = getRedirect()
     await supabase.auth.signInWithOAuth({
       provider: 'google',

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { Suspense } from 'react'
+import posthog from 'posthog-js'
 
 function LoginForm() {
   const [email, setEmail] = useState('')
@@ -49,6 +50,7 @@ function LoginForm() {
       }
       setLoading(false)
     } else {
+      posthog.capture('auth_login_success', { method: 'email', redirect_url: redirect })
       // Use full navigation so destination page remounts (needed for sessionStorage restore)
       window.location.href = redirect
     }
@@ -56,6 +58,7 @@ function LoginForm() {
 
   async function handleGoogleLogin() {
     setGoogleLoading(true)
+    posthog.capture('auth_login_google', { method: 'google' })
     const redirect = getRedirect()
     await supabase.auth.signInWithOAuth({
       provider: 'google',

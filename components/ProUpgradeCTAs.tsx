@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useProUpgrade } from '@/lib/use-pro-upgrade'
+import posthog from 'posthog-js'
 
 interface Props {
   layout?: 'row' | 'stack'
@@ -15,7 +16,7 @@ export default function ProUpgradeCTAs({ layout = 'row', userEmail, source, retu
   return (
     <div className={layout === 'stack' ? 'flex flex-col gap-2' : 'flex items-center gap-2 flex-wrap'}>
       <button
-        onClick={() => startUpgrade(userEmail, source, returnPath)}
+        onClick={() => { posthog.capture('pro_upgrade_cta_clicked', { source }); startUpgrade(userEmail, source, returnPath) }}
         disabled={loading}
         className={`bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-60 ${layout === 'stack' ? 'w-full py-3' : 'px-4 py-2'}`}
       >

@@ -9,6 +9,7 @@ import ScaledPreview from '@/components/ScaledPreview'
 import SaveNameModal from '@/components/SaveNameModal'
 import type { User } from '@supabase/supabase-js'
 import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
+import posthog from 'posthog-js'
 
 declare global {
   interface Window {
@@ -162,6 +163,7 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
       setUser(session?.user ?? null)
       if (session?.user) {
         if (event === 'SIGNED_IN') {
+          posthog.identify(session.user.id, { email: session.user.email })
           const proFlag = initialProFlag
             || (typeof window !== 'undefined' && (localStorage.getItem('pro_unlocked') || sessionStorage.getItem('pro_unlocked')))
           if (proFlag) {
@@ -284,6 +286,7 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
         }
       }
       localStorage.setItem('resume_builder_last_template', templateId)
+      posthog.capture('builder_loaded', { template_id: templateId, has_draft: !!localStorage.getItem(storageKey(templateId)), logged_in: !!user })
     }
     const wasPaymentReload = !!localStorage.getItem(`download_pending_${templateId}`)
     load().then(() => { if (wasPaymentReload) setIsDirty(true) })
@@ -464,6 +467,7 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
       form.append('accent_color', accentColor)
       const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
       if (!uploadRes.ok) { alert('Could not save to Dashboard. Please try again.'); return false }
+      posthog.capture('builder_save_to_dashboard', { template_id: templateId, resume_name: sanitized })
       setSaveCount(c => c + 1)
       setSavedVersion(true)
       setIsDirty(false)
@@ -488,7 +492,7 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
       // Re-check via adminClient endpoint to bypass RLS replication lag
       const res = await fetch('/api/pro-status')
       const d = await res.json()
-      if (d.pro) { setIsPro(true) } else { setShowProDocsModal(true); return }
+      if (d.pro) { setIsPro(true) } else { posthog.capture('pro_upgrade_shown', { source: 'docs_builder' }); setShowProDocsModal(true); return }
     }
     try {
       setDocsLoading(true)
@@ -572,8 +576,9 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
     if (!isPro && !purchased) {
       const statusRes = await fetch('/api/pro-status')
       const statusData = await statusRes.json()
-      if (statusData.pro) { setIsPro(true) } else { setShowProDownloadModal(true); return }
+      if (statusData.pro) { setIsPro(true) } else { posthog.capture('pro_upgrade_shown', { source: 'download', template_id: templateId }); setShowProDownloadModal(true); return }
     }
+    posthog.capture('builder_download_started', { template_id: templateId })
     const res = await fetch('/api/builder/pdf?pdf=1', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -902,6 +907,7 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
                   })
                 } else {
                   if (user) localStorage.removeItem(storageKey(templateId))
+                  posthog.capture('builder_template_changed', { from_template: templateId })
                   router.push('/builder')
                 }
               }}
@@ -986,7 +992,7 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
                 {savingVersion ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Saving…</> : 'Save to Dashboard'}
               </button>
               <button
-                onClick={() => { localStorage.removeItem(storageKey(templateId)); router.push('/builder') }}
+                onClick={() => { localStorage.removeItem(storageKey(templateId)); posthog.capture('builder_template_changed', { from_template: templateId }); router.push('/builder') }}
                 className="w-full border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors"
               >
                 Change anyway

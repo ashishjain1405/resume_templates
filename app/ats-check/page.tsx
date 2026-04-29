@@ -8,6 +8,7 @@ import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
 import { useProUpgrade } from '@/lib/use-pro-upgrade'
 import { createClient } from '@/lib/supabase'
 import { TEMPLATES } from '@/lib/templates'
+import posthog from 'posthog-js'
 
 import ClassicPreview from '@/components/resume-previews/Classic'
 import ModernPreview from '@/components/resume-previews/Modern'
@@ -508,6 +509,7 @@ function ATSCheckInner() {
   async function handleAnalyse() {
     const currentFile = file
     const currentTab = tab
+    posthog.capture('ats_analyse_started', { tab: currentTab, logged_in: !!userEmail })
     setError('')
     setLoading(true)
     setResult(null)
@@ -625,6 +627,7 @@ function ATSCheckInner() {
         return
       }
       const atsResult = data as ATSResult
+      posthog.capture('ats_analyse_success', { overall_score: atsResult.overall_score, ats_score: atsResult.ats_score, recruiter_score: atsResult.recruiter_score })
       setResult(atsResult)
       // If analysing an existing saved resume, treat it as already saved — score will auto-PATCH
       setSaveCount(selectedResumeIdRef.current ? 1 : 0)
@@ -650,6 +653,10 @@ function ATSCheckInner() {
 
   const canSubmit = tab === 'upload' ? !!file : tab === 'saved' ? !!selectedResumeId : resumeText.trim().length > 50
   const limitReached = !isPro && usage !== null && usage.used >= usage.limit
+
+  useEffect(() => {
+    if (limitReached) posthog.capture('pro_upgrade_shown', { source: 'ats_limit_banner' })
+  }, [limitReached])
 
   async function handleSaveToDashboard() {
     setSavingToDashboard(true)
@@ -795,6 +802,7 @@ function ATSCheckInner() {
           sessionStorage.setItem('docs_pending_resume_id', selectedResumeId)
           sessionStorage.setItem('docs_pending_ats', '1')
         }
+        posthog.capture('pro_upgrade_shown', { source: 'docs_ats' })
         setShowProDocsModal(true)
         return
       }
@@ -1111,6 +1119,7 @@ function ATSCheckInner() {
                         tab,
                         builderTemplateId,
                       }))
+                      posthog.capture('pro_upgrade_shown', { source: 'rewrite' })
                       setShowProRewriteModal(true)
                       return
                     }

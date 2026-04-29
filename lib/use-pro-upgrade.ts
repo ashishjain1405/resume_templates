@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import posthog from 'posthog-js'
 
 function loadRazorpayScript(): Promise<void> {
   if (typeof window !== 'undefined' && window.Razorpay) return Promise.resolve()
@@ -43,6 +44,7 @@ export function useProUpgrade() {
 
       await loadRazorpayScript()
 
+      posthog.capture('pro_payment_started', { source, amount_inr: 999 })
       const rzp = new window.Razorpay({
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
         amount,
@@ -58,6 +60,7 @@ export function useProUpgrade() {
             body: JSON.stringify(response),
           })
           if (verifyRes.ok) {
+            posthog.capture('pro_payment_success', { source, amount_inr: 999 })
             // Payment is server-verified (HMAC + DB insert confirmed). Trust it immediately.
             localStorage.setItem('pro_unlocked', '1')
             sessionStorage.setItem('pro_unlocked', '1')
@@ -89,6 +92,7 @@ export function useProUpgrade() {
         theme: { color: '#2563eb' },
         modal: {
           ondismiss: () => {
+            posthog.capture('pro_payment_dismissed', { source })
             setLoading(false)
           },
         },

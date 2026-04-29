@@ -17,6 +17,7 @@
     "openai": "^6.34.0",
     "pdf-parse": "^1.1.1",
     "pdfjs-dist": "^5.6.205",
+    "posthog-js": "^1.372.5",
     "puppeteer-core": "^24.42.0",
     "razorpay": "^2.9.6",
     "react": "19.2.4",

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import ProUpgradeCTAs from '@/components/ProUpgradeCTAs'
 import BuySessionButton from '../BuySessionButton'
+import posthog from 'posthog-js'
 
 interface Slot {
   start: string
@@ -77,6 +78,7 @@ export default function BookSessionPage() {
       })
       const data = await res.json()
       if (!res.ok) {
+        posthog.capture('session_booking_error', { error_type: data.error ?? 'unknown' })
         if (data.error === 'session_limit_reached') {
           setError('You\'ve used your included session. Pro includes 1 session — book more at ₹299 each.')
         } else {
@@ -84,6 +86,7 @@ export default function BookSessionPage() {
         }
         return
       }
+      posthog.capture('session_booking_success', { scheduled_at: data.scheduledAt })
       setMeetLink(data.meetLink)
       setScheduledAt(data.scheduledAt)
       setStep('done')
@@ -266,7 +269,7 @@ export default function BookSessionPage() {
                   ))}
                 </div>
                 <button
-                  onClick={() => selectedSlot && setStep('confirm')}
+                  onClick={() => { if (selectedSlot) { posthog.capture('session_booking_started', { slot_date: selectedSlot.start.split('T')[0], slot_time: selectedSlot.start.split('T')[1] }); setStep('confirm') } }}
                   disabled={!selectedSlot}
                   className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm"
                 >

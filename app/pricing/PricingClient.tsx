@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useProUpgrade } from '@/lib/use-pro-upgrade'
+import posthog from 'posthog-js'
 
 interface Props {
   isPro: boolean
@@ -74,6 +75,7 @@ export default function PricingClient({ isPro, userEmail, isLoggedIn }: Props) {
 
   function handleUpgrade() {
     if (!isLoggedIn) { router.push('/auth/signup?redirect=/pricing?autoupgrade=1'); return }
+    posthog.capture('pro_upgrade_cta_clicked', { source: 'pricing' })
     startUpgrade(userEmail, 'pricing')
   }
 
