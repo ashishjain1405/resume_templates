@@ -630,11 +630,11 @@ p.body.white { color: rgba(255,255,255,0.8); }
         <div class="flow-step">
           <span class="step-num">01 · TRIGGER</span>
           <span class="step-title">From the ATS results page</span>
-          <span class="step-desc">One click sends the current resume + ATS analysis context + job description to Claude.</span>
+          <span class="step-desc">One click sends the current resume + ATS analysis context + job description to OpenAI.</span>
         </div>
         <div class="flow-step">
           <span class="step-num">02 · AI EDIT</span>
-          <span class="step-title">Claude edits, not replaces</span>
+          <span class="step-title">OpenAI edits, not replaces</span>
           <span class="step-desc">Strengthens bullets, weaves in missing keywords, fixes ATS-non-compliant phrasing — all grounded in the user's actual experience.</span>
         </div>
         <div class="flow-step">
@@ -850,7 +850,7 @@ p.body.white { color: rgba(255,255,255,0.8); }
     <div class="card shadow">
       <div class="icon-box blue" style="margin-bottom:10px;">✍️</div>
       <span class="card-title">Rewrite that preserves voice</span>
-      <p class="card-body">Claude edits the user's actual content — never replaces it. The output reads like a professionally edited version of the candidate, which matters in interviews.</p>
+      <p class="card-body">OpenAI edits the user's actual content — never replaces it. The output reads like a professionally edited version of the candidate, which matters in interviews.</p>
     </div>
     <div class="card shadow">
       <div class="icon-box violet" style="margin-bottom:10px;">🤝</div>
@@ -990,7 +990,7 @@ p.body.white { color: rgba(255,255,255,0.8); }
       <span class="badge badge-white">Next.js 15</span>
       <span class="badge badge-white">Supabase</span>
       <span class="badge badge-white">GPT-4o Mini</span>
-      <span class="badge badge-white">Claude API</span>
+      <span class="badge badge-white">OpenAI</span>
       <span class="badge badge-white">Razorpay</span>
       <span class="badge badge-white">Vercel</span>
     </div>
@@ -1023,7 +1023,7 @@ p.body.white { color: rgba(255,255,255,0.8); }
       <thead><tr><th>Layer</th><th>Technology</th></tr></thead>
       <tbody>
         <tr><td>AI Scoring</td><td>OpenAI GPT-4o Mini — structured JSON output</td></tr>
-        <tr><td>AI Rewrite</td><td>Anthropic Claude API — full resume rewrite</td></tr>
+        <tr><td>AI Rewrite</td><td>OpenAI — full resume rewrite</td></tr>
         <tr><td>PDF Parsing</td><td><code>unpdf</code> (WASM) — server-side, no native deps</td></tr>
         <tr><td>PDF Generation</td><td>Puppeteer + <code>@sparticuz/chromium-min</code></td></tr>
         <tr><td>Payments</td><td>Razorpay — UPI, cards, net banking, wallets</td></tr>
@@ -1079,7 +1079,7 @@ p.body.white { color: rgba(255,255,255,0.8); }
     <div class="card" style="border-left:3px solid var(--amber-500);">
       <div style="display:flex; gap:14px; align-items:flex-start;">
         <span class="badge badge-amber" style="flex-shrink:0; margin-top:2px;">AI REWRITE</span>
-        <span style="font-size:0.58em; color:var(--gray-600); line-height:1.6;"><code style="background:var(--gray-100); padding:1px 5px; border-radius:4px; font-size:0.9em;">POST /api/resume/rewrite</code> → verify Pro status → Claude API with original content + ATS context + JD → revised ResumeData object → Puppeteer PDF → before/after comparison with score delta</span>
+        <span style="font-size:0.58em; color:var(--gray-600); line-height:1.6;"><code style="background:var(--gray-100); padding:1px 5px; border-radius:4px; font-size:0.9em;">POST /api/resume/rewrite</code> → verify Pro status → OpenAI with original content + ATS context + JD → revised ResumeData object → Puppeteer PDF → before/after comparison with score delta</span>
       </div>
     </div>
     <div class="card" style="border-left:3px solid var(--violet-500);">
