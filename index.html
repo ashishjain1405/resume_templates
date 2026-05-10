@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resume Expert — Product Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<style>
+/* ── BASE ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  --blue-50:  #eff6ff;
+  --blue-100: #dbeafe;
+  --blue-200: #bfdbfe;
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+  --amber-50:  #fffbeb;
+  --amber-100: #fef3c7;
+  --amber-200: #fde68a;
+  --amber-500: #f59e0b;
+  --amber-600: #d97706;
+  --amber-700: #b45309;
+  --green-50:  #f0fdf4;
+  --green-100: #dcfce7;
+  --green-500: #22c55e;
+  --green-600: #16a34a;
+  --green-700: #15803d;
+  --violet-50:  #f5f3ff;
+  --violet-100: #ede9fe;
+  --violet-500: #8b5cf6;
+  --violet-600: #7c3aed;
+  --indigo-50:  #eef2ff;
+  --indigo-100: #e0e7ff;
+  --indigo-600: #4f46e5;
+  --gray-50:  #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+}
+
+.reveal-viewport { background: #fff; }
+.reveal { font-family: 'Inter', system-ui, sans-serif; }
+
+.reveal .slides section {
+  text-align: left;
+  padding: 0 !important;
+  top: 0 !important;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* reset reveal defaults */
+.reveal h1, .reveal h2, .reveal h3,
+.reveal p, .reveal li, .reveal ul {
+  margin: 0; padding: 0;
+  text-shadow: none !important;
+  font-family: 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* ── SLIDE WRAPPER ── */
+.slide {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  background: #fff;
+  padding: 40px 52px;
+  position: relative;
+  overflow: hidden;
+}
+.slide.gray { background: var(--gray-50); }
+.slide.blue-grad {
+  background: linear-gradient(135deg, var(--blue-600) 0%, var(--blue-700) 100%);
+}
+.slide.dark { background: var(--gray-900); }
+
+/* dot-grid background (hero/section headers) */
+.dot-grid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, var(--gray-300) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ── TOP NAV BAR (slide label) ── */
+.slide-label {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--blue-600);
+}
+.slide-label.amber { background: var(--amber-500); }
+.slide-label.green { background: var(--green-600); }
+.slide-label.violet { background: var(--violet-500); }
+.slide-label.gray-bar { background: var(--gray-200); }
+
+/* ── BADGES / PILLS ── */
+.badge {
+  display: inline-flex; align-items: center;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 9999px;
+  line-height: 1;
+}
+.badge-blue   { background: var(--blue-50);   color: var(--blue-600);   border: 1px solid var(--blue-200); }
+.badge-amber  { background: var(--amber-100); color: var(--amber-700);  border: 1px solid var(--amber-200); }
+.badge-green  { background: var(--green-100); color: var(--green-700);  border: 1px solid #bbf7d0; }
+.badge-gray   { background: var(--gray-100);  color: var(--gray-600);   border: 1px solid var(--gray-200); }
+.badge-violet { background: var(--violet-100); color: var(--violet-600); border: 1px solid #ddd6fe; }
+.badge-white  { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+
+/* ── TYPOGRAPHY ── */
+.eyebrow {
+  font-size: 11px; font-weight: 700;
+  color: var(--blue-600);
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 10px;
+  display: block;
+}
+.eyebrow.amber { color: var(--amber-600); }
+.eyebrow.green { color: var(--green-600); }
+.eyebrow.white { color: rgba(255,255,255,0.75); }
+
+h1.display {
+  font-size: 2.6em; font-weight: 800;
+  color: var(--gray-900); line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+h1.display .blue  { color: var(--blue-600); }
+h1.display .amber { color: var(--amber-600); }
+h1.display .white { color: #fff; }
+
+h2.title {
+  font-size: 1.5em; font-weight: 800;
+  color: var(--gray-900); line-height: 1.15;
+  letter-spacing: -0.025em;
+  margin-bottom: 18px;
+}
+h2.title.white { color: #fff; }
+
+h3.section-head {
+  font-size: 0.82em; font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 8px;
+}
+h3.section-head.white { color: #fff; }
+
+p.lead {
+  font-size: 0.72em; font-weight: 400;
+  color: var(--gray-500); line-height: 1.7;
+}
+p.lead.white { color: rgba(255,255,255,0.75); }
+
+p.body {
+  font-size: 0.62em; font-weight: 400;
+  color: var(--gray-600); line-height: 1.65;
+}
+p.body.white { color: rgba(255,255,255,0.8); }
+
+/* ── DIVIDER ── */
+.divider {
+  width: 36px; height: 3px;
+  background: var(--blue-600);
+  border-radius: 2px;
+  margin-bottom: 16px;
+}
+.divider.amber  { background: var(--amber-500); }
+.divider.green  { background: var(--green-500); }
+.divider.violet { background: var(--violet-500); }
+.divider.white  { background: rgba(255,255,255,0.5); }
+
+/* ── CARDS ── */
+.card {
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+.card.shadow { box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
+.card.blue-left   { border-left: 4px solid var(--blue-600);   background: var(--blue-50); }
+.card.amber-left  { border-left: 4px solid var(--amber-500);  background: var(--amber-50); }
+.card.green-left  { border-left: 4px solid var(--green-600);  background: var(--green-50); }
+.card.violet-left { border-left: 4px solid var(--violet-500); background: var(--violet-50); }
+.card.indigo-left { border-left: 4px solid var(--indigo-600); background: var(--indigo-50); }
+.card.dark-card   { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
+
+.card-label {
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--gray-400);
+  margin-bottom: 5px;
+  display: block;
+}
+.card-title {
+  font-size: 0.72em; font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 6px;
+  display: block;
+  line-height: 1.3;
+}
+.card-title.white { color: #fff; }
+.card-body {
+  font-size: 0.58em; color: var(--gray-500);
+  line-height: 1.6;
+}
+.card-body.white { color: rgba(255,255,255,0.7); }
+
+/* icon box */
+.icon-box {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; margin-bottom: 10px;
+  flex-shrink: 0;
+}
+.icon-box.blue   { background: var(--blue-100); }
+.icon-box.amber  { background: var(--amber-100); }
+.icon-box.green  { background: var(--green-100); }
+.icon-box.violet { background: var(--violet-100); }
+
+/* ── GRID LAYOUTS ── */
+.grid { display: grid; gap: 14px; }
+.grid-2 { grid-template-columns: 1fr 1fr; }
+.grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+.grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.grid-5-3 { grid-template-columns: 5fr 3fr; gap: 24px; }
+.grid-1-1 { grid-template-columns: 1fr 1fr; gap: 24px; }
+
+/* ── FLOW STEPS ── */
+.flow-row {
+  display: flex; align-items: stretch; gap: 0;
+}
+.flow-step {
+  flex: 1;
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.flow-arrow {
+  display: flex; align-items: center;
+  font-size: 1.2em; color: var(--gray-300);
+  padding: 0 6px; flex-shrink: 0;
+}
+.step-num {
+  font-size: 9px; font-weight: 800;
+  color: var(--blue-600);
+  letter-spacing: 0.1em;
+  display: block; margin-bottom: 4px;
+}
+.step-title {
+  font-size: 0.65em; font-weight: 700;
+  color: var(--gray-900); display: block; margin-bottom: 3px;
+}
+.step-desc {
+  font-size: 0.56em; color: var(--gray-500); line-height: 1.5;
+}
+
+/* ── LIST ── */
+.check-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+.check-list li {
+  font-size: 0.6em; color: var(--gray-600);
+  display: flex; align-items: flex-start; gap: 8px; line-height: 1.5;
+}
+.check-list li::before {
+  content: '✓';
+  font-size: 0.85em; font-weight: 700;
+  color: var(--green-600);
+  margin-top: 1px; flex-shrink: 0;
+}
+.check-list.white li { color: rgba(255,255,255,0.8); }
+.check-list.white li::before { color: #6ee7b7; }
+
+/* ── TABLE ── */
+.data-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 0.58em;
+}
+.data-table th {
+  font-size: 0.85em; font-weight: 700;
+  color: var(--gray-500);
+  text-transform: uppercase; letter-spacing: 0.07em;
+  text-align: left; padding: 8px 12px;
+  border-bottom: 1px solid var(--gray-200);
+}
+.data-table td {
+  padding: 9px 12px;
+  color: var(--gray-600);
+  border-bottom: 1px solid var(--gray-100);
+  vertical-align: top; line-height: 1.5;
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table td:first-child { color: var(--gray-900); font-weight: 600; }
+.data-table td code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  background: var(--gray-100); color: var(--gray-700);
+  padding: 1px 5px; border-radius: 4px;
+}
+.data-table.blue-head th { color: var(--blue-600); border-bottom-color: var(--blue-200); }
+
+/* ── STAT BOXES ── */
+.stat-row { display: flex; gap: 12px; }
+.stat-box {
+  flex: 1;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  padding: 14px 16px;
+  text-align: center;
+}
+.stat-val {
+  font-size: 1.4em; font-weight: 800;
+  color: var(--blue-600);
+  display: block; line-height: 1;
+  margin-bottom: 5px;
+}
+.stat-val.amber { color: var(--amber-600); }
+.stat-val.green { color: var(--green-600); }
+.stat-label {
+  font-size: 0.48em; color: var(--gray-500);
+  line-height: 1.4;
+}
+
+/* ── HIGHLIGHT BOX ── */
+.highlight {
+  background: var(--blue-50);
+  border: 1px solid var(--blue-200);
+  border-left: 3px solid var(--blue-600);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  font-size: 0.6em; color: var(--gray-700); line-height: 1.6;
+}
+.highlight.amber {
+  background: var(--amber-50);
+  border-color: var(--amber-200);
+  border-left-color: var(--amber-500);
+}
+.highlight.green {
+  background: var(--green-50);
+  border-color: #bbf7d0;
+  border-left-color: var(--green-600);
+}
+.highlight strong { color: var(--blue-700); }
+.highlight.amber strong { color: var(--amber-700); }
+
+/* ── FUNNEL ── */
+.funnel { display: flex; flex-direction: column; gap: 8px; }
+.funnel-row {
+  display: flex; align-items: center; gap: 14px;
+  background: #fff; border: 1px solid var(--gray-200);
+  border-radius: 10px; padding: 11px 16px;
+}
+.f-tier {
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 4px 12px; border-radius: 9999px;
+  min-width: 72px; text-align: center; flex-shrink: 0;
+}
+.f-price {
+  font-size: 0.72em; font-weight: 800;
+  color: var(--gray-900); min-width: 100px; flex-shrink: 0;
+}
+.f-desc { font-size: 0.56em; color: var(--gray-500); line-height: 1.5; }
+
+/* ── SVG SCORE RING ── */
+.score-ring-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 4px;
+}
+.score-ring-label {
+  font-size: 0.5em; font-weight: 600; color: var(--gray-500);
+  text-align: center;
+}
+
+/* ── PROGRESS BAR ── */
+.progress-row { display: flex; flex-direction: column; gap: 8px; }
+.progress-item { display: flex; flex-direction: column; gap: 4px; }
+.progress-meta {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.progress-name { font-size: 0.56em; font-weight: 600; color: var(--gray-700); }
+.progress-val  { font-size: 0.52em; font-weight: 700; color: var(--blue-600); }
+.progress-track {
+  height: 5px; background: var(--gray-100);
+  border-radius: 9999px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; border-radius: 9999px;
+  background: var(--blue-600);
+}
+.progress-fill.amber { background: var(--amber-500); }
+.progress-fill.green { background: var(--green-500); }
+
+/* ── REVEAL CHROME ── */
+.reveal .progress { background: rgba(0,0,0,0.06); height: 2px; }
+.reveal .progress span { background: var(--blue-600); }
+.reveal .controls { color: var(--blue-600); }
+.reveal .slide-number {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px; color: var(--gray-400);
+  background: transparent;
+}
+</style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ══════════════════════════════════════
+     SLIDE 1 — TITLE
+══════════════════════════════════════ -->
+<section>
+<div class="slide dot-grid" style="justify-content:center; align-items:center; text-align:center; padding:60px;">
+  <div style="position:relative; z-index:1; max-width:640px; margin:0 auto;">
+    <span class="badge badge-blue" style="margin-bottom:20px;">Product Overview · May 2026</span>
+    <h1 class="display" style="margin-bottom:16px; font-size:3em;">
+      Resume <span class="blue">Expert</span>
+    </h1>
+    <p class="lead" style="max-width:500px; margin:0 auto 28px;">
+      AI-powered resume scoring, rewriting, and expert consultation — built for Indian job seekers, priced for a one-time purchase.
+    </p>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+      <span class="badge badge-blue">AI Scoring</span>
+      <span class="badge badge-blue">AI Rewrite</span>
+      <span class="badge badge-blue">Resume Builder</span>
+      <span class="badge badge-amber">Expert Sessions</span>
+      <span class="badge badge-green">India-first</span>
+    </div>
+    <div style="margin-top:32px; padding-top:28px; border-top:1px solid var(--gray-200); display:flex; justify-content:center; gap:32px;">
+      <div style="text-align:center;">
+        <div style="font-size:1.6em; font-weight:800; color:var(--blue-600); line-height:1;">₹999</div>
+        <div style="font-size:0.5em; color:var(--gray-500); margin-top:3px;">one-time Pro</div>
+      </div>
+      <div style="width:1px; background:var(--gray-200);"></div>
+      <div style="text-align:center;">
+        <div style="font-size:1.6em; font-weight:800; color:var(--gray-900); line-height:1;">5</div>
+        <div style="font-size:0.5em; color:var(--gray-500); margin-top:3px;">premium templates</div>
+      </div>
+      <div style="width:1px; background:var(--gray-200);"></div>
+      <div style="text-align:center;">
+        <div style="font-size:1.6em; font-weight:800; color:var(--gray-900); line-height:1;">2</div>
+        <div style="font-size:0.5em; color:var(--gray-500); margin-top:3px;">AI models</div>
+      </div>
+      <div style="width:1px; background:var(--gray-200);"></div>
+      <div style="text-align:center;">
+        <div style="font-size:1.6em; font-weight:800; color:var(--amber-600); line-height:1;">1:1</div>
+        <div style="font-size:0.5em; color:var(--gray-500); margin-top:3px;">expert session</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 2 — THE PROBLEM
+══════════════════════════════════════ -->
+<section>
+<div class="slide gray">
+  <div class="slide-label"></div>
+  <span class="eyebrow">The Problem</span>
+  <h2 class="title" style="max-width:520px; margin-bottom:10px;">Most resumes fail before a human ever reads them</h2>
+  <p class="lead" style="margin-bottom:22px; max-width:560px;">Indian job seekers have no reliable way to know why their applications go unanswered — or what to change.</p>
+  <div class="grid grid-3" style="gap:14px; margin-bottom:18px;">
+    <div class="card blue-left">
+      <div class="card-label">Pain 01</div>
+      <span class="card-title">Invisible ATS Filters</span>
+      <p class="card-body">Large companies auto-reject resumes before a human sees them. Candidates never learn if it's a formatting issue, missing keywords, or poor parsing.</p>
+    </div>
+    <div class="card amber-left">
+      <div class="card-label">Pain 02</div>
+      <span class="card-title">Generic, Unactionable Feedback</span>
+      <p class="card-body">Free tools return vague advice — "use action verbs," "add measurable outcomes" — with no indication of which bullet, which section, or what to write instead.</p>
+    </div>
+    <div class="card violet-left">
+      <div class="card-label">Pain 03</div>
+      <span class="card-title">Expensive or Slow Alternatives</span>
+      <p class="card-body">Human agencies charge ₹5,000–₹20,000 and take 3–5 days. Western SaaS tools charge monthly subscriptions not calibrated for Indian hiring norms.</p>
+    </div>
+  </div>
+  <div class="highlight">
+    <strong>Resume Expert</strong> makes invisible friction visible — quantified on a 0–100 scale — and gives users concrete, one-click tools to fix it. One-time payment. Lifetime access.
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 3 — SECTION HEADER: PRODUCT
+══════════════════════════════════════ -->
+<section>
+<div class="slide blue-grad dot-grid" style="justify-content:center;">
+  <div style="position:relative; z-index:1; max-width:600px;">
+    <span class="badge badge-white" style="margin-bottom:16px;">01 · Product</span>
+    <h1 class="display" style="color:#fff; font-size:2.6em; margin-bottom:16px;">
+      Four journeys.<br>One platform.
+    </h1>
+    <p class="lead white" style="font-size:0.75em;">
+      Score → Rewrite → Build → Expert. Each journey feeds into the next, creating a complete resume workflow for Indian professionals.
+    </p>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 4 — JOURNEY 1: ATS SCORE
+══════════════════════════════════════ -->
+<section>
+<div class="slide">
+  <div class="slide-label"></div>
+  <span class="eyebrow">Journey 01 · Free &amp; Pro</span>
+  <h2 class="title" style="margin-bottom:6px;">Score an existing resume</h2>
+  <div class="grid-1-1" style="gap:22px; align-items:start;">
+    <div>
+      <div class="flow-row" style="margin-bottom:14px;">
+        <div class="flow-step">
+          <span class="step-num">01</span>
+          <span class="step-title">Upload or paste</span>
+          <span class="step-desc">PDF or raw text. WASM-based parsing on the server — no native binary deps.</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">
+          <span class="step-num">02</span>
+          <span class="step-title">AI analysis</span>
+          <span class="step-desc">GPT-4o Mini evaluates against a structured scoring rubric, returns JSON.</span>
+        </div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-step">
+          <span class="step-num">03</span>
+          <span class="step-title">Results</span>
+          <span class="step-desc">Dual score, section breakdown, specific issues, keyword gaps.</span>
+        </div>
+      </div>
+      <div class="grid grid-2" style="gap:10px;">
+        <div class="card blue-left">
+          <span class="card-label">ATS Score</span>
+          <span class="card-title">Automated filter survival</span>
+          <p class="card-body">Keyword density, formatting parsability, contact field completeness, section structure.</p>
+        </div>
+        <div class="card amber-left">
+          <span class="card-label">Recruiter Score</span>
+          <span class="card-title">Human readability</span>
+          <p class="card-body">Impact language, quantified achievements, relevance to the job description.</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <!-- score ring visual -->
+      <div style="background:var(--gray-50); border:1px solid var(--gray-200); border-radius:12px; padding:18px 20px; margin-bottom:12px;">
+        <div style="display:flex; gap:20px; align-items:center; margin-bottom:14px;">
+          <div class="score-ring-wrap">
+            <svg width="72" height="72" viewBox="0 0 72 72">
+              <circle cx="36" cy="36" r="28" fill="none" stroke="#f3f4f6" stroke-width="7"/>
+              <circle cx="36" cy="36" r="28" fill="none" stroke="#2563eb" stroke-width="7"
+                stroke-dasharray="175.9" stroke-dashoffset="44" stroke-linecap="round"
+                transform="rotate(-90 36 36)"/>
+              <text x="36" y="40" text-anchor="middle" font-size="14" font-weight="800" fill="#111827" font-family="Inter,sans-serif">75</text>
+            </svg>
+            <span class="score-ring-label">ATS Score</span>
+          </div>
+          <div class="score-ring-wrap">
+            <svg width="72" height="72" viewBox="0 0 72 72">
+              <circle cx="36" cy="36" r="28" fill="none" stroke="#f3f4f6" stroke-width="7"/>
+              <circle cx="36" cy="36" r="28" fill="none" stroke="#d97706" stroke-width="7"
+                stroke-dasharray="175.9" stroke-dashoffset="70" stroke-linecap="round"
+                transform="rotate(-90 36 36)"/>
+              <text x="36" y="40" text-anchor="middle" font-size="14" font-weight="800" fill="#111827" font-family="Inter,sans-serif">60</text>
+            </svg>
+            <span class="score-ring-label">Recruiter Score</span>
+          </div>
+          <div style="flex:1;">
+            <div class="progress-row">
+              <div class="progress-item">
+                <div class="progress-meta"><span class="progress-name">Keywords</span><span class="progress-val">68</span></div>
+                <div class="progress-track"><div class="progress-fill" style="width:68%"></div></div>
+              </div>
+              <div class="progress-item">
+                <div class="progress-meta"><span class="progress-name">Formatting</span><span class="progress-val">82</span></div>
+                <div class="progress-track"><div class="progress-fill" style="width:82%"></div></div>
+              </div>
+              <div class="progress-item">
+                <div class="progress-meta"><span class="progress-name">Achievements</span><span class="progress-val">55</span></div>
+                <div class="progress-track"><div class="progress-fill amber" style="width:55%"></div></div>
+              </div>
+              <div class="progress-item">
+                <div class="progress-meta"><span class="progress-name">Relevance</span><span class="progress-val">71</span></div>
+                <div class="progress-track"><div class="progress-fill" style="width:71%"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:0.52em; color:var(--gray-500); border-top:1px solid var(--gray-100); padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span>Top issue: <span style="color:var(--gray-800); font-weight:600;">3 bullets lack quantified outcomes</span></span>
+          <span class="badge badge-blue">+12 pts potential</span>
+        </div>
+      </div>
+      <div class="highlight">
+        <strong>Free:</strong> 5 checks/month &nbsp;·&nbsp; <strong>Pro:</strong> unlimited checks + cached results on dashboard
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 5 — JOURNEY 2: AI REWRITE
+══════════════════════════════════════ -->
+<section>
+<div class="slide gray">
+  <div class="slide-label amber"></div>
+  <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
+    <span class="eyebrow" style="margin-bottom:0;">Journey 02</span>
+    <span class="badge badge-amber">Pro only</span>
+  </div>
+  <h2 class="title" style="margin-bottom:18px;">AI rewrite — score improvements in minutes</h2>
+  <div class="grid-1-1" style="gap:22px;">
+    <div>
+      <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
+        <div class="flow-step">
+          <span class="step-num">01 · TRIGGER</span>
+          <span class="step-title">From the ATS results page</span>
+          <span class="step-desc">One click sends the current resume + ATS analysis context + job description to Claude.</span>
+        </div>
+        <div class="flow-step">
+          <span class="step-num">02 · AI EDIT</span>
+          <span class="step-title">Claude edits, not replaces</span>
+          <span class="step-desc">Strengthens bullets, weaves in missing keywords, fixes ATS-non-compliant phrasing — all grounded in the user's actual experience.</span>
+        </div>
+        <div class="flow-step">
+          <span class="step-num">03 · OUTPUT</span>
+          <span class="step-title">Before/after + PDF</span>
+          <span class="step-desc">Side-by-side comparison with score delta. One-click A4 PDF download of the rewritten version.</span>
+        </div>
+      </div>
+      <div class="highlight amber">
+        The rewrite <strong>preserves voice</strong>. A resume that doesn't sound like the candidate fails in interviews even if it passes the ATS.
+      </div>
+    </div>
+    <div>
+      <!-- before/after mockup -->
+      <div style="background:#fff; border:1px solid var(--gray-200); border-radius:12px; overflow:hidden; margin-bottom:10px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr;">
+          <div style="padding:14px 16px; border-right:1px solid var(--gray-100);">
+            <div style="font-size:9px; font-weight:700; color:var(--gray-400); letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px;">Before</div>
+            <p style="font-size:0.52em; color:var(--gray-400); line-height:1.6; text-decoration:line-through; text-decoration-color:rgba(156,163,175,0.6);">Responsible for managing social media accounts and writing content for the marketing team at previous company.</p>
+          </div>
+          <div style="padding:14px 16px; background:var(--blue-50);">
+            <div style="font-size:9px; font-weight:700; color:var(--blue-600); letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px;">After</div>
+            <p style="font-size:0.52em; color:var(--gray-700); line-height:1.6;">Grew Instagram following 3.2× in 6 months by executing a data-driven content calendar; increased organic reach by 47% YoY.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex; gap:12px; align-items:center;">
+          <div class="score-ring-wrap">
+            <svg width="52" height="52" viewBox="0 0 52 52">
+              <circle cx="26" cy="26" r="20" fill="none" stroke="#f3f4f6" stroke-width="5"/>
+              <circle cx="26" cy="26" r="20" fill="none" stroke="#16a34a" stroke-width="5"
+                stroke-dasharray="125.7" stroke-dashoffset="16" stroke-linecap="round" transform="rotate(-90 26 26)"/>
+              <text x="26" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#111827" font-family="Inter,sans-serif">87</text>
+            </svg>
+            <span class="score-ring-label">New ATS</span>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:0.58em; font-weight:700; color:var(--gray-900); margin-bottom:3px;">Score improved from 75 → 87</div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <span class="badge badge-green">+12 ATS pts</span>
+              <span class="badge badge-green">+18 Recruiter pts</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 6 — JOURNEY 3 + 4
+══════════════════════════════════════ -->
+<section>
+<div class="slide">
+  <div class="slide-label green"></div>
+  <span class="eyebrow">Journeys 03 &amp; 04</span>
+  <h2 class="title" style="margin-bottom:18px;">Build from scratch &amp; expert sessions</h2>
+  <div class="grid-1-1" style="gap:20px;">
+    <!-- builder -->
+    <div>
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+        <div class="icon-box blue">🏗</div>
+        <h3 class="section-head" style="margin-bottom:0;">Resume Builder</h3>
+      </div>
+      <div class="grid grid-2" style="gap:9px; margin-bottom:10px;">
+        <div class="card">
+          <span class="card-label">Guided form</span>
+          <p class="card-body">Personal info, experience bullets, education, skills, awards. Structured so nothing gets missed.</p>
+        </div>
+        <div class="card">
+          <span class="card-label">Live preview</span>
+          <p class="card-body">Template renders in real time. Accent color picker. What you see = what you download.</p>
+        </div>
+        <div class="card">
+          <span class="card-label">Check ATS inline</span>
+          <p class="card-body">Generates a PDF of the current draft and runs full analysis — without leaving the builder.</p>
+        </div>
+        <div class="card">
+          <span class="card-label">Auto-save</span>
+          <p class="card-body">Draft persisted to Supabase per (user, template). Survives page reloads.</p>
+        </div>
+      </div>
+      <div class="highlight green">
+        Same React component drives preview <em>and</em> PDF generation via headless Chromium — <strong>pixel-accurate output, zero fidelity gaps.</strong>
+      </div>
+    </div>
+    <!-- sessions -->
+    <div>
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+        <div class="icon-box amber">🎙</div>
+        <div>
+          <h3 class="section-head" style="margin-bottom:0;">Expert 1:1 Sessions</h3>
+          <span class="badge badge-amber" style="margin-top:3px;">Pro · 1 session included</span>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
+        <div class="flow-step" style="font-size:1em;">
+          <span class="step-num">BOOK</span>
+          <span class="step-title">14-day availability calendar</span>
+          <span class="step-desc">Sourced live from Google Calendar. Mon–Fri 11am–5pm IST, Sat–Sun 12pm–5pm. 30-min slots.</span>
+        </div>
+        <div class="flow-step">
+          <span class="step-num">CONFIRM</span>
+          <span class="step-title">Instant Google Meet link</span>
+          <span class="step-desc">Slot race-condition checked. Calendar event + Meet created automatically. Email to user and expert via Resend.</span>
+        </div>
+      </div>
+      <div class="card amber-left">
+        <span class="card-title">AI prep makes sessions 3× more valuable</span>
+        <p class="card-body">AI handles mechanics (keywords, formatting, bullet structure). The expert session focuses on strategy: narrative credibility, positioning, likely recruiter objections. No time wasted on basics.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 7 — SECTION HEADER: SEGMENTS
+══════════════════════════════════════ -->
+<section>
+<div class="slide dot-grid gray" style="justify-content:center;">
+  <div style="position:relative; z-index:1; max-width:580px;">
+    <span class="badge badge-blue" style="margin-bottom:16px;">02 · Target Segments</span>
+    <div class="divider"></div>
+    <h1 class="display" style="font-size:2.4em; margin-bottom:14px;">Four cohorts.<br>One platform.</h1>
+    <p class="lead">The Indian professional job market spans graduates to senior leaders. Each cohort has a distinct primary pain — and a distinct entry point into the product.</p>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 8 — SEGMENTS DETAIL
+══════════════════════════════════════ -->
+<section>
+<div class="slide">
+  <div class="slide-label"></div>
+  <span class="eyebrow">Target User Segments</span>
+  <h2 class="title" style="margin-bottom:18px;">Who uses Resume Expert</h2>
+  <div class="grid grid-2" style="gap:12px;">
+    <div class="card shadow" style="border-top:3px solid var(--blue-600);">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+        <span class="card-title" style="margin-bottom:0;">Career Starters</span>
+        <span class="badge badge-gray">0–2 yrs</span>
+      </div>
+      <p class="card-body" style="margin-bottom:10px;">Recent graduates who've never built a professional resume. Need structure, a credible design, and confidence the document meets baseline recruiter expectations.</p>
+      <div style="border-top:1px solid var(--gray-100); padding-top:8px;">
+        <div style="font-size:0.52em; color:var(--gray-500);">Primary path: <span style="color:var(--blue-600); font-weight:600;">Free ATS check → individual template purchase</span></div>
+      </div>
+    </div>
+    <div class="card shadow" style="border-top:3px solid var(--amber-500);">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+        <span class="card-title" style="margin-bottom:0;">Active Job Seekers</span>
+        <span class="badge badge-gray">2–5 yrs</span>
+      </div>
+      <p class="card-body" style="margin-bottom:10px;">Mid-career professionals actively applying. They have a resume but it underperforms — task-description bullets, generic language, poor keyword match to job descriptions.</p>
+      <div style="border-top:1px solid var(--gray-100); padding-top:8px;">
+        <div style="font-size:0.52em; color:var(--gray-500);">Primary path: <span style="color:var(--blue-600); font-weight:600;">ATS score → Pro upgrade for unlimited + rewrite</span></div>
+      </div>
+    </div>
+    <div class="card shadow" style="border-top:3px solid var(--violet-500);">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+        <span class="card-title" style="margin-bottom:0;">Career Changers</span>
+        <span class="badge badge-gray">Any level</span>
+      </div>
+      <p class="card-body" style="margin-bottom:10px;">Professionals pivoting industries or functions. Resume is factually accurate but poorly framed for the target role. The challenge is narrative, not content.</p>
+      <div style="border-top:1px solid var(--gray-100); padding-top:8px;">
+        <div style="font-size:0.52em; color:var(--gray-500);">Primary path: <span style="color:var(--blue-600); font-weight:600;">AI rewrite with JD input + expert session</span></div>
+      </div>
+    </div>
+    <div class="card shadow" style="border-top:3px solid var(--green-600);">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+        <span class="card-title" style="margin-bottom:0;">Senior Professionals</span>
+        <span class="badge badge-gray">5+ yrs</span>
+      </div>
+      <p class="card-body" style="margin-bottom:10px;">Experienced candidates targeting leadership roles. Care about presentation quality and professional polish. Expert session is a peer-level sounding board, not a basic review.</p>
+      <div style="border-top:1px solid var(--gray-100); padding-top:8px;">
+        <div style="font-size:0.52em; color:var(--gray-500);">Primary path: <span style="color:var(--blue-600); font-weight:600;">Executive template + expert session</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 9 — SECTION HEADER: BENEFITS
+══════════════════════════════════════ -->
+<section>
+<div class="slide blue-grad dot-grid" style="justify-content:center;">
+  <div style="position:relative; z-index:1; max-width:600px;">
+    <span class="badge badge-white" style="margin-bottom:16px;">03 · Key Benefits</span>
+    <h1 class="display" style="color:#fff; font-size:2.4em; margin-bottom:16px;">Why users choose<br>Resume Expert</h1>
+    <p class="lead white">Six benefits that distinguish the platform from every free tool, SaaS subscription, and human agency available to Indian job seekers.</p>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 10 — BENEFITS
+══════════════════════════════════════ -->
+<section>
+<div class="slide gray">
+  <div class="slide-label"></div>
+  <span class="eyebrow">Key Benefits</span>
+  <h2 class="title" style="margin-bottom:18px;">Six reasons users choose Resume Expert</h2>
+  <div class="grid grid-3" style="gap:12px;">
+    <div class="card shadow">
+      <div class="icon-box blue" style="margin-bottom:10px;">📊</div>
+      <span class="card-title">Quantified, specific feedback</span>
+      <p class="card-body">Not "use action verbs." A score 0–100 across two axes, broken down by six sections, with specific issues and a way to verify each fix by re-running.</p>
+    </div>
+    <div class="card shadow">
+      <div class="icon-box blue" style="margin-bottom:10px;">✍️</div>
+      <span class="card-title">Rewrite that preserves voice</span>
+      <p class="card-body">Claude edits the user's actual content — never replaces it. The output reads like a professionally edited version of the candidate, which matters in interviews.</p>
+    </div>
+    <div class="card shadow">
+      <div class="icon-box violet" style="margin-bottom:10px;">🤝</div>
+      <span class="card-title">AI + human, not either/or</span>
+      <p class="card-body">AI handles the mechanical layer. The expert handles strategy. This division of labour makes both more effective than they would be alone.</p>
+    </div>
+    <div class="card shadow">
+      <div class="icon-box amber" style="margin-bottom:10px;">💳</div>
+      <span class="card-title">One-time pricing</span>
+      <p class="card-body">₹999, lifetime. A job search is a one-time event. No renewal, no seat limits, no feature gating. More honest than a monthly subscription model.</p>
+    </div>
+    <div class="card shadow">
+      <div class="icon-box green" style="margin-bottom:10px;">🇮🇳</div>
+      <span class="card-title">India-first, not India-adapted</span>
+      <p class="card-body">INR + Razorpay (UPI/cards), IST hours, templates aligned to Indian hiring norms. Not a Western product retrofitted for India.</p>
+    </div>
+    <div class="card shadow">
+      <div class="icon-box blue" style="margin-bottom:10px;">🔗</div>
+      <span class="card-title">Full workflow integration</span>
+      <p class="card-body">Google Docs editing, Calendar booking, Meet sessions, email notifications. Fits into existing tools rather than replacing them.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 11 — SECTION HEADER: MARKET
+══════════════════════════════════════ -->
+<section>
+<div class="slide dot-grid gray" style="justify-content:center;">
+  <div style="position:relative; z-index:1; max-width:600px;">
+    <span class="badge badge-blue" style="margin-bottom:16px;">04 · Market Positioning</span>
+    <div class="divider"></div>
+    <h1 class="display" style="font-size:2.3em; margin-bottom:14px;">
+      Smarter than templates.<br>Faster than agencies.<br><span class="blue">More relevant than SaaS.</span>
+    </h1>
+    <p class="lead">No single competitor covers AI-native tooling + human consultation + India-native pricing in one product.</p>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 12 — COMPETITIVE LANDSCAPE
+══════════════════════════════════════ -->
+<section>
+<div class="slide">
+  <div class="slide-label"></div>
+  <span class="eyebrow">Competitive Landscape</span>
+  <h2 class="title" style="margin-bottom:16px;">Where Resume Expert sits</h2>
+  <table class="data-table blue-head" style="margin-bottom:14px;">
+    <thead>
+      <tr><th>Competitor</th><th>Model</th><th>Price</th><th>Gap</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Canva / Zety</td><td>Templates only</td><td>Free–$15/mo</td><td>No ATS intelligence, no rewrite, no expert</td></tr>
+      <tr><td>LinkedIn Resume Builder</td><td>Free, basic</td><td>Free</td><td>No scoring, no templates, no consultation</td></tr>
+      <tr><td>Resume.io / Enhancv</td><td>Subscription SaaS</td><td>$15–25/mo (~₹1,800+)</td><td>Subscription fatigue; Western-centric rubric</td></tr>
+      <tr><td>Naukri Resume Writing</td><td>Human-assisted</td><td>₹1,299–₹3,499</td><td>3–5 day turnaround; no self-serve AI</td></tr>
+      <tr><td>Human agencies</td><td>Fully manual</td><td>₹5,000–₹20,000+</td><td>High cost, slow, no AI leverage</td></tr>
+      <tr><td>ChatGPT (DIY)</td><td>Freeform AI</td><td>Free / $20/mo</td><td>No scoring, no templates, no workflow, no expert</td></tr>
+    </tbody>
+  </table>
+  <div class="highlight">
+    <strong>Resume Expert</strong> is the only option that combines quantified scoring + AI rewrite + professional templates + expert consultation in a single India-native, one-time purchase.
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 13 — FUNNEL + MOAT
+══════════════════════════════════════ -->
+<section>
+<div class="slide gray">
+  <div class="slide-label amber"></div>
+  <span class="eyebrow">Conversion Funnel &amp; Defensibility</span>
+  <h2 class="title" style="margin-bottom:18px;">Proof-of-value funnel + three-layer moat</h2>
+  <div class="grid-1-1" style="gap:24px; align-items:start;">
+    <div>
+      <h3 class="section-head" style="margin-bottom:10px;">Conversion path</h3>
+      <div class="funnel">
+        <div class="funnel-row">
+          <span class="f-tier badge-gray" style="background:var(--gray-100); color:var(--gray-600); border:1px solid var(--gray-200);">FREE</span>
+          <span class="f-price">₹0</span>
+          <span class="f-desc">5 ATS checks/month. Proof-of-value entry. Users see the scoring quality before any purchase decision.</span>
+        </div>
+        <div class="funnel-row">
+          <span class="f-tier badge-blue" style="background:var(--blue-50); color:var(--blue-600); border:1px solid var(--blue-200);">TEMPLATE</span>
+          <span class="f-price">₹99–₹299</span>
+          <span class="f-desc">Individual templates. Low commitment. Tests the builder experience before Pro upgrade.</span>
+        </div>
+        <div class="funnel-row" style="border-color:var(--blue-200); background:var(--blue-50);">
+          <span class="f-tier" style="background:var(--blue-600); color:#fff; border:none;">PRO</span>
+          <span class="f-price" style="color:var(--blue-700);">₹999 one-time</span>
+          <span class="f-desc" style="color:var(--blue-600);">All templates + unlimited checks + AI rewrite + 1 session. Primary revenue driver.</span>
+        </div>
+        <div class="funnel-row">
+          <span class="f-tier badge-amber" style="background:var(--amber-100); color:var(--amber-700); border:1px solid var(--amber-200);">SESSION</span>
+          <span class="f-price">₹499 / session</span>
+          <span class="f-desc">Add-on for active job seekers. Max LTV path: ₹1,648+.</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3 class="section-head" style="margin-bottom:10px;">Defensibility</h3>
+      <div style="display:flex; flex-direction:column; gap:9px;">
+        <div class="card blue-left">
+          <span class="card-label">Moat 01</span>
+          <span class="card-title">The scoring rubric</span>
+          <p class="card-body">Prompts tuned to Indian market norms — IT services, startups, MNC India. Not a generic Western rubric. Not visible to competitors and improves with iteration.</p>
+        </div>
+        <div class="card amber-left">
+          <span class="card-label">Moat 02</span>
+          <span class="card-title">Expert network</span>
+          <p class="card-body">A human product. Recruiting, training, and quality management create an operational barrier software-only competitors can't shortcut.</p>
+        </div>
+        <div class="card green-left">
+          <span class="card-label">Moat 03</span>
+          <span class="card-title">Integrated workflow</span>
+          <p class="card-body">Score → Rewrite → Build → Google Docs → Expert creates a workflow users return to multiple times per job search. Harder to displace than lock-in.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 14 — SECTION HEADER: TECH
+══════════════════════════════════════ -->
+<section>
+<div class="slide blue-grad dot-grid" style="justify-content:center;">
+  <div style="position:relative; z-index:1; max-width:600px;">
+    <span class="badge badge-white" style="margin-bottom:16px;">05 · Technical Architecture</span>
+    <h1 class="display" style="color:#fff; font-size:2.4em; margin-bottom:16px;">Serverless. AI-native.<br>India-ready.</h1>
+    <p class="lead white">Next.js + Supabase + Vercel. Two AI models. Razorpay payments. Deep Google Workspace integration. No self-managed servers — scales to zero and to peak automatically.</p>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:20px;">
+      <span class="badge badge-white">Next.js 15</span>
+      <span class="badge badge-white">Supabase</span>
+      <span class="badge badge-white">GPT-4o Mini</span>
+      <span class="badge badge-white">Claude API</span>
+      <span class="badge badge-white">Razorpay</span>
+      <span class="badge badge-white">Vercel</span>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 15 — TECH STACK
+══════════════════════════════════════ -->
+<section>
+<div class="slide">
+  <div class="slide-label"></div>
+  <span class="eyebrow">Technical Architecture</span>
+  <h2 class="title" style="margin-bottom:16px;">Technology stack</h2>
+  <div class="grid-1-1" style="gap:20px;">
+    <table class="data-table blue-head">
+      <thead><tr><th>Layer</th><th>Technology</th></tr></thead>
+      <tbody>
+        <tr><td>Frontend</td><td>Next.js 15 (App Router), React 19, TypeScript</td></tr>
+        <tr><td>Styling</td><td>Tailwind CSS v4 — utility-first, consistent design system</td></tr>
+        <tr><td>Backend</td><td>Next.js API Routes (serverless, Vercel)</td></tr>
+        <tr><td>Database</td><td>Supabase — PostgreSQL + Row-Level Security</td></tr>
+        <tr><td>Auth</td><td>Supabase Auth — email/password + magic link</td></tr>
+        <tr><td>File Storage</td><td>Supabase Storage — signed URLs, 5-min expiry</td></tr>
+        <tr><td>Collab Edit</td><td>Google Drive API — open/edit in Google Docs</td></tr>
+      </tbody>
+    </table>
+    <table class="data-table blue-head">
+      <thead><tr><th>Layer</th><th>Technology</th></tr></thead>
+      <tbody>
+        <tr><td>AI Scoring</td><td>OpenAI GPT-4o Mini — structured JSON output</td></tr>
+        <tr><td>AI Rewrite</td><td>Anthropic Claude API — full resume rewrite</td></tr>
+        <tr><td>PDF Parsing</td><td><code>unpdf</code> (WASM) — server-side, no native deps</td></tr>
+        <tr><td>PDF Generation</td><td>Puppeteer + <code>@sparticuz/chromium-min</code></td></tr>
+        <tr><td>Payments</td><td>Razorpay — UPI, cards, net banking, wallets</td></tr>
+        <tr><td>Email</td><td>Resend — transactional (confirmations, alerts)</td></tr>
+        <tr><td>Calendar</td><td>Google Calendar API + Meet — auto-booking</td></tr>
+        <tr><td>Analytics</td><td>PostHog — feature adoption + conversion</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 16 — DATABASE SCHEMA
+══════════════════════════════════════ -->
+<section>
+<div class="slide gray">
+  <div class="slide-label"></div>
+  <span class="eyebrow">Technical Architecture · Database</span>
+  <h2 class="title" style="margin-bottom:6px;">Database schema</h2>
+  <p class="lead" style="margin-bottom:14px;">Eight tables in Supabase PostgreSQL. All protected by Row-Level Security — users only see their own data. Backend mutations use a service-role client bypassing RLS.</p>
+  <table class="data-table blue-head">
+    <thead><tr><th>Table</th><th>Purpose</th><th>Key columns</th></tr></thead>
+    <tbody>
+      <tr><td><code>pro_access</code></td><td>One-time Pro purchases</td><td>user_id, razorpay_payment_id, amount_inr, purchased_at</td></tr>
+      <tr><td><code>purchases</code></td><td>Individual template purchases</td><td>user_id, template_id — UNIQUE constraint</td></tr>
+      <tr><td><code>resumes</code></td><td>Builder draft state (JSON)</td><td>user_id, template_id, data (JSONB), accent_color — UNIQUE(user, template)</td></tr>
+      <tr><td><code>uploaded_resumes</code></td><td>Uploaded PDF/DOCX metadata</td><td>user_id, storage_path, ats_score (cached), mime_type, size_bytes</td></tr>
+      <tr><td><code>ats_checks</code></td><td>Free tier usage tracking</td><td>user_id, checked_at — monthly rollup, max 5/month free</td></tr>
+      <tr><td><code>sessions</code></td><td>Expert booking records</td><td>user_id, scheduled_at (UNIQUE), google_event_id, meet_link, status</td></tr>
+      <tr><td><code>session_purchases</code></td><td>Additional session credits</td><td>user_id, Razorpay metadata — ₹499/session</td></tr>
+      <tr><td><code>rate_limits</code></td><td>API abuse protection</td><td>user_id, key (action name), count, window_start — 20 req/min</td></tr>
+    </tbody>
+  </table>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 17 — API FLOWS
+══════════════════════════════════════ -->
+<section>
+<div class="slide">
+  <div class="slide-label"></div>
+  <span class="eyebrow">Technical Architecture · API</span>
+  <h2 class="title" style="margin-bottom:16px;">Core API flows</h2>
+  <div style="display:flex; flex-direction:column; gap:9px;">
+    <div class="card" style="border-left:3px solid var(--blue-600);">
+      <div style="display:flex; gap:14px; align-items:flex-start;">
+        <span class="badge badge-blue" style="flex-shrink:0; margin-top:2px;">ATS CHECK</span>
+        <span style="font-size:0.58em; color:var(--gray-600); line-height:1.6;"><code style="background:var(--gray-100); padding:1px 5px; border-radius:4px; font-size:0.9em;">POST /api/ats-check</code> → unpdf WASM extracts text → GPT-4o Mini structured JSON output → cache ats_score on resume record → decrement free-tier counter → return dual score + issues + keyword gaps</span>
+      </div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--amber-500);">
+      <div style="display:flex; gap:14px; align-items:flex-start;">
+        <span class="badge badge-amber" style="flex-shrink:0; margin-top:2px;">AI REWRITE</span>
+        <span style="font-size:0.58em; color:var(--gray-600); line-height:1.6;"><code style="background:var(--gray-100); padding:1px 5px; border-radius:4px; font-size:0.9em;">POST /api/resume/rewrite</code> → verify Pro status → Claude API with original content + ATS context + JD → revised ResumeData object → Puppeteer PDF → before/after comparison with score delta</span>
+      </div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--violet-500);">
+      <div style="display:flex; gap:14px; align-items:flex-start;">
+        <span class="badge badge-violet" style="flex-shrink:0; margin-top:2px;">PDF GEN</span>
+        <span style="font-size:0.58em; color:var(--gray-600); line-height:1.6;"><code style="background:var(--gray-100); padding:1px 5px; border-radius:4px; font-size:0.9em;">POST /api/builder/pdf</code> → render React template to full HTML → launch headless Chromium → A4 PDF binary stream. Same component as live preview — pixel-accurate output guaranteed.</span>
+      </div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--green-600);">
+      <div style="display:flex; gap:14px; align-items:flex-start;">
+        <span class="badge badge-green" style="flex-shrink:0; margin-top:2px;">BOOKING</span>
+        <span style="font-size:0.58em; color:var(--gray-600); line-height:1.6;"><code style="background:var(--gray-100); padding:1px 5px; border-radius:4px; font-size:0.9em;">POST /api/sessions/book</code> → verify Pro + credits → confirm slot free (Calendar API) → create event + Meet link → insert sessions record → Resend confirmation email to user + expert</span>
+      </div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--gray-400);">
+      <div style="display:flex; gap:14px; align-items:flex-start;">
+        <span class="badge badge-gray" style="flex-shrink:0; margin-top:2px;">PAYMENT</span>
+        <span style="font-size:0.58em; color:var(--gray-600); line-height:1.6;"><code style="background:var(--gray-100); padding:1px 5px; border-radius:4px; font-size:0.9em;">POST /api/razorpay/pro-order</code> → Razorpay modal (UPI / cards / net banking) → <code style="background:var(--gray-100); padding:1px 5px; border-radius:4px; font-size:0.9em;">POST /api/razorpay/pro-verify</code> → HMAC-SHA256 verify → insert pro_access (idempotent) → welcome email</span>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 18 — TEMPLATES + SECURITY
+══════════════════════════════════════ -->
+<section>
+<div class="slide gray">
+  <div class="slide-label"></div>
+  <span class="eyebrow">Technical Architecture · Templates &amp; Security</span>
+  <h2 class="title" style="margin-bottom:18px;">Five templates &amp; security posture</h2>
+  <div class="grid-1-1" style="gap:24px;">
+    <div>
+      <h3 class="section-head" style="margin-bottom:10px;">Premium templates</h3>
+      <table class="data-table" style="margin-bottom:12px;">
+        <thead><tr><th>Template</th><th>Price</th><th>Best for</th></tr></thead>
+        <tbody>
+          <tr><td>Classic</td><td>₹99</td><td>Any industry, ATS-safe</td></tr>
+          <tr><td>Quotation</td><td>₹149</td><td>Minimal, creative roles</td></tr>
+          <tr><td>Modern</td><td>₹199</td><td>Bold sidebar, tech/product</td></tr>
+          <tr><td>Multicolumn</td><td>₹249</td><td>High density, two-column</td></tr>
+          <tr><td>Executive</td><td>₹299</td><td>Leadership, senior roles</td></tr>
+        </tbody>
+      </table>
+      <div class="highlight">
+        All five included in <strong>Pro (₹999)</strong>. One React component per template drives both the live builder preview and the Puppeteer PDF export — zero fidelity gaps, single codebase to maintain.
+      </div>
+    </div>
+    <div>
+      <h3 class="section-head" style="margin-bottom:10px;">Security posture</h3>
+      <ul class="check-list">
+        <li>HTTPS + HSTS (<code style="font-size:0.85em; background:var(--gray-100); padding:1px 4px; border-radius:3px;">max-age=31536000; includeSubDomains</code>)</li>
+        <li>Content-Security-Policy + <code style="font-size:0.85em; background:var(--gray-100); padding:1px 4px; border-radius:3px;">X-Frame-Options: DENY</code> — blocks XSS and clickjacking</li>
+        <li>Resume downloads via signed URLs — 5-minute expiry, no permanent public file paths</li>
+        <li>Razorpay webhook payloads verified by HMAC-SHA256 before any database write</li>
+        <li>All AI API keys server-side only — never bundled into the client</li>
+        <li>Per-user rate limiting on every route (20 req/min; 5 req/min for session booking)</li>
+        <li>RLS on all Supabase tables — users can only read their own rows</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 19 — CLOSING
+══════════════════════════════════════ -->
+<section>
+<div class="slide blue-grad" style="justify-content:center; align-items:center; text-align:center; padding:60px;">
+  <div style="max-width:580px; margin:0 auto;">
+    <span class="badge badge-white" style="margin-bottom:24px;">Resume Expert · India · May 2026</span>
+    <h1 style="font-size:3.2em; font-weight:900; color:#fff; line-height:1.05; margin-bottom:8px; letter-spacing:-0.03em; font-family:Inter,sans-serif;">₹999.</h1>
+    <h2 style="font-size:1.6em; font-weight:700; color:rgba(255,255,255,0.9); letter-spacing:-0.02em; margin-bottom:20px; font-family:Inter,sans-serif;">One time. Lifetime access.</h2>
+    <p style="font-size:0.65em; color:rgba(255,255,255,0.7); line-height:1.7; max-width:440px; margin:0 auto 32px;">AI scoring + AI rewrite + 5 premium templates + expert consultation. Built for India. Priced honestly.</p>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px;">
+      <div style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:10px; padding:14px 10px;">
+        <div style="font-size:1.3em; font-weight:800; color:#fff; line-height:1;">∞</div>
+        <div style="font-size:0.46em; color:rgba(255,255,255,0.65); margin-top:4px;">ATS checks</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:10px; padding:14px 10px;">
+        <div style="font-size:1.3em; font-weight:800; color:#fff; line-height:1;">5</div>
+        <div style="font-size:0.46em; color:rgba(255,255,255,0.65); margin-top:4px;">templates</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:10px; padding:14px 10px;">
+        <div style="font-size:1.3em; font-weight:800; color:#fff; line-height:1;">AI</div>
+        <div style="font-size:0.46em; color:rgba(255,255,255,0.65); margin-top:4px;">rewrite</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:10px; padding:14px 10px;">
+        <div style="font-size:1.3em; font-weight:800; color:#fff; line-height:1;">1:1</div>
+        <div style="font-size:0.46em; color:rgba(255,255,255,0.65); margin-top:4px;">expert session</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>
+Reveal.initialize({
+  hash: true,
+  slideNumber: 'c/t',
+  progress: true,
+  controls: true,
+  center: false,
+  transition: 'slide',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'fade',
+  width: 1100,
+  height: 640,
+  margin: 0.0,
+});
+</script>
+</body>
+</html>
