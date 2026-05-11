@@ -413,6 +413,246 @@ p.body.white { color: rgba(255,255,255,0.8); }
   font-size: 11px; color: var(--gray-400);
   background: transparent;
 }
+
+/* ── MOBILE SCROLLABLE VIEW ── */
+#mob { display: none; }
+
+.is-mobile .reveal-viewport { display: none !important; }
+.is-mobile #mob {
+  display: block;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #fff;
+  padding-bottom: 48px;
+}
+
+/* mobile section */
+.ms {
+  padding: 28px 20px;
+  border-bottom: 1px solid var(--gray-100);
+}
+.ms.gray { background: var(--gray-50); }
+.ms.blue-bg {
+  background: linear-gradient(135deg, var(--blue-600), var(--blue-700));
+  border-bottom: none;
+}
+
+/* mobile typography */
+.ms h1 {
+  font-size: 1.75rem; font-weight: 800;
+  line-height: 1.1; letter-spacing: -0.03em;
+  color: var(--gray-900); margin: 0 0 10px;
+}
+.ms h1.white { color: #fff; }
+.ms h2 {
+  font-size: 1.15rem; font-weight: 800;
+  color: var(--gray-900); margin: 0 0 6px;
+  letter-spacing: -0.02em; line-height: 1.2;
+}
+.ms h3 {
+  font-size: 0.8rem; font-weight: 700;
+  color: var(--gray-900); margin: 16px 0 8px;
+}
+.ms p, .ms li {
+  font-size: 0.8rem; color: var(--gray-600);
+  line-height: 1.65; margin: 0;
+}
+.ms p.sub { color: var(--gray-500); margin-bottom: 16px; }
+.ms p.white { color: rgba(255,255,255,0.8); }
+.ms .eye {
+  font-size: 0.62rem; font-weight: 700;
+  color: var(--blue-600); letter-spacing: 0.1em;
+  text-transform: uppercase; display: block;
+  margin-bottom: 6px;
+}
+.ms .eye.white { color: rgba(255,255,255,0.7); }
+
+/* mobile cards */
+.mc {
+  background: #fff; border: 1px solid var(--gray-200);
+  border-radius: 10px; padding: 14px 16px;
+  margin-top: 10px;
+}
+.mc + .mc { margin-top: 8px; }
+.mc.bl { border-left: 3px solid var(--blue-600); background: var(--blue-50); }
+.mc.al { border-left: 3px solid var(--amber-500); background: var(--amber-50); }
+.mc.gl { border-left: 3px solid var(--green-600); background: var(--green-50); }
+.mc.vl { border-left: 3px solid var(--violet-500); background: var(--violet-50); }
+.mc .mlabel {
+  font-size: 0.6rem; font-weight: 700; color: var(--gray-400);
+  letter-spacing: 0.1em; text-transform: uppercase;
+  display: block; margin-bottom: 3px;
+}
+.mc .mtitle {
+  font-size: 0.78rem; font-weight: 700;
+  color: var(--gray-900); display: block; margin-bottom: 4px;
+}
+.mc .mbody {
+  font-size: 0.72rem; color: var(--gray-500); line-height: 1.55;
+}
+.mc .mpath {
+  font-size: 0.65rem; color: var(--gray-500);
+  margin-top: 8px; padding-top: 8px;
+  border-top: 1px solid var(--gray-100);
+}
+.mc .mpath strong { color: var(--blue-600); }
+
+/* mobile highlight */
+.mhi {
+  background: var(--blue-50);
+  border-left: 3px solid var(--blue-600);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px; margin-top: 12px;
+  font-size: 0.72rem; color: var(--gray-700); line-height: 1.6;
+}
+.mhi.al {
+  background: var(--amber-50);
+  border-left-color: var(--amber-500);
+}
+.mhi.gl {
+  background: var(--green-50);
+  border-left-color: var(--green-600);
+}
+.mhi strong { color: var(--blue-700); }
+.mhi.al strong { color: var(--amber-700); }
+
+/* mobile badge row */
+.mbadges {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-top: 12px;
+}
+
+/* mobile stats */
+.mstats {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin-top: 14px;
+}
+.mstat {
+  background: var(--gray-50); border: 1px solid var(--gray-200);
+  border-radius: 8px; padding: 12px;
+  text-align: center;
+}
+.mstat .sv {
+  font-size: 1.3rem; font-weight: 800;
+  color: var(--blue-600); display: block; line-height: 1;
+}
+.mstat .sv.am { color: var(--amber-600); }
+.mstat .sl {
+  font-size: 0.6rem; color: var(--gray-500);
+  margin-top: 3px; display: block;
+}
+
+/* mobile funnel */
+.mfunnel { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.mfrow {
+  display: flex; align-items: center; gap: 10px;
+  background: #fff; border: 1px solid var(--gray-200);
+  border-radius: 8px; padding: 10px 12px;
+}
+.mfrow.pro { background: var(--blue-50); border-color: var(--blue-200); }
+.mftier {
+  font-size: 0.58rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 9999px;
+  flex-shrink: 0; min-width: 64px; text-align: center;
+}
+.mfprice {
+  font-size: 0.78rem; font-weight: 800;
+  color: var(--gray-900); min-width: 76px; flex-shrink: 0;
+}
+.mfprice.blue { color: var(--blue-700); }
+.mfdesc { font-size: 0.65rem; color: var(--gray-500); line-height: 1.4; }
+
+/* mobile checklist */
+.mclist { list-style: none; padding: 0; margin: 8px 0 0; display: flex; flex-direction: column; gap: 6px; }
+.mclist li {
+  font-size: 0.72rem; color: var(--gray-600);
+  display: flex; gap: 8px; align-items: flex-start; line-height: 1.5;
+}
+.mclist li::before {
+  content: '✓'; color: var(--green-600);
+  font-weight: 700; font-size: 0.8rem; flex-shrink: 0; margin-top: 1px;
+}
+
+/* mobile table → cards */
+.mtable { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.mtrow {
+  display: flex; gap: 0;
+  background: #fff; border: 1px solid var(--gray-200);
+  border-radius: 8px; overflow: hidden;
+}
+.mtrow .mtk {
+  background: var(--gray-50); border-right: 1px solid var(--gray-200);
+  padding: 10px 12px; font-size: 0.68rem; font-weight: 700;
+  color: var(--gray-900); min-width: 100px; flex-shrink: 0;
+  display: flex; align-items: center;
+}
+.mtrow .mtv {
+  padding: 10px 12px; font-size: 0.68rem;
+  color: var(--gray-600); line-height: 1.5;
+  display: flex; align-items: center;
+}
+
+/* mobile section divider */
+.msec-header {
+  padding: 24px 20px 20px;
+}
+.msec-header.blue-bg {
+  background: linear-gradient(135deg, var(--blue-600), var(--blue-700));
+}
+.msec-header.gray-bg { background: var(--gray-50); }
+.msec-bar {
+  width: 32px; height: 3px; background: var(--blue-600);
+  border-radius: 2px; margin-bottom: 12px;
+}
+.msec-bar.white { background: rgba(255,255,255,0.5); }
+
+/* mobile closing */
+.mclosing {
+  background: linear-gradient(135deg, var(--blue-600), var(--blue-700));
+  padding: 40px 20px; text-align: center;
+}
+.mclosing .big {
+  font-size: 2.8rem; font-weight: 900;
+  color: #fff; line-height: 1; letter-spacing: -0.03em;
+}
+.mclosing .sub2 {
+  font-size: 1.1rem; font-weight: 700;
+  color: rgba(255,255,255,0.9); margin: 6px 0 12px;
+}
+.mclosing p { font-size: 0.75rem; color: rgba(255,255,255,0.7); max-width: 300px; margin: 0 auto 20px; }
+.mclosing-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin-top: 20px;
+}
+.mcg-item {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px; padding: 12px 8px; text-align: center;
+}
+.mcg-item .mcgv {
+  font-size: 1.3rem; font-weight: 800; color: #fff; display: block;
+}
+.mcg-item .mcgl {
+  font-size: 0.58rem; color: rgba(255,255,255,0.65); margin-top: 3px; display: block;
+}
+
+/* mobile nav */
+#mob-nav {
+  position: sticky; top: 0; z-index: 100;
+  background: #fff; border-bottom: 1px solid var(--gray-200);
+  padding: 12px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+#mob-nav .brand {
+  font-size: 0.85rem; font-weight: 800; color: var(--gray-900);
+}
+#mob-nav .brand span { color: var(--blue-600); }
+#mob-nav .nb { display: flex; gap: 6px; }
+#mob-nav .nb a {
+  font-size: 0.6rem; font-weight: 600; color: var(--gray-500);
+  background: var(--gray-100); border-radius: 9999px;
+  padding: 4px 10px; text-decoration: none; white-space: nowrap;
+}
 </style>
 </head>
 <body>
@@ -1182,19 +1422,331 @@ p.body.white { color: rgba(255,255,255,0.8); }
 
 <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
 <script>
-Reveal.initialize({
-  hash: true,
-  slideNumber: 'c/t',
-  progress: true,
-  controls: true,
-  center: false,
-  transition: 'slide',
-  transitionSpeed: 'fast',
-  backgroundTransition: 'fade',
-  width: 1100,
-  height: 640,
-  margin: 0.0,
-});
+// Detect mobile (real device width, not Reveal's scaled canvas)
+const isMobile = window.innerWidth < 768 || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+if (isMobile) {
+  document.documentElement.classList.add('is-mobile');
+} else {
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    progress: true,
+    controls: true,
+    center: false,
+    transition: 'slide',
+    transitionSpeed: 'fast',
+    backgroundTransition: 'fade',
+    width: 1100,
+    height: 640,
+    margin: 0.0,
+  });
+}
 </script>
+
+<!-- ══════════════════════════════════════
+     MOBILE SCROLLABLE VIEW
+     Hidden on desktop via .is-mobile class detection above
+══════════════════════════════════════ -->
+<div id="mob">
+
+  <!-- sticky nav -->
+  <div id="mob-nav">
+    <div class="brand">Resume <span>Expert</span></div>
+    <div class="nb">
+      <a href="#mob-product">Product</a>
+      <a href="#mob-segments">Segments</a>
+      <a href="#mob-market">Market</a>
+      <a href="#mob-tech">Tech</a>
+    </div>
+  </div>
+
+  <!-- TITLE -->
+  <div class="ms" style="text-align:center; padding:32px 20px 28px;">
+    <span class="badge badge-blue" style="margin-bottom:14px;">Product Overview · May 2026</span>
+    <h1 style="font-size:2rem; font-weight:800; color:var(--gray-900); letter-spacing:-0.03em; margin:0 0 10px;">Resume <span style="color:var(--blue-600);">Expert</span></h1>
+    <p style="font-size:0.8rem; color:var(--gray-500); line-height:1.65; margin-bottom:16px;">AI-powered resume scoring, rewriting, and expert consultation — built for Indian job seekers, priced for a one-time purchase.</p>
+    <div class="mbadges" style="justify-content:center;">
+      <span class="badge badge-blue">AI Scoring</span>
+      <span class="badge badge-blue">AI Rewrite</span>
+      <span class="badge badge-blue">Builder</span>
+      <span class="badge badge-amber">Expert Sessions</span>
+      <span class="badge badge-green">India-first</span>
+    </div>
+    <div class="mstats" style="grid-template-columns:1fr 1fr 1fr 1fr; margin-top:20px;">
+      <div class="mstat"><span class="sv">₹999</span><span class="sl">one-time</span></div>
+      <div class="mstat"><span class="sv">5</span><span class="sl">templates</span></div>
+      <div class="mstat"><span class="sv">2</span><span class="sl">AI models</span></div>
+      <div class="mstat"><span class="sv am">1:1</span><span class="sl">expert session</span></div>
+    </div>
+  </div>
+
+  <!-- THE PROBLEM -->
+  <div class="ms gray">
+    <span class="eye">The Problem</span>
+    <h2>Most resumes fail before a human ever reads them</h2>
+    <p class="sub">Indian job seekers have no reliable way to know why their applications go unanswered.</p>
+    <div class="mc bl">
+      <span class="mlabel">Pain 01</span>
+      <span class="mtitle">Invisible ATS Filters</span>
+      <p class="mbody">Large companies auto-reject resumes before a human sees them. Candidates never learn if it's a formatting issue, missing keywords, or poor parsing.</p>
+    </div>
+    <div class="mc al">
+      <span class="mlabel">Pain 02</span>
+      <span class="mtitle">Generic, Unactionable Feedback</span>
+      <p class="mbody">Free tools return vague advice with no indication of which bullet, which section, or what to write instead.</p>
+    </div>
+    <div class="mc vl">
+      <span class="mlabel">Pain 03</span>
+      <span class="mtitle">Expensive or Slow Alternatives</span>
+      <p class="mbody">Human agencies charge ₹5,000–₹20,000 and take 3–5 days. Western SaaS tools are monthly subscriptions not calibrated for India.</p>
+    </div>
+    <div class="mhi"><strong>Resume Expert</strong> makes invisible friction visible — quantified 0–100 — with concrete one-click tools to fix it. One-time payment. Lifetime access.</div>
+  </div>
+
+  <!-- PRODUCT SECTION HEADER -->
+  <div id="mob-product" class="ms blue-bg">
+    <span class="eye white">01 · Product</span>
+    <h1 class="white">Four journeys.<br>One platform.</h1>
+    <p class="white" style="margin-top:8px;">Score → Rewrite → Build → Expert. Each journey feeds into the next.</p>
+  </div>
+
+  <!-- JOURNEY 1 -->
+  <div class="ms">
+    <span class="eye">Journey 01 · Free &amp; Pro</span>
+    <h2>Score an existing resume</h2>
+    <p class="sub">Upload PDF or paste text → GPT-4o Mini analysis → dual-axis score + section breakdown + keyword gaps.</p>
+    <div class="mc bl">
+      <span class="mlabel">ATS Score</span>
+      <span class="mtitle">Automated filter survival</span>
+      <p class="mbody">Keyword density, formatting parsability, contact completeness, section structure.</p>
+    </div>
+    <div class="mc al">
+      <span class="mlabel">Recruiter Score</span>
+      <span class="mtitle">Human readability</span>
+      <p class="mbody">Impact language, quantified achievements, relevance to the job description.</p>
+    </div>
+    <div class="mhi"><strong>Free:</strong> 5 checks/month &nbsp;·&nbsp; <strong>Pro:</strong> unlimited + cached results on dashboard</div>
+  </div>
+
+  <!-- JOURNEY 2 -->
+  <div class="ms gray">
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+      <span class="eye" style="margin-bottom:0;">Journey 02</span>
+      <span class="badge badge-amber">Pro only</span>
+    </div>
+    <h2>AI rewrite — score improvements in minutes</h2>
+    <p class="sub">One click from the ATS results page sends resume + context + job description to OpenAI.</p>
+    <div class="mc">
+      <span class="mlabel">01 · Trigger</span>
+      <p class="mbody">From the ATS results page — context, job description, and original content sent together.</p>
+    </div>
+    <div class="mc">
+      <span class="mlabel">02 · AI Edit</span>
+      <p class="mbody">OpenAI strengthens bullets, weaves in missing keywords, fixes ATS-non-compliant phrasing — grounded in the user's actual experience.</p>
+    </div>
+    <div class="mc">
+      <span class="mlabel">03 · Output</span>
+      <p class="mbody">Before/after comparison with score delta. One-click A4 PDF download.</p>
+    </div>
+    <div class="mhi al">The rewrite <strong>preserves voice</strong>. A resume that doesn't sound like the candidate fails in interviews even if it passes the ATS.</div>
+  </div>
+
+  <!-- JOURNEY 3 + 4 -->
+  <div class="ms">
+    <span class="eye">Journeys 03 &amp; 04</span>
+    <h2>Build from scratch &amp; expert sessions</h2>
+    <h3>🏗 Resume Builder</h3>
+    <div class="mc">
+      <span class="mlabel">Guided form</span>
+      <p class="mbody">Personal info, experience bullets, education, skills, awards. Structured so nothing gets missed.</p>
+    </div>
+    <div class="mc">
+      <span class="mlabel">Live preview + auto-save</span>
+      <p class="mbody">Template renders in real time. Draft persisted to Supabase per (user, template). Same React component → PDF, pixel-accurate.</p>
+    </div>
+    <div class="mhi gl">Same component drives preview <em>and</em> PDF export — <strong>zero fidelity gaps.</strong></div>
+    <h3 style="margin-top:18px;">🎙 Expert 1:1 Sessions <span class="badge badge-amber" style="vertical-align:middle; margin-left:4px;">Pro · 1 included</span></h3>
+    <div class="mc al">
+      <span class="mlabel">Book</span>
+      <p class="mbody">14-day Google Calendar availability. Mon–Fri 11am–5pm IST, Sat–Sun 12pm–5pm. 30-min slots. Instant Meet link.</p>
+    </div>
+    <div class="mhi al">AI handles mechanics. Expert handles strategy — narrative credibility, positioning, recruiter objections. No time wasted on basics.</div>
+  </div>
+
+  <!-- SEGMENTS HEADER -->
+  <div id="mob-segments" class="ms gray" style="background:var(--gray-50);">
+    <span class="badge badge-blue" style="margin-bottom:10px;">02 · Target Segments</span>
+    <h2 style="font-size:1.3rem;">Four cohorts. One platform.</h2>
+    <p style="font-size:0.78rem; color:var(--gray-500); margin-top:6px;">Each cohort has a distinct primary pain and a distinct entry point into the product.</p>
+  </div>
+
+  <!-- SEGMENTS DETAIL -->
+  <div class="ms">
+    <span class="eye">Target User Segments</span>
+    <h2>Who uses Resume Expert</h2>
+    <div class="mc" style="border-top:3px solid var(--blue-600);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <span class="mtitle" style="margin-bottom:0;">Career Starters</span>
+        <span class="badge badge-gray">0–2 yrs</span>
+      </div>
+      <p class="mbody">Recent graduates. Need structure and confidence their document meets baseline recruiter expectations.</p>
+      <p class="mpath">Primary path: <strong>Free ATS check → individual template</strong></p>
+    </div>
+    <div class="mc" style="border-top:3px solid var(--amber-500);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <span class="mtitle" style="margin-bottom:0;">Active Job Seekers</span>
+        <span class="badge badge-gray">2–5 yrs</span>
+      </div>
+      <p class="mbody">Have a resume but it underperforms — task-description bullets, generic language, poor keyword match.</p>
+      <p class="mpath">Primary path: <strong>ATS score → Pro upgrade</strong></p>
+    </div>
+    <div class="mc" style="border-top:3px solid var(--violet-500);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <span class="mtitle" style="margin-bottom:0;">Career Changers</span>
+        <span class="badge badge-gray">Any level</span>
+      </div>
+      <p class="mbody">Pivoting industries. Resume is accurate but poorly framed for the target role. The challenge is narrative.</p>
+      <p class="mpath">Primary path: <strong>AI rewrite with JD + expert session</strong></p>
+    </div>
+    <div class="mc" style="border-top:3px solid var(--green-600);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+        <span class="mtitle" style="margin-bottom:0;">Senior Professionals</span>
+        <span class="badge badge-gray">5+ yrs</span>
+      </div>
+      <p class="mbody">Targeting leadership roles. Care about polish. Expert session is a peer-level sounding board.</p>
+      <p class="mpath">Primary path: <strong>Executive template + expert session</strong></p>
+    </div>
+  </div>
+
+  <!-- BENEFITS HEADER -->
+  <div class="ms blue-bg">
+    <span class="eye white">03 · Key Benefits</span>
+    <h1 class="white">Why users choose Resume Expert</h1>
+  </div>
+
+  <!-- BENEFITS -->
+  <div class="ms gray">
+    <span class="eye">Key Benefits</span>
+    <h2>Six reasons</h2>
+    <div class="mc"><span class="mlabel">01</span><span class="mtitle">📊 Quantified, specific feedback</span><p class="mbody">Score 0–100 across two axes, broken down by six sections, with specific issues and a way to verify each fix.</p></div>
+    <div class="mc"><span class="mlabel">02</span><span class="mtitle">✍️ Rewrite that preserves voice</span><p class="mbody">OpenAI edits actual content — never replaces it. Sounds like a professionally edited version of the candidate.</p></div>
+    <div class="mc"><span class="mlabel">03</span><span class="mtitle">🤝 AI + human, not either/or</span><p class="mbody">AI handles mechanics. Expert handles strategy. Both more effective together than alone.</p></div>
+    <div class="mc"><span class="mlabel">04</span><span class="mtitle">💳 One-time pricing</span><p class="mbody">₹999, lifetime. No renewal, no seat limits. A job search is a one-time event — the pricing model matches.</p></div>
+    <div class="mc"><span class="mlabel">05</span><span class="mtitle">🇮🇳 India-first, not India-adapted</span><p class="mbody">INR + Razorpay (UPI/cards), IST hours, templates aligned to Indian hiring norms.</p></div>
+    <div class="mc"><span class="mlabel">06</span><span class="mtitle">🔗 Full workflow integration</span><p class="mbody">Google Docs, Calendar, Meet, Resend. Fits into existing tools rather than replacing them.</p></div>
+  </div>
+
+  <!-- MARKET HEADER -->
+  <div id="mob-market" class="ms gray" style="background:var(--gray-50);">
+    <span class="badge badge-blue" style="margin-bottom:10px;">04 · Market Positioning</span>
+    <h2 style="font-size:1.2rem;">Smarter than templates. Faster than agencies. More relevant than SaaS.</h2>
+  </div>
+
+  <!-- COMPETITIVE TABLE -->
+  <div class="ms">
+    <span class="eye">Competitive Landscape</span>
+    <h2>Where Resume Expert sits</h2>
+    <div class="mtable">
+      <div class="mtrow"><div class="mtk">Canva / Zety</div><div class="mtv">Templates only — no ATS intelligence, no rewrite, no expert</div></div>
+      <div class="mtrow"><div class="mtk">LinkedIn</div><div class="mtv">Free, basic — no scoring, no templates, no consultation</div></div>
+      <div class="mtrow"><div class="mtk">Resume.io</div><div class="mtv">$15–25/mo subscription — Western-centric, subscription fatigue</div></div>
+      <div class="mtrow"><div class="mtk">Naukri</div><div class="mtv">₹1,299–₹3,499 human — 3–5 day turnaround, no self-serve AI</div></div>
+      <div class="mtrow"><div class="mtk">Agencies</div><div class="mtv">₹5,000–₹20,000+ — high cost, slow, no AI leverage</div></div>
+      <div class="mtrow"><div class="mtk">ChatGPT DIY</div><div class="mtv">Freeform AI — no scoring, no templates, no workflow</div></div>
+    </div>
+    <div class="mhi" style="margin-top:12px;"><strong>Resume Expert</strong> is the only option combining quantified scoring + AI rewrite + professional templates + expert consultation in a single India-native, one-time purchase.</div>
+  </div>
+
+  <!-- FUNNEL + MOAT -->
+  <div class="ms gray">
+    <span class="eye">Conversion &amp; Defensibility</span>
+    <h2>Proof-of-value funnel</h2>
+    <div class="mfunnel">
+      <div class="mfrow"><span class="mftier" style="background:var(--gray-100); color:var(--gray-600); border:1px solid var(--gray-200);">FREE</span><span class="mfprice">₹0</span><span class="mfdesc">5 ATS checks/month. Proof-of-value before any purchase.</span></div>
+      <div class="mfrow"><span class="mftier" style="background:var(--blue-50); color:var(--blue-600); border:1px solid var(--blue-200);">TEMPLATE</span><span class="mfprice">₹99–₹299</span><span class="mfdesc">Individual templates. Low commitment upsell to Pro.</span></div>
+      <div class="mfrow pro"><span class="mftier" style="background:var(--blue-600); color:#fff;">PRO</span><span class="mfprice blue">₹999 once</span><span class="mfdesc" style="color:var(--blue-600);">All templates + unlimited + rewrite + 1 session.</span></div>
+      <div class="mfrow"><span class="mftier" style="background:var(--amber-100); color:var(--amber-700); border:1px solid var(--amber-200);">SESSION</span><span class="mfprice">₹499 each</span><span class="mfdesc">Add-on. Max LTV: ₹1,648+.</span></div>
+    </div>
+    <h3>Three-layer moat</h3>
+    <div class="mc bl"><span class="mlabel">Moat 01</span><span class="mtitle">The scoring rubric</span><p class="mbody">Prompts tuned to Indian market norms — IT services, startups, MNC India. Not visible to competitors.</p></div>
+    <div class="mc al"><span class="mlabel">Moat 02</span><span class="mtitle">Expert network</span><p class="mbody">Recruiting, training, and quality management create an operational barrier software-only competitors can't shortcut.</p></div>
+    <div class="mc gl"><span class="mlabel">Moat 03</span><span class="mtitle">Integrated workflow</span><p class="mbody">Score → Rewrite → Build → Google Docs → Expert. Users return multiple times per job search.</p></div>
+  </div>
+
+  <!-- TECH HEADER -->
+  <div id="mob-tech" class="ms blue-bg">
+    <span class="eye white">05 · Technical Architecture</span>
+    <h1 class="white">Serverless. AI-native. India-ready.</h1>
+    <div class="mbadges" style="margin-top:12px;">
+      <span class="badge badge-white">Next.js 15</span>
+      <span class="badge badge-white">Supabase</span>
+      <span class="badge badge-white">GPT-4o Mini</span>
+      <span class="badge badge-white">OpenAI</span>
+      <span class="badge badge-white">Razorpay</span>
+      <span class="badge badge-white">Vercel</span>
+    </div>
+  </div>
+
+  <!-- TECH STACK -->
+  <div class="ms">
+    <span class="eye">Technology Stack</span>
+    <h2>What it's built on</h2>
+    <div class="mtable">
+      <div class="mtrow"><div class="mtk">Frontend</div><div class="mtv">Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS v4</div></div>
+      <div class="mtrow"><div class="mtk">Backend</div><div class="mtv">Next.js API Routes — serverless, Vercel</div></div>
+      <div class="mtrow"><div class="mtk">Database</div><div class="mtv">Supabase — PostgreSQL + Row-Level Security</div></div>
+      <div class="mtrow"><div class="mtk">Auth</div><div class="mtv">Supabase Auth — email/password + magic link</div></div>
+      <div class="mtrow"><div class="mtk">AI Scoring</div><div class="mtv">OpenAI GPT-4o Mini — structured JSON output</div></div>
+      <div class="mtrow"><div class="mtk">AI Rewrite</div><div class="mtv">OpenAI — full resume rewrite</div></div>
+      <div class="mtrow"><div class="mtk">PDF Parse</div><div class="mtv">unpdf (WASM) — server-side, no native deps</div></div>
+      <div class="mtrow"><div class="mtk">PDF Export</div><div class="mtv">Puppeteer + @sparticuz/chromium-min</div></div>
+      <div class="mtrow"><div class="mtk">Payments</div><div class="mtv">Razorpay — UPI, cards, net banking</div></div>
+      <div class="mtrow"><div class="mtk">Calendar</div><div class="mtv">Google Calendar API + Meet — auto-booking</div></div>
+      <div class="mtrow"><div class="mtk">Email</div><div class="mtv">Resend — transactional</div></div>
+      <div class="mtrow"><div class="mtk">Hosting</div><div class="mtv">Vercel — global CDN, auto-scaling</div></div>
+    </div>
+  </div>
+
+  <!-- API FLOWS -->
+  <div class="ms gray">
+    <span class="eye">Core API Flows</span>
+    <h2>How the platform works</h2>
+    <div class="mc bl"><span class="mlabel">ATS Check</span><p class="mbody"><code style="font-size:0.85em; background:var(--gray-100); padding:1px 4px; border-radius:3px;">POST /api/ats-check</code> → unpdf WASM → GPT-4o Mini JSON → cache score → decrement free-tier counter → return dual score + issues</p></div>
+    <div class="mc al"><span class="mlabel">AI Rewrite</span><p class="mbody"><code style="font-size:0.85em; background:var(--gray-100); padding:1px 4px; border-radius:3px;">POST /api/resume/rewrite</code> → verify Pro → OpenAI with content + JD → revised ResumeData → Puppeteer PDF → before/after with score delta</p></div>
+    <div class="mc vl"><span class="mlabel">PDF Gen</span><p class="mbody"><code style="font-size:0.85em; background:var(--gray-100); padding:1px 4px; border-radius:3px;">POST /api/builder/pdf</code> → render React template → headless Chromium → A4 PDF binary stream</p></div>
+    <div class="mc gl"><span class="mlabel">Booking</span><p class="mbody"><code style="font-size:0.85em; background:var(--gray-100); padding:1px 4px; border-radius:3px;">POST /api/sessions/book</code> → verify Pro + credits → Calendar API → create event + Meet link → Resend email</p></div>
+    <div class="mc"><span class="mlabel">Payment</span><p class="mbody"><code style="font-size:0.85em; background:var(--gray-100); padding:1px 4px; border-radius:3px;">POST /api/razorpay/pro-order</code> → Razorpay modal → HMAC-SHA256 verify → insert pro_access → welcome email</p></div>
+  </div>
+
+  <!-- SECURITY -->
+  <div class="ms">
+    <span class="eye">Security</span>
+    <h2>Security posture</h2>
+    <ul class="mclist">
+      <li>HTTPS + HSTS (max-age=31536000; includeSubDomains)</li>
+      <li>Content-Security-Policy + X-Frame-Options: DENY</li>
+      <li>Resume downloads via signed URLs — 5-min expiry, no permanent public paths</li>
+      <li>Razorpay webhooks verified by HMAC-SHA256 before any DB write</li>
+      <li>All AI API keys server-side only — never in the client bundle</li>
+      <li>Per-user rate limiting on every route (20 req/min; 5 for booking)</li>
+      <li>RLS on all Supabase tables — users only read their own rows</li>
+    </ul>
+  </div>
+
+  <!-- CLOSING -->
+  <div class="mclosing">
+    <div class="big">₹999.</div>
+    <div class="sub2">One time. Lifetime access.</div>
+    <p>AI scoring + AI rewrite + 5 premium templates + expert consultation. Built for India. Priced honestly.</p>
+    <div class="mclosing-grid">
+      <div class="mcg-item"><span class="mcgv">∞</span><span class="mcgl">ATS checks</span></div>
+      <div class="mcg-item"><span class="mcgv">5</span><span class="mcgl">templates</span></div>
+      <div class="mcg-item"><span class="mcgv">AI</span><span class="mcgl">rewrite</span></div>
+      <div class="mcg-item"><span class="mcgv">1:1</span><span class="mcgl">expert session</span></div>
+    </div>
+    <p style="margin-top:20px; font-size:0.65rem; color:rgba(255,255,255,0.5);">Resume Expert · India · May 2026</p>
+  </div>
+
+</div><!-- #mob -->
 </body>
 </html>
