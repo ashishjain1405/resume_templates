@@ -1218,12 +1218,71 @@ p.body.white { color: rgba(255,255,255,0.8); }
 </section>
 
 <!-- ══════════════════════════════════════
-     SLIDE 14 — SECTION HEADER: TECH
+     SLIDE 14 — NOT JUST AN AI WRAPPER HEADER
+══════════════════════════════════════ -->
+<section>
+<div class="slide dot-grid gray" style="justify-content:center;">
+  <div style="position:relative; z-index:1; max-width:600px;">
+    <span class="badge badge-blue" style="margin-bottom:16px;">05 · Differentiation</span>
+    <div class="divider"></div>
+    <h1 class="display" style="font-size:2.3em; margin-bottom:14px;">
+      This is not an<br><span class="blue">AI wrapper.</span>
+    </h1>
+    <p class="lead">Calling an OpenAI API is two lines of code. What Resume Expert has built around that call is the product.</p>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 15 — NOT JUST AN AI WRAPPER DETAIL
+══════════════════════════════════════ -->
+<section>
+<div class="slide">
+  <div class="slide-label violet"></div>
+  <span class="eyebrow">Differentiation</span>
+  <h2 class="title" style="margin-bottom:18px;">Six layers of product built on top of the AI call</h2>
+  <div class="grid grid-3" style="gap:11px;">
+    <div class="card" style="border-top:3px solid var(--blue-600);">
+      <div class="icon-box blue" style="margin-bottom:8px;">🎯</div>
+      <span class="card-title">India-tuned scoring rubric</span>
+      <p class="card-body">The prompt isn't generic. It encodes what Indian recruiters at IT services firms, product startups, and MNC India offices actually look for — keyword conventions, summary expectations, date formats, and section norms that differ materially from Western standards. This took iteration and domain expertise to build, and it's not visible to anyone calling the same API.</p>
+    </div>
+    <div class="card" style="border-top:3px solid var(--amber-500);">
+      <div class="icon-box amber" style="margin-bottom:8px;">👁</div>
+      <span class="card-title">Dual-axis scoring model</span>
+      <p class="card-body">Most tools return one score. Resume Expert separates ATS compliance (machine readability, keyword density, format parsability) from Recruiter quality (impact language, achievement framing, narrative clarity). These are different problems — conflating them produces useless feedback. The model design, not the API call, is the insight.</p>
+    </div>
+    <div class="card" style="border-top:3px solid var(--violet-500);">
+      <div class="icon-box violet" style="margin-bottom:8px;">🔁</div>
+      <span class="card-title">Closed feedback loop</span>
+      <p class="card-body">The AI output doesn't end at a suggestion. Users fix an issue, regenerate their PDF from the builder, re-run the ATS check, and see the score move. The system is designed for iteration, not a one-shot report. The score is cached per resume so returning users see their history without re-consuming API credits.</p>
+    </div>
+    <div class="card" style="border-top:3px solid var(--green-600);">
+      <div class="icon-box green" style="margin-bottom:8px;">🏗</div>
+      <span class="card-title">End-to-end resume pipeline</span>
+      <p class="card-body">PDF parsing (WASM), live template rendering, headless Chromium PDF export, Supabase storage, signed URL delivery — the AI sits inside a complete document workflow. A user can arrive with nothing and leave with a formatted, downloaded, ATS-scored PDF without touching any other tool. That pipeline is the product, not the API call.</p>
+    </div>
+    <div class="card" style="border-top:3px solid var(--blue-600);">
+      <div class="icon-box blue" style="margin-bottom:8px;">🤝</div>
+      <span class="card-title">Human expert in the loop</span>
+      <p class="card-body">Every Pro purchase includes a 1:1 session with a human expert. The AI prepares the user — the expert validates the edge cases AI can't handle: is this career narrative credible, is the positioning right for this specific company, what will a recruiter at this firm actually think. This hybrid model is a deliberate product decision, not a gap to be filled later.</p>
+    </div>
+    <div class="card" style="border-top:3px solid var(--amber-500);">
+      <div class="icon-box amber" style="margin-bottom:8px;">⚙️</div>
+      <span class="card-title">Infrastructure that protects margin</span>
+      <p class="card-body">Free tier capped at 5 checks/month, tracked in <code style="font-size:0.85em; background:var(--gray-100); padding:1px 4px; border-radius:3px;">ats_checks</code>. Rate limiting at 20 req/min per user. Score caching on <code style="font-size:0.85em; background:var(--gray-100); padding:1px 4px; border-radius:3px;">uploaded_resumes</code> avoids redundant API calls. AI rewrite gated behind Pro verification. Without this layer, the unit economics break at scale — an AI wrapper without it would haemorrhage API costs.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SLIDE 16 — SECTION HEADER: TECH (renumbered)
 ══════════════════════════════════════ -->
 <section>
 <div class="slide blue-grad dot-grid" style="justify-content:center;">
   <div style="position:relative; z-index:1; max-width:600px;">
-    <span class="badge badge-white" style="margin-bottom:16px;">05 · Technical Architecture</span>
+    <span class="badge badge-white" style="margin-bottom:16px;">06 · Technical Architecture</span>
     <h1 class="display" style="color:#fff; font-size:2.4em; margin-bottom:16px;">Serverless. AI-native.<br>India-ready.</h1>
     <p class="lead white">Next.js + Supabase + Vercel. Two AI models. Razorpay payments. Deep Google Workspace integration. No self-managed servers — scales to zero and to peak automatically.</p>
     <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:20px;">
@@ -1673,9 +1732,52 @@ if (isMobile) {
     <div class="mc gl"><span class="mlabel">Moat 03</span><span class="mtitle">Integrated workflow</span><p class="mbody">Score → Rewrite → Build → Google Docs → Expert. Users return multiple times per job search.</p></div>
   </div>
 
+  <!-- NOT JUST AN AI WRAPPER HEADER -->
+  <div class="ms gray" style="background:var(--gray-50);">
+    <span class="badge badge-blue" style="margin-bottom:10px;">05 · Differentiation</span>
+    <h2 style="font-size:1.3rem;">This is not an AI wrapper.</h2>
+    <p style="font-size:0.78rem; color:var(--gray-500); margin-top:6px;">Calling an OpenAI API is two lines of code. What Resume Expert has built around that call is the product.</p>
+  </div>
+
+  <!-- NOT JUST AN AI WRAPPER DETAIL -->
+  <div class="ms">
+    <span class="eye">Differentiation</span>
+    <h2>Six layers built on top of the API call</h2>
+    <div class="mc" style="border-top:3px solid var(--blue-600);">
+      <span class="mlabel">Layer 01</span>
+      <span class="mtitle">🎯 India-tuned scoring rubric</span>
+      <p class="mbody">The prompt encodes what Indian recruiters at IT firms, startups, and MNC India offices actually look for — keyword conventions, summary norms, date formats that differ from Western standards. Built through iteration. Not visible to anyone calling the same API.</p>
+    </div>
+    <div class="mc" style="border-top:3px solid var(--amber-500);">
+      <span class="mlabel">Layer 02</span>
+      <span class="mtitle">👁 Dual-axis scoring model</span>
+      <p class="mbody">ATS compliance (machine readability) separated from Recruiter quality (impact, narrative). These are different problems — conflating them produces useless feedback. The model design is the insight, not the API call.</p>
+    </div>
+    <div class="mc" style="border-top:3px solid var(--violet-500);">
+      <span class="mlabel">Layer 03</span>
+      <span class="mtitle">🔁 Closed feedback loop</span>
+      <p class="mbody">Users fix an issue, regenerate their PDF, re-run the ATS check, and see the score move. Designed for iteration, not a one-shot report. Scores cached per resume — returning users see history without consuming API credits.</p>
+    </div>
+    <div class="mc" style="border-top:3px solid var(--green-600);">
+      <span class="mlabel">Layer 04</span>
+      <span class="mtitle">🏗 End-to-end resume pipeline</span>
+      <p class="mbody">PDF parsing (WASM) → live template rendering → headless Chromium PDF export → Supabase storage → signed URL delivery. The AI sits inside a complete document workflow. A user can arrive with nothing and leave with a formatted, downloaded, ATS-scored PDF.</p>
+    </div>
+    <div class="mc" style="border-top:3px solid var(--blue-600);">
+      <span class="mlabel">Layer 05</span>
+      <span class="mtitle">🤝 Human expert in the loop</span>
+      <p class="mbody">Every Pro purchase includes a 1:1 session. AI prepares the user — the expert handles what AI can't: is this career narrative credible, is the positioning right for this specific company. A deliberate product decision, not a gap to fill later.</p>
+    </div>
+    <div class="mc" style="border-top:3px solid var(--amber-500);">
+      <span class="mlabel">Layer 06</span>
+      <span class="mtitle">⚙️ Infrastructure that protects margin</span>
+      <p class="mbody">Free tier capped at 5 checks/month. Rate limiting at 20 req/min. Score caching avoids redundant API calls. Rewrite gated behind Pro. Without this, unit economics break at scale — an AI wrapper without it haemorrhages API costs.</p>
+    </div>
+  </div>
+
   <!-- TECH HEADER -->
   <div id="mob-tech" class="ms blue-bg">
-    <span class="eye white">05 · Technical Architecture</span>
+    <span class="eye white">06 · Technical Architecture</span>
     <h1 class="white">Serverless. AI-native. India-ready.</h1>
     <div class="mbadges" style="margin-top:12px;">
       <span class="badge badge-white">Next.js 15</span>
