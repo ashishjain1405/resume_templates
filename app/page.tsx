@@ -171,7 +171,7 @@ export default function HomePage() {
       <section className="py-14 px-4 bg-blue-600">
         <div className="max-w-6xl mx-auto text-center">
           <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Your next interview starts here.</h2>
-          <p className="text-blue-100 text-sm mb-6">Get your free resume score in seconds - it&apos;s free.</p>
+          <p className="text-blue-100 text-sm mb-6">Get your resume score in seconds - it&apos;s free.</p>
           <Link
             href="/ats-check"
             className="inline-block bg-white text-blue-600 px-8 py-3.5 rounded-lg font-semibold hover:bg-blue-50 transition-colors text-sm"
