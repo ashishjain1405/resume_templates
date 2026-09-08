@@ -26,7 +26,6 @@ export const metadata: Metadata = {
     siteName: 'Resume Expert',
     title: "Resume Expert — India's Best Resume Templates",
     description: 'ATS-friendly resume templates for Indian job seekers. Download in PDF. Trusted by 1,000+ professionals.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Resume Expert — Resume Templates' }],
   },
   twitter: {
     card: 'summary_large_image',
