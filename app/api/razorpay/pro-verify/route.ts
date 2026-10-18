@@ -3,7 +3,7 @@ import { createHmac, timingSafeEqual } from 'crypto'
 import { createClient, createAdminClient } from '@/lib/supabase-server'
 import { PRO_PRICE_INR } from '@/lib/pro'
 import { getRazorpay } from '@/lib/razorpay'
-import { resend, FROM, REPLY_TO } from '@/lib/resend'
+import { getResend, FROM, REPLY_TO } from '@/lib/resend'
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     <p style="font-size:13px;color:#9ca3af;margin:0;line-height:1.6;">- Ashish<br>Founder, Resume Expert</p>
   </div>
 </div>`
-    resend.emails.send({
+    getResend().emails.send({
       from: FROM,
       to: user.email,
       replyTo: REPLY_TO,

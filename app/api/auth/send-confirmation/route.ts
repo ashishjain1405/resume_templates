@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import { createAdminClient } from '@/lib/supabase-server'
-import { resend, FROM } from '@/lib/resend'
+import { getResend, FROM } from '@/lib/resend'
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
   </div>
 </div>`
 
-    const { error: emailError } = await resend.emails.send({
+    const { error: emailError } = await getResend().emails.send({
       from: FROM,
       to: email,
       subject: 'Confirm your Resume Expert account',

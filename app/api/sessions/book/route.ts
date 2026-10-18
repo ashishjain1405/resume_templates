@@ -3,7 +3,7 @@ import { createClient, createAdminClient } from '@/lib/supabase-server'
 import { isPro } from '@/lib/pro'
 import { getAvailableSlots, createBookingEvent, deleteBookingEvent } from '@/lib/google-calendar'
 import { checkRateLimit } from '@/lib/rate-limit'
-import { resend, FROM } from '@/lib/resend'
+import { getResend, FROM } from '@/lib/resend'
 
 export async function POST(request: NextRequest) {
   try {
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
       const safeName = esc(userName || 'Not provided')
       const safeEmail = esc(user.email ?? '')
-      const { data: emailData, error: emailError } = await resend.emails.send({
+      const { data: emailData, error: emailError } = await getResend().emails.send({
         from: FROM,
         to: process.env.EXPERT_EMAIL!,
         subject: `New session booked — ${userName || user.email}`,
