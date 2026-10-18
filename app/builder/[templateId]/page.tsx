@@ -46,19 +46,15 @@ function CheckATSButton({ user, data, accentColor, templateId }: {
         accent_color: accentColor,
         updated_at: new Date().toISOString(),
       }, { onConflict: 'user_id,template_id' })
-      const pdfRes = await fetch('/api/builder/pdf?pdf=1', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ templateId, data, accentColor }),
-      })
-      if (!pdfRes.ok) return
-      const blob = await pdfRes.blob()
       const name = `${data.personal.name?.replace(/\s+/g, '_') || 'resume'}_${templateId}.pdf`
-      const file = new File([blob], name, { type: 'application/pdf' })
       const form = new FormData()
-      form.append('file', file)
+      form.append('render', '1')
+      form.append('filename', name)
       form.append('template_id', templateId)
+      form.append('resume_data', JSON.stringify(data))
+      form.append('accent_color', accentColor)
       const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: form })
+      if (!uploadRes.ok) return
       const uploadData = await uploadRes.json()
       if (uploadData.resume?.id) {
         window.open(`/ats-check?resumeId=${uploadData.resume.id}`, '_blank')
@@ -449,19 +445,12 @@ function BuilderPageInner({ params }: { params: Promise<{ templateId: string }> 
     }
     setSavingVersion(true)
     try {
-      const res = await fetch('/api/builder/pdf?pdf=1', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ templateId, data, accentColor }),
-      })
-      if (!res.ok) { const err = await res.text(); alert(`Could not generate resume: ${err}`); return false }
-      const blob = await res.blob()
       const sanitized = resumeName.trim().replace(/[^a-zA-Z0-9 \-(). ]/g, '').trim() || 'My Resume'
       const fileName = `${sanitized.replace(/\s+/g, '_')}.pdf`
       previousNamesRef.current[templateId] = sanitized
-      const file = new File([blob], fileName, { type: 'application/pdf' })
       const form = new FormData()
-      form.append('file', file)
+      form.append('render', '1')
+      form.append('filename', fileName)
       form.append('template_id', templateId)
       form.append('resume_data', JSON.stringify(data))
       form.append('accent_color', accentColor)

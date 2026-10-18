@@ -257,14 +257,21 @@ function ATSCheckInner() {
     fetch(`/api/resume/${resumeId}`)
       .then(r => r.json())
       .then(async data => {
-        if (!data.url) return
-        const resp = await fetch(data.url)
-        const blob = await resp.blob()
-        const contentType = blob.type || 'application/pdf'
-        const filename = data.filename ?? (contentType.includes('pdf') ? 'resume.pdf' : 'resume.docx')
-        const f = new File([blob], filename, { type: contentType })
-        setFile(f)
-        setTab('upload')
+        // Locked builder resume (no Pro/purchase): server returns extracted text instead of a file URL
+        const locked = !data.url && data.locked && data.text?.trim()
+        if (!data.url && !locked) return
+        let f: File | null = null
+        if (!locked) {
+          const resp = await fetch(data.url)
+          const blob = await resp.blob()
+          const contentType = blob.type || 'application/pdf'
+          const filename = data.filename ?? (contentType.includes('pdf') ? 'resume.pdf' : 'resume.docx')
+          f = new File([blob], filename, { type: contentType })
+          setFile(f)
+          setTab('upload')
+        } else {
+          setTab('saved')
+        }
         setResumeId(resumeId)
         if (data.template_id) setBuilderTemplateId(data.template_id)
         setError('')
@@ -272,11 +279,16 @@ function ATSCheckInner() {
         setResult(null)
         try {
           const form = new FormData()
-          try {
-            const extracted = await extractPdfText(f)
-            if (extracted.trim()) { setResumeTextSync(extracted); form.append('resumeText', extracted) }
-            else form.append('file', f)
-          } catch { form.append('file', f) }
+          if (!f) {
+            setResumeTextSync(data.text)
+            form.append('resumeText', data.text)
+          } else {
+            try {
+              const extracted = await extractPdfText(f)
+              if (extracted.trim()) { setResumeTextSync(extracted); form.append('resumeText', extracted) }
+              else form.append('file', f)
+            } catch { form.append('file', f) }
+          }
           const res = await fetch('/api/ats-check', { method: 'POST', body: form })
           const raw = await res.text()
           let parsed: { error?: string; _usage?: { used: number; limit: number } | null } & Partial<ATSResult> = {}
@@ -315,20 +327,16 @@ function ATSCheckInner() {
       if (pending.fromBuilder && pending.data && pending.templateId) {
         setBuilderTemplateId(pending.templateId)
         setLoading(true)
-        fetch('/api/builder/pdf?pdf=1', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ templateId: pending.templateId, data: pending.data, accentColor: pending.accentColor }),
-        })
-          .then(r => r.ok ? r.blob() : null)
-          .then(async blob => {
-            if (!blob) { setError('Could not generate PDF. Please try again.'); setLoading(false); return }
-            const name = `${pending.data.personal?.name?.replace(/\s+/g, '_') || 'resume'}_${pending.templateId}.pdf`
-            const file = new File([blob], name, { type: 'application/pdf' })
-            const uploadForm = new FormData()
-            uploadForm.append('file', file)
-            uploadForm.append('template_id', pending.templateId)
-            const uploadRes = await fetch('/api/resume/upload', { method: 'POST', body: uploadForm })
+        const name = `${pending.data.personal?.name?.replace(/\s+/g, '_') || 'resume'}_${pending.templateId}.pdf`
+        const uploadForm = new FormData()
+        uploadForm.append('render', '1')
+        uploadForm.append('filename', name)
+        uploadForm.append('template_id', pending.templateId)
+        uploadForm.append('resume_data', JSON.stringify(pending.data))
+        if (pending.accentColor) uploadForm.append('accent_color', pending.accentColor)
+        fetch('/api/resume/upload', { method: 'POST', body: uploadForm })
+          .then(async uploadRes => {
+            if (!uploadRes.ok) { setError('Could not generate PDF. Please try again.'); setLoading(false); return }
             const uploadData = await uploadRes.json()
             try {
               const supabase = createClient()
@@ -346,8 +354,7 @@ function ATSCheckInner() {
             if (uploadData.resume?.id) {
               window.location.href = `/ats-check?resumeId=${uploadData.resume.id}`
             } else {
-              setFile(file)
-              setTab('upload')
+              setError('Could not generate PDF. Please try again.')
               setLoading(false)
             }
           })
@@ -379,7 +386,9 @@ function ATSCheckInner() {
         setLoading(true)
         fetch(`/api/resume/${pending.selectedResumeId}`)
           .then(r => r.json())
-          .then(async ({ url, filename }) => {
+          .then(async ({ url, filename, locked }) => {
+            // Locked builder resume: no file access, analyse from the saved tab via server-extracted text
+            if (locked) { setTab('saved'); return }
             if (!url) throw new Error('no url')
             const blob = await fetch(url).then(r => r.blob())
             setFile(new File([blob], filename ?? 'resume.pdf', { type: blob.type || 'application/pdf' }))
@@ -533,11 +542,10 @@ function ATSCheckInner() {
         // Fetch signed URL, download file, parse in browser
         const urlRes = await fetch(`/api/resume/${selectedResumeId}`)
         const urlData = await urlRes.json()
-        if (!urlData.url) { setError('Could not load saved resume.'); return }
-        const resp = await fetch(urlData.url)
-        const blob = await resp.blob()
+        if (!urlData.url && !urlData.locked) { setError('Could not load saved resume.'); return }
         try {
-          const text = await extractPdfText(blob)
+          // Locked builder resumes come back as server-extracted text instead of a file URL
+          const text = urlData.url ? await extractPdfText(await fetch(urlData.url).then(r => r.blob())) : (urlData.text ?? '')
           if (!text.trim()) { setError('Could not read text from this PDF. Please try pasting the text instead.'); return }
           setResumeTextSync(text)
           form.append('resumeText', text)

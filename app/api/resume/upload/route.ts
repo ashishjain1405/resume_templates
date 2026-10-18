@@ -2,6 +2,11 @@ import { NextRequest } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase-server'
 import { fileTypeFromBuffer } from 'file-type'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { buildResumeHtml } from '@/lib/build-resume-html'
+import { validateResumeData } from '@/lib/resume-data'
+import { renderPdf } from '@/lib/pdf'
+
+export const maxDuration = 60
 
 const MAX_SIZE = 5 * 1024 * 1024 // 5 MB
 const ALLOWED_TYPES = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
@@ -18,16 +23,38 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: 'Too many requests. Please wait a few minutes.' }, { status: 429 })
     }
 
-    if (!file || file.size === 0) return Response.json({ error: 'No file provided' }, { status: 400 })
-    if (file.size > MAX_SIZE) return Response.json({ error: 'File must be under 5 MB' }, { status: 400 })
+    const templateIdRaw = form.get('template_id') as string | null
+    const resumeDataRaw = form.get('resume_data') as string | null
+    const accentColorRaw = form.get('accent_color') as string | null
+    let resumeDataValue: object | undefined
+    if (resumeDataRaw) {
+      try { resumeDataValue = JSON.parse(resumeDataRaw) } catch { /* ignore invalid JSON */ }
+    }
+
+    // render=1: build the PDF server-side from resume_data so the bytes never reach the client
+    // (lets free users save/check builder resumes without being able to download them)
+    const render = form.get('render') === '1'
+    let buffer: Buffer
+    let filename: string
+    let mimeType: string
+    if (render) {
+      if (!templateIdRaw || !resumeDataValue) return Response.json({ error: 'Missing template_id or resume_data' }, { status: 400 })
+      const html = buildResumeHtml(validateResumeData(resumeDataValue), accentColorRaw ?? '#2563eb', templateIdRaw)
+      buffer = await renderPdf(html)
+      filename = ((form.get('filename') as string | null) || `resume_${templateIdRaw}.pdf`).slice(0, 200)
+      mimeType = 'application/pdf'
+    } else {
+      if (!file || file.size === 0) return Response.json({ error: 'No file provided' }, { status: 400 })
+      if (file.size > MAX_SIZE) return Response.json({ error: 'File must be under 5 MB' }, { status: 400 })
+      buffer = Buffer.from(await file.arrayBuffer())
+      filename = file.name
+      const detected = await fileTypeFromBuffer(buffer)
+      mimeType = detected?.mime ?? ''
+      if (!ALLOWED_TYPES.includes(mimeType)) return Response.json({ error: 'Only PDF and DOCX files are allowed' }, { status: 400 })
+    }
 
     const adminClient = await createAdminClient()
-    const buffer = Buffer.from(await file.arrayBuffer())
-    const detected = await fileTypeFromBuffer(buffer)
-    const mimeType = detected?.mime ?? ''
-    if (!ALLOWED_TYPES.includes(mimeType)) return Response.json({ error: 'Only PDF and DOCX files are allowed' }, { status: 400 })
-
-    const storagePath = `${user.id}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
+    const storagePath = `${user.id}/${Date.now()}_${filename.replace(/[^a-zA-Z0-9._-]/g, '_')}`
 
     const { error: uploadError } = await adminClient.storage
       .from('user-resumes')
@@ -38,7 +65,6 @@ export async function POST(request: NextRequest) {
       return Response.json({ error: uploadError.message }, { status: 500 })
     }
 
-    const templateIdRaw = form.get('template_id') as string | null
     const atsScoreRaw = form.get('ats_score')
     let atsScoreValue: number | undefined
     if (atsScoreRaw !== null) {
@@ -46,13 +72,6 @@ export async function POST(request: NextRequest) {
       if (!Number.isInteger(score) || score < 0 || score > 100) return Response.json({ error: 'Invalid ats_score' }, { status: 400 })
       atsScoreValue = score
     }
-    const resumeDataRaw = form.get('resume_data') as string | null
-    const accentColorRaw = form.get('accent_color') as string | null
-    let resumeDataValue: object | undefined
-    if (resumeDataRaw) {
-      try { resumeDataValue = JSON.parse(resumeDataRaw) } catch { /* ignore invalid JSON */ }
-    }
-
     // Same-name dedup: if template_id is present, find any existing row with same (user, template, filename)
     let existingRow: { id: string; storage_path: string } | null = null
     if (templateIdRaw) {
@@ -61,7 +80,7 @@ export async function POST(request: NextRequest) {
         .select('id, storage_path')
         .eq('user_id', user.id)
         .eq('template_id', templateIdRaw)
-        .eq('filename', file.name)
+        .eq('filename', filename)
         .maybeSingle()
       existingRow = existing ?? null
     }
@@ -70,10 +89,10 @@ export async function POST(request: NextRequest) {
       .from('uploaded_resumes')
       .insert({
         user_id: user.id,
-        filename: file.name,
+        filename,
         storage_path: storagePath,
         mime_type: mimeType,
-        size_bytes: file.size,
+        size_bytes: buffer.length,
         ...(atsScoreValue !== undefined ? { ats_score: atsScoreValue } : {}),
         ...(templateIdRaw ? { template_id: templateIdRaw } : {}),
         ...(resumeDataValue ? { resume_data: resumeDataValue } : {}),

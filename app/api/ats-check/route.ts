@@ -2,23 +2,10 @@ import { NextRequest } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase-server'
 import { isPro } from '@/lib/pro'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { parsePdf } from '@/lib/pdf'
 import OpenAI from 'openai'
 
 export const maxDuration = 60
-
-// Cache unpdf module at module level so WASM is only initialized once per container
-let _unpdf: typeof import('unpdf') | null = null
-async function getUnpdf() {
-  if (!_unpdf) _unpdf = await import('unpdf')
-  return _unpdf
-}
-
-async function parsePdf(buf: Buffer): Promise<string> {
-  const { extractText, getDocumentProxy } = await getUnpdf()
-  const pdf = await getDocumentProxy(new Uint8Array(buf))
-  const { text } = await extractText(pdf, { mergePages: true })
-  return text
-}
 
 let _openai: OpenAI | null = null
 function getOpenAI() {

@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase-server'
+import { createClient, createAdminClient } from '@/lib/supabase-server'
 import type { ResumeData } from '@/lib/resume-data'
 import { buildResumeHtml } from '@/lib/build-resume-html'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { validateResumeData } from '@/lib/resume-data'
+import { canUseTemplate } from '@/lib/pro'
+import { renderPdf } from '@/lib/pdf'
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
@@ -23,6 +25,11 @@ export async function POST(req: NextRequest) {
     accentColor: string
   }
 
+  const adminClient = await createAdminClient()
+  if (!(await canUseTemplate(user.id, templateId, adminClient))) {
+    return NextResponse.json({ error: 'Pro access or template purchase required' }, { status: 403 })
+  }
+
   const html = buildResumeHtml(validateResumeData(data), accentColor, templateId)
 
   if (!asPdf) {
@@ -36,37 +43,13 @@ export async function POST(req: NextRequest) {
 
   // Generate real PDF via headless Chromium
   try {
-    const chromium = require('@sparticuz/chromium-min')
-    const puppeteer = require('puppeteer-core')
-
-    const executablePath = await chromium.executablePath(
-      'https://github.com/Sparticuz/chromium/releases/download/v147.0.2/chromium-v147.0.2-pack.x64.tar'
-    )
-
-    const browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath,
-      headless: chromium.headless,
+    const pdfBuffer = await renderPdf(html)
+    return new NextResponse(new Uint8Array(pdfBuffer), {
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="resume-${templateId}.pdf"`,
+      },
     })
-
-    try {
-      const page = await browser.newPage()
-      await page.setContent(html, { waitUntil: 'networkidle0' })
-      const pdfBuffer = await page.pdf({
-        format: 'A4',
-        printBackground: true,
-        margin: { top: '0', right: '0', bottom: '0', left: '0' },
-      })
-      return new NextResponse(pdfBuffer, {
-        headers: {
-          'Content-Type': 'application/pdf',
-          'Content-Disposition': `attachment; filename="resume-${templateId}.pdf"`,
-        },
-      })
-    } finally {
-      await browser.close()
-    }
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e)
     console.error('PDF generation error:', msg)

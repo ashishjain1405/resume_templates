@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase-server'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { isPro } from '@/lib/pro'
 import { validateResumeData, type ResumeData } from '@/lib/resume-data'
 import OpenAI from 'openai'
 
@@ -301,6 +302,10 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
+    const adminClient = await createAdminClient()
+    const pro = await isPro(user.id, adminClient)
+    if (!pro) return Response.json({ error: 'Pro access required' }, { status: 403 })
+
     if (!(await checkRateLimit(user.id, 'resume-rewrite', 10))) {
       return Response.json({ error: 'rate_limited' }, { status: 429 })
     }
@@ -318,7 +323,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Step A: Fetch original ResumeData from Supabase (may not exist for uploaded resumes)
-    const adminClient = await createAdminClient()
     const { data: row } = await adminClient
       .from('resumes')
       .select('data, accent_color')

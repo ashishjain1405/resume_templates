@@ -1,5 +1,7 @@
 import { NextRequest } from 'next/server'
 import { createClient, createAdminClient } from '@/lib/supabase-server'
+import { canUseTemplate } from '@/lib/pro'
+import { parsePdf } from '@/lib/pdf'
 
 // GET /api/resume/[id] — returns a short-lived signed URL for the file
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -18,6 +20,17 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   if (error || !row) return Response.json({ error: 'Not found' }, { status: 404 })
 
   const adminClient = await createAdminClient()
+
+  // Builder-template resumes are only downloadable with Pro or a template purchase.
+  // Otherwise return extracted text only, so free ATS checks on them still work.
+  if (row.template_id && !(await canUseTemplate(user.id, row.template_id, adminClient))) {
+    const { data: blob, error: dlError } = await adminClient.storage.from('user-resumes').download(row.storage_path)
+    if (dlError || !blob) return Response.json({ error: 'Could not load resume' }, { status: 500 })
+    let text = ''
+    try { text = await parsePdf(Buffer.from(await blob.arrayBuffer())) } catch { /* non-PDF or unreadable */ }
+    return Response.json({ url: null, locked: true, text, filename: row.filename, template_id: row.template_id })
+  }
+
   const { data: signed, error: signError } = await adminClient.storage
     .from('user-resumes')
     .createSignedUrl(row.storage_path, 120)
